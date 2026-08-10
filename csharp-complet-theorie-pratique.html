@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C# de A à Z — Théorie &amp; Pratique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0e1420;
+  --ink-2:#141c2c;
+  --panel:#182238;
+  --panel-2:#1d2a44;
+  --line: rgba(212,167,61,0.14);
+  --line-soft: rgba(247,243,234,0.08);
+  --parchment:#f3ecd9;
+  --parchment-dim:#c9c2ac;
+  --gold:#d4a73d;
+  --gold-bright:#f0c766;
+  --teal:#3fa796;
+  --teal-bright:#5fc9b8;
+  --red-flag:#d97757;
+  --text-hi:#f7f3ea;
+  --text-mid:#c7c2b3;
+  --text-dim:#8a8f9e;
+  --code-bg:#0b101c;
+  --radius:10px;
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Inter', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background: var(--ink);
+  color: var(--text-hi);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  min-height:100vh;
+}
+body.light{
+  --ink:#faf7ef;
+  --ink-2:#f3ede0;
+  --panel:#ffffff;
+  --panel-2:#f5f0e4;
+  --line: rgba(148,110,20,0.18);
+  --line-soft: rgba(20,20,20,0.08);
+  --text-hi:#211c12;
+  --text-mid:#4a4433;
+  --text-dim:#7a7461;
+  --code-bg:#1c2333;
+}
+::selection{ background: var(--gold); color:#1a1305; }
+a{color:inherit;}
+button{font-family:inherit;}
+
+/* ---------- Scrollbars ---------- */
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background: var(--line); border-radius:8px;}
+::-webkit-scrollbar-thumb:hover{background: var(--gold);}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; gap:16px;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, var(--ink) 70%, transparent);
+  border-bottom:1px solid var(--line-soft);
+  backdrop-filter: blur(6px);
+}
+.brand{
+  display:flex; align-items:baseline; gap:10px; cursor:pointer;
+  flex-shrink:0;
+}
+.brand .mark{
+  font-family: var(--serif); font-weight:700; font-size:22px;
+  color: var(--gold-bright); letter-spacing:0.5px;
+}
+.brand .sub{
+  font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+  color: var(--text-dim); font-weight:600;
+}
+.topbar-search{
+  flex:1; max-width:520px; position:relative;
+}
+.topbar-search input{
+  width:100%; padding:9px 14px 9px 36px;
+  background: var(--panel); border:1px solid var(--line-soft);
+  border-radius:8px; color:var(--text-hi); font-size:14px; font-family:var(--sans);
+  outline:none; transition: border-color .15s;
+}
+.topbar-search input:focus{ border-color: var(--gold); }
+.topbar-search::before{
+  content:"⌕"; position:absolute; left:12px; top:50%; transform:translateY(-50%);
+  color:var(--text-dim); font-size:16px; pointer-events:none;
+}
+.topbar-actions{ display:flex; align-items:center; gap:8px; margin-left:auto; }
+.icon-btn{
+  background:transparent; border:1px solid var(--line-soft); color:var(--text-mid);
+  width:36px;height:36px;border-radius:8px; cursor:pointer; font-size:15px;
+  display:flex;align-items:center;justify-content:center; transition:.15s;
+}
+.icon-btn:hover{ border-color: var(--gold); color: var(--gold-bright); }
+.progress-pill{
+  font-family:var(--mono); font-size:12px; color:var(--text-dim);
+  border:1px solid var(--line-soft); padding:7px 12px; border-radius:20px;
+  white-space:nowrap;
+}
+.progress-pill b{ color: var(--gold-bright); font-weight:600;}
+
+/* ---------- Layout ---------- */
+.layout{
+  display:grid;
+  grid-template-columns: 300px 1fr;
+  min-height: calc(100vh - 60px);
+}
+.sidebar{
+  border-right:1px solid var(--line-soft);
+  padding: 20px 14px 60px;
+  overflow-y:auto;
+  height: calc(100vh - 60px);
+  position: sticky; top: 60px;
+}
+.side-group{ margin-bottom: 22px; }
+.side-group-title{
+  font-size:11px; text-transform:uppercase; letter-spacing:1.4px;
+  color: var(--gold); font-weight:700; padding: 0 10px 8px;
+  display:flex; align-items:center; gap:8px;
+}
+.side-group-title .n{
+  font-family:var(--mono); color:var(--text-dim); font-weight:500;
+}
+.side-item{
+  display:flex; align-items:center; gap:10px;
+  padding: 8px 10px; border-radius:7px; cursor:pointer;
+  font-size:13.5px; color: var(--text-mid); line-height:1.35;
+  transition:.12s; border:1px solid transparent;
+}
+.side-item:hover{ background: var(--panel); color:var(--text-hi); }
+.side-item.active{
+  background: var(--panel-2); color: var(--gold-bright);
+  border-color: var(--line); font-weight:600;
+}
+.side-item .dot{
+  width:7px;height:7px;border-radius:50%; flex-shrink:0;
+  background: var(--line-soft); transition:.15s;
+}
+.side-item.done .dot{ background: var(--teal-bright); box-shadow:0 0 6px var(--teal-bright); }
+.side-item.active .dot{ background: var(--gold-bright); }
+.side-nav-top{
+  display:flex; flex-direction:column; gap:2px; margin-bottom:24px;
+  padding-bottom:18px; border-bottom:1px solid var(--line-soft);
+}
+.side-nav-top .side-item{ font-weight:600; }
+.side-nav-top .side-item.active{ background: linear-gradient(90deg, rgba(212,167,61,.16), transparent); }
+
+.main{
+  padding: 36px 48px 100px;
+  max-width: 980px;
+  min-width:0;
+}
+@media (max-width: 900px){
+  .layout{ grid-template-columns: 1fr; }
+  .sidebar{ position:fixed; left:-320px; top:60px; width:290px; z-index:50;
+    background:var(--ink); transition:left .2s; box-shadow:20px 0 40px rgba(0,0,0,.4);}
+  .sidebar.open{ left:0; }
+  .main{ padding:24px 18px 80px; }
+  .topbar-search{ display:none; }
+}
+
+/* ---------- Home / Hero ---------- */
+.hero{
+  padding: 20px 0 40px;
+  border-bottom:1px solid var(--line-soft); margin-bottom:36px;
+}
+.hero-eyebrow{
+  font-family:var(--mono); font-size:12px; color:var(--gold);
+  text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.hero-eyebrow::before{ content:""; width:24px; height:1px; background:var(--gold);}
+.hero h1{
+  font-family: var(--serif); font-size: 44px; font-weight:600; line-height:1.12;
+  margin: 0 0 18px; color: var(--text-hi); max-width: 780px;
+}
+.hero h1 em{ font-style:italic; color: var(--gold-bright); font-weight:500;}
+.hero p.lead{
+  font-size:16.5px; line-height:1.65; color: var(--text-mid); max-width:640px; margin:0 0 26px;
+}
+.hero-stats{ display:flex; gap:0; flex-wrap:wrap; margin-top: 28px; border-top:1px solid var(--line-soft);}
+.hstat{ padding:16px 28px 4px 0; margin-right:28px; border-right:1px solid var(--line-soft); }
+.hstat:last-child{ border-right:none; }
+.hstat .num{ font-family:var(--serif); font-size:30px; color:var(--gold-bright); font-weight:600; }
+.hstat .lbl{ font-size:11.5px; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin-top:2px;}
+
+.track-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top: 10px;}
+@media (max-width:700px){ .track-grid{grid-template-columns:1fr;} }
+.track-card{
+  background: var(--panel); border:1px solid var(--line-soft); border-radius: var(--radius);
+  padding:18px 20px; cursor:pointer; transition:.15s;
+}
+.track-card:hover{ border-color: var(--gold); transform: translateY(-1px); }
+.track-card .tc-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;}
+.track-card h3{ font-family:var(--serif); font-size:17px; margin:0; color:var(--text-hi); font-weight:600;}
+.track-card .tc-count{ font-family:var(--mono); font-size:11px; color:var(--gold); border:1px solid var(--line); border-radius:12px; padding:2px 9px; white-space:nowrap;}
+.track-card p{ font-size:13px; color:var(--text-dim); margin:0; line-height:1.5;}
+
+.section-label{
+  font-family:var(--mono); font-size:12px; color:var(--gold);
+  text-transform:uppercase; letter-spacing:1.5px; margin: 40px 0 16px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-label::after{ content:""; flex:1; height:1px; background:var(--line-soft);}
+
+/* ---------- Lesson page ---------- */
+.crumb{ font-size:12.5px; color:var(--text-dim); margin-bottom:14px; font-family:var(--mono);}
+.crumb a{ color:var(--teal-bright); cursor:pointer; text-decoration:none;}
+.crumb a:hover{ text-decoration:underline; }
+.lesson-head{ margin-bottom:28px; }
+.lesson-tag{ font-family:var(--mono); font-size:11.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:10px;}
+.lesson-tag b{ color:var(--gold);}
+.lesson-head h1{ font-family:var(--serif); font-size:34px; font-weight:600; margin:6px 0 10px; line-height:1.2; color:var(--text-hi);}
+.lesson-meta{ display:flex; gap:14px; align-items:center; }
+.lesson-meta .time{ font-size:12.5px; color:var(--text-dim);}
+.mark-done-btn{
+  margin-left:auto; background: var(--panel); border:1px solid var(--line); color:var(--text-mid);
+  padding:8px 16px; border-radius:20px; font-size:12.5px; cursor:pointer; font-weight:600; transition:.15s;
+  display:flex; align-items:center; gap:7px;
+}
+.mark-done-btn:hover{ border-color:var(--teal-bright); color:var(--teal-bright);}
+.mark-done-btn.is-done{ background: rgba(63,167,150,.14); border-color:var(--teal-bright); color:var(--teal-bright);}
+
+.theory{ font-size:15.5px; line-height:1.8; color: var(--text-mid); }
+.theory p{ margin: 0 0 16px; }
+.theory strong{ color: var(--text-hi); font-weight:600; }
+.theory em{ color: var(--gold-bright); font-style:normal; }
+.theory ul{ margin:0 0 16px; padding-left:22px; }
+.theory li{ margin-bottom:8px; }
+.theory table{ width:100%; border-collapse:collapse; margin:18px 0; font-size:13.5px;}
+.theory th,.theory td{ border:1px solid var(--line-soft); padding:8px 12px; text-align:left;}
+.theory th{ background:var(--panel); color:var(--gold-bright); font-weight:600;}
+.theory code{ font-family:var(--mono); background:var(--panel-2); padding:2px 6px; border-radius:4px; font-size:0.88em; color:var(--gold-bright); }
+
+.code-block{
+  background: var(--code-bg); border:1px solid var(--line-soft); border-radius: var(--radius);
+  margin: 22px 0 26px; overflow:hidden;
+}
+.code-block .cb-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px; border-bottom:1px solid rgba(255,255,255,.06);
+  font-family:var(--mono); font-size:12px; color: var(--text-dim);
+}
+.code-block .cb-head .cb-title{ color:var(--parchment-dim); }
+.code-block .cb-lang{ color:var(--teal-bright); text-transform:uppercase; letter-spacing:1px; font-size:10.5px; margin-right:10px;}
+.copy-btn{
+  background:transparent; border:1px solid rgba(255,255,255,.12); color:var(--text-dim);
+  font-size:11px; padding:4px 10px; border-radius:6px; cursor:pointer; font-family:var(--mono);
+}
+.copy-btn:hover{ color:var(--gold-bright); border-color:var(--gold);}
+.code-block pre{
+  margin:0; padding:18px 20px; overflow-x:auto; font-family:var(--mono); font-size:13px;
+  line-height:1.65; color:#dce4f5;
+}
+.tok-kw{color:#c894e8;} .tok-str{color:#9ecf8f;} .tok-com{color:#6b7385; font-style:italic;}
+.tok-type{color:#5fc9b8;} .tok-num{color:#e8b25f;} .tok-fn{color:#7fb4e8;}
+
+.keypoints{
+  background: var(--panel); border:1px solid var(--line-soft); border-left:3px solid var(--gold);
+  border-radius: 0 var(--radius) var(--radius) 0; padding:18px 22px; margin:26px 0;
+}
+.keypoints .kp-label{ font-family:var(--mono); font-size:11px; color:var(--gold); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:10px; font-weight:700;}
+.keypoints ul{ margin:0; padding-left:18px; }
+.keypoints li{ font-size:13.5px; color:var(--text-mid); margin-bottom:7px; line-height:1.5;}
+
+.exercise-box{
+  background: linear-gradient(135deg, rgba(212,167,61,.07), rgba(63,167,150,.05));
+  border:1px solid var(--line); border-radius: var(--radius); padding:20px 24px; margin:28px 0 10px;
+}
+.exercise-box .ex-label{ font-family:var(--serif); font-size:15px; color:var(--gold-bright); font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:8px;}
+.exercise-box p{ font-size:14px; color:var(--text-mid); line-height:1.6; margin:0;}
+
+.lesson-nav{ display:flex; justify-content:space-between; gap:16px; margin-top:44px; padding-top:24px; border-top:1px solid var(--line-soft);}
+.lesson-nav-btn{
+  flex:1; background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius);
+  padding:14px 18px; cursor:pointer; transition:.15s; max-width:46%;
+}
+.lesson-nav-btn:hover{ border-color:var(--gold); }
+.lesson-nav-btn .dir{ font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin-bottom:4px;}
+.lesson-nav-btn .ttl{ font-size:13.5px; color:var(--text-hi); font-weight:600; }
+.lesson-nav-btn.next{ text-align:right; margin-left:auto; }
+
+/* ---------- Reference browser ---------- */
+.ref-toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+.ref-search{
+  flex:1; min-width:220px; padding:10px 14px; background:var(--panel); border:1px solid var(--line-soft);
+  border-radius:8px; color:var(--text-hi); font-size:14px; outline:none;
+}
+.ref-search:focus{ border-color:var(--gold); }
+.chip{
+  padding:8px 14px; border-radius:20px; border:1px solid var(--line-soft); background:var(--panel);
+  font-size:12.5px; color:var(--text-mid); cursor:pointer; white-space:nowrap; transition:.12s; font-weight:500;
+}
+.chip:hover{ border-color:var(--gold); }
+.chip.active{ background: var(--gold); color:#1a1305; border-color:var(--gold); font-weight:700;}
+.ref-count{ font-size:12.5px; color:var(--text-dim); margin: 4px 0 16px; font-family:var(--mono);}
+.ref-list{ display:flex; flex-direction:column; gap:8px; }
+.ref-item{
+  background:var(--panel); border:1px solid var(--line-soft); border-radius:8px; padding:14px 18px; cursor:pointer; transition:.12s;
+}
+.ref-item:hover{ border-color:var(--gold); }
+.ref-item .ri-top{ display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;}
+.ref-item .ri-name{ font-family:var(--mono); font-size:14.5px; color:var(--teal-bright); font-weight:600;}
+.ref-item .ri-badge{ font-size:10px; text-transform:uppercase; letter-spacing:0.6px; padding:2px 8px; border-radius:10px; font-weight:700;}
+.ri-badge.CPTA{ background:rgba(212,167,61,.15); color:var(--gold-bright); }
+.ri-badge.CIAL{ background:rgba(63,167,150,.15); color:var(--teal-bright); }
+.ri-badge.COMMUN{ background:rgba(199,194,179,.12); color:var(--text-mid); }
+.ri-badge.ENUM{ background:rgba(217,119,87,.15); color:var(--red-flag); }
+.ri-badge.new{ background:rgba(240,199,102,.2); color:var(--gold-bright); }
+.ref-item .ri-desc{ font-size:12.5px; color:var(--text-dim); line-height:1.4; }
+.ref-item .ri-cat{ font-size:11px; color:var(--text-dim); font-family:var(--mono); margin-top:4px;}
+
+.ref-detail-back{ font-family:var(--mono); font-size:12.5px; color:var(--teal-bright); cursor:pointer; margin-bottom:18px; display:inline-block;}
+.ref-detail-head{ margin-bottom:18px; }
+.ref-detail-head h1{ font-family:var(--mono); font-size:26px; color:var(--text-hi); margin:8px 0; word-break:break-word;}
+.ref-detail-body{
+  background:var(--code-bg); border:1px solid var(--line-soft); border-radius:var(--radius);
+  padding:20px 24px; font-family:var(--mono); font-size:13px; line-height:1.7; color:#dce4f5;
+  white-space:pre-wrap; overflow-x:auto;
+}
+
+.pager{ display:flex; justify-content:center; gap:8px; margin: 26px 0 10px; flex-wrap:wrap; }
+.pager button{
+  background:var(--panel); border:1px solid var(--line-soft); color:var(--text-mid);
+  padding:7px 13px; border-radius:6px; cursor:pointer; font-size:12.5px; font-family:var(--mono);
+}
+.pager button:hover{ border-color:var(--gold); }
+.pager button.active{ background:var(--gold); color:#1a1305; font-weight:700; border-color:var(--gold);}
+.pager button:disabled{ opacity:.35; cursor:default; }
+
+/* ---------- Glossary ---------- */
+.gloss-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:14px;}
+@media (max-width:700px){ .gloss-grid{grid-template-columns:1fr;} }
+.gloss-item{ background:var(--panel); border:1px solid var(--line-soft); border-radius:8px; padding:14px 18px;}
+.gloss-item .g-term{ font-family:var(--mono); font-size:13.5px; color:var(--gold-bright); font-weight:700; margin-bottom:6px;}
+.gloss-item .g-def{ font-size:13px; color:var(--text-mid); line-height:1.5;}
+
+/* ---------- Timeline ---------- */
+.timeline{ position:relative; padding-left: 28px; }
+.timeline::before{ content:""; position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:var(--line);}
+.tl-item{ position:relative; margin-bottom:30px; }
+.tl-item::before{ content:""; position:absolute; left:-28px; top:5px; width:12px; height:12px; border-radius:50%; background:var(--ink); border:2px solid var(--gold);}
+.tl-item h3{ font-family:var(--serif); font-size:19px; color:var(--gold-bright); margin:0 0 10px; }
+.tl-item ul{ margin:0; padding-left:18px;}
+.tl-item li{ font-size:13.5px; color:var(--text-mid); margin-bottom:6px; line-height:1.55;}
+
+/* ---------- Search overlay ---------- */
+.search-overlay{
+  position:fixed; inset:0; background:rgba(5,8,14,.7); backdrop-filter: blur(3px);
+  z-index:100; display:none; align-items:flex-start; justify-content:center; padding-top:12vh;
+}
+.search-overlay.open{ display:flex; }
+.search-modal{
+  background:var(--panel); border:1px solid var(--line); border-radius:12px; width:min(600px,90vw);
+  max-height:60vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.search-modal input{
+  padding:16px 20px; font-size:16px; background:transparent; border:none; border-bottom:1px solid var(--line-soft);
+  color:var(--text-hi); outline:none; font-family:var(--sans);
+}
+.search-results{ overflow-y:auto; padding:8px; }
+.search-result{ padding:12px 14px; border-radius:8px; cursor:pointer; }
+.search-result:hover, .search-result.sel{ background:var(--panel-2); }
+.search-result .sr-title{ font-size:13.5px; color:var(--text-hi); font-weight:600;}
+.search-result .sr-sub{ font-size:11.5px; color:var(--text-dim); font-family:var(--mono); margin-top:2px;}
+
+.menu-toggle{ display:none; }
+@media (max-width:900px){
+  .menu-toggle{ display:flex; }
+}
+
+.footer-note{ margin-top:60px; padding-top:20px; border-top:1px solid var(--line-soft); font-size:12px; color:var(--text-dim); line-height:1.6;}
+</style>
+
+<style>
+/* ---------- Practice-specific additions ---------- */
+.diff-badge{ font-size:10px; text-transform:uppercase; letter-spacing:0.6px; padding:2px 9px; border-radius:10px; font-weight:700; white-space:nowrap;}
+.diff-badge.Débutant{ background:rgba(63,167,150,.15); color:var(--teal-bright); }
+.diff-badge.Intermédiaire{ background:rgba(212,167,61,.15); color:var(--gold-bright); }
+.diff-badge.Avancé{ background:rgba(217,119,87,.15); color:var(--red-flag); }
+
+.theme-chip{ font-size:10.5px; padding:3px 10px; border-radius:10px; background:var(--panel-2); color:var(--text-dim); border:1px solid var(--line-soft);}
+
+.ex-card{ background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius); padding:16px 20px; margin-bottom:12px; cursor:pointer; transition:.12s;}
+.ex-card:hover{ border-color:var(--gold); }
+.ex-card .ex-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;}
+.ex-card h3{ font-family:var(--serif); font-size:16.5px; margin:0; color:var(--text-hi); font-weight:600; flex:1;}
+.ex-card .ex-themes{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;}
+.ex-card p.stmt{ font-size:13px; color:var(--text-mid); line-height:1.55; margin:0;}
+
+.detail-section{ margin: 26px 0; }
+.detail-section .ds-label{ font-family:var(--mono); font-size:11px; color:var(--gold); text-transform:uppercase; letter-spacing:1.2px; font-weight:700; margin-bottom:12px;}
+.hint-item{ background:var(--panel); border:1px solid var(--line-soft); border-radius:8px; padding:12px 16px; margin-bottom:8px; font-size:13.5px; color:var(--text-mid); line-height:1.5;}
+.reveal-btn{ background: var(--panel-2); border:1px solid var(--line); color:var(--gold-bright); padding:10px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; margin-top:6px;}
+.reveal-btn:hover{ border-color:var(--gold); }
+.solution-block{ display:none; margin-top:14px; }
+.solution-block.shown{ display:block; }
+
+.proj-card{ background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius); padding:22px 26px; margin-bottom:18px; cursor:pointer; transition:.12s;}
+.proj-card:hover{ border-color:var(--gold); }
+.proj-card .pc-top{ display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
+.proj-card h3{ font-family:var(--serif); font-size:20px; margin:0; color:var(--text-hi); font-weight:600;}
+.proj-card .pc-duration{ font-family:var(--mono); font-size:11.5px; color:var(--text-dim); margin-left:auto;}
+.proj-card p.pdesc{ font-size:13.5px; color:var(--text-mid); line-height:1.6; margin:0 0 12px;}
+.proj-card .pc-themes{ display:flex; gap:6px; flex-wrap:wrap;}
+.req-list{ margin:0; padding-left:20px; }
+.req-list li{ font-size:13.5px; color:var(--text-mid); margin-bottom:9px; line-height:1.55;}
+
+.filter-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
+
+.split-hero-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:24px;}
+@media (max-width:800px){ .split-hero-grid{ grid-template-columns:1fr; } }
+.split-card{ border-radius:var(--radius); padding:24px 26px; cursor:pointer; transition:.15s; border:1px solid var(--line);}
+.split-card:hover{ transform:translateY(-2px); }
+.split-card.theory{ background:linear-gradient(135deg, rgba(212,167,61,.12), rgba(212,167,61,.03)); }
+.split-card.practice{ background:linear-gradient(135deg, rgba(63,167,150,.12), rgba(63,167,150,.03)); }
+.split-card .sc-eyebrow{ font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:10px; font-weight:700;}
+.split-card.theory .sc-eyebrow{ color:var(--gold); }
+.split-card.practice .sc-eyebrow{ color:var(--teal-bright); }
+.split-card h2{ font-family:var(--serif); font-size:24px; margin:0 0 10px; color:var(--text-hi); font-weight:600;}
+.split-card p{ font-size:13.5px; color:var(--text-mid); line-height:1.6; margin:0 0 14px;}
+.split-card .sc-stat{ font-family:var(--mono); font-size:12px; color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <button class="icon-btn menu-toggle" id="menuToggle">☰</button>
+  <div class="brand" onclick="go({view:'home'})">
+    <span class="mark">C# de A à Z</span>
+    <span class="sub">Théorie · Pratique</span>
+  </div>
+  <div class="topbar-search" id="searchTrigger">
+    <input placeholder="Rechercher une leçon, un exercice… (Ctrl+K)" readonly style="cursor:pointer;">
+  </div>
+  <div class="topbar-actions">
+    <span class="progress-pill" id="progressPill"><b>0</b>/0 leçons</span>
+    <button class="icon-btn" id="themeToggle" title="Basculer thème clair/sombre">◐</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main"></main>
+</div>
+
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-modal" onclick="event.stopPropagation()">
+    <input id="globalSearchInput" placeholder="Rechercher une leçon, un exercice, un projet…">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+<script>
+const THEORY = [{"id":"cs-intro","module":"C# — Bases du langage","title":"Introduction à C# et .NET : votre premier programme","minutes":12,"theory":"**C#** (prononcé « C sharp ») est un langage de programmation orienté objet créé par Microsoft, exécuté sur la plateforme **.NET**. C'est le langage utilisé dans ce cours pour piloter Sage 100c, mais aussi pour développer des applications web, mobiles, de bureau ou des jeux vidéo.\n\n**.NET** est la plateforme d'exécution : elle fournit un immense ensemble de bibliothèques prêtes à l'emploi et un moteur d'exécution (le CLR — Common Language Runtime) qui compile le code C# en langage intermédiaire (IL) puis l'exécute sur n'importe quel système compatible.\n\n**Structure minimale d'un programme C#** :\n- Un **namespace** (espace de noms) regroupe logiquement du code lié.\n- Une **classe** contient le code.\n- La méthode **Main()** est le point d'entrée : c'est la première instruction exécutée au lancement du programme.\n- Chaque instruction se termine par un **point-virgule** `;`.\n- Les blocs de code sont délimités par des accolades `{ }`.\n\n**Visual Studio** (ou Visual Studio Code) est l'environnement de développement recommandé : il compile, exécute et aide à corriger le code grâce à l'IntelliSense (auto-complétion contextuelle).","codeTitle":"Premier programme : afficher un message","codeLang":"csharp","code":"using System;\n\nnamespace MonPremierProgramme\n{\n    class Program\n    {\n        static void Main(string[] args)\n        {\n            // Console.WriteLine affiche du texte suivi d'un retour à la ligne\n            Console.WriteLine(\"Bonjour, je débute en C# !\");\n\n            // Console.Write affiche sans retour à la ligne\n            Console.Write(\"Ce programme \");\n            Console.Write(\"s'exécute avec succès.\");\n        }\n    }\n}","keypoints":["Main() est le point d'entrée obligatoire de tout programme C# console","Chaque instruction se termine par un point-virgule","Console.WriteLine() affiche du texte avec retour à la ligne, Console.Write() sans",".NET est la plateforme d'exécution ; C# est le langage"],"exercise":"Modifiez le programme pour afficher votre nom, votre ville et votre objectif d'apprentissage sur trois lignes séparées.","difficulty":"Débutant"},{"id":"cs-variables","module":"C# — Bases du langage","title":"Variables, types de données et constantes","minutes":16,"theory":"Une **variable** est un espace mémoire nommé qui stocke une valeur pouvant changer. En C#, le langage est **fortement typé** : chaque variable a un type déclaré, connu dès la compilation.\n\n**Types de base (types valeur)** :\n- `int` : nombre entier (ex. `42`)\n- `double` : nombre décimal (ex. `3.14`)\n- `bool` : booléen (`true` / `false`)\n- `char` : un seul caractère (ex. `'A'`)\n- `decimal` : nombre décimal de haute précision, **recommandé pour les montants financiers**\n- `DateTime` : date et heure\n\n**Type référence** :\n- `string` : chaîne de caractères (ex. `\"Bonjour\"`)\n\n**Déclaration** : `type nom = valeur;`. Le mot-clé `var` permet de laisser le compilateur déduire le type automatiquement à partir de la valeur assignée (inférence de type) — pratique, mais le type reste fixé une fois déduit.\n\n**Constante** : une valeur qui ne changera jamais, déclarée avec `const`. Convention : nom en PascalCase ou MAJUSCULES selon les équipes.\n\n**Conversion de type** : convertir un `string` en `int` se fait avec `int.Parse()` ou, plus sûr, `int.TryParse()` qui ne lève pas d'exception en cas d'échec.","codeTitle":"Déclarer des variables de différents types et les convertir","codeLang":"csharp","code":"using System;\n\nint age = 25;\ndouble prixUnitaire = 19.99;\nbool estEtudiant = true;\nchar initiale = 'A';\ndecimal montantFacture = 1250.50m;   // le suffixe m indique un decimal\nstring prenom = \"Sarah\";\n\n// Inférence de type avec var\nvar ville = \"Antananarivo\";  // le compilateur déduit : string\n\nconst double TVA = 0.20;     // constante : ne peut plus être modifiée\n\nConsole.WriteLine($\"{prenom}, {age} ans, habite à {ville}.\");\nConsole.WriteLine($\"Montant TTC : {montantFacture * (decimal)(1 + TVA):C}\");\n\n// Conversion sécurisée d'une saisie utilisateur\nstring saisie = \"42\";\nif (int.TryParse(saisie, out int nombre))\n{\n    Console.WriteLine($\"Conversion réussie : {nombre}\");\n}\nelse\n{\n    Console.WriteLine(\"Saisie invalide.\");\n}","keypoints":["C# est fortement typé : chaque variable a un type fixe","decimal est recommandé pour les montants financiers (précision exacte)","var laisse le compilateur déduire le type, mais celui-ci reste fixé","int.TryParse() convertit sans risque d'exception, contrairement à int.Parse()"],"exercise":"Déclarez des variables pour modéliser un article de magasin (référence, libellé, prix, quantité en stock) avec les types les plus appropriés, puis calculez et affichez la valeur totale du stock.","difficulty":"Débutant"},{"id":"cs-operateurs","module":"C# — Bases du langage","title":"Opérateurs et expressions","minutes":12,"theory":"**Opérateurs arithmétiques** : `+` `-` `*` `/` `%` (modulo, reste de la division entière).\n\nPiège classique : la division entre deux `int` donne un résultat **entier tronqué** (`7 / 2` = `3`, pas `3.5`). Pour obtenir un résultat décimal, au moins un des deux opérandes doit être `double` ou `decimal`.\n\n**Opérateurs de comparaison** : `==` (égal), `!=` (différent), `<`, `>`, `<=`, `>=` — retournent toujours un `bool`.\n\n**Opérateurs logiques** : `&&` (ET logique), `||` (OU logique), `!` (négation). Ils permettent de combiner plusieurs conditions.\n\n**Opérateurs d'affectation combinés** : `+=`, `-=`, `*=`, `/=` sont des raccourcis (`x += 5` équivaut à `x = x + 5`).\n\n**Opérateur ternaire** `condition ? valeurSiVrai : valeurSiFaux` : une façon concise d'écrire un `if/else` qui retourne une valeur.","codeTitle":"Piège de la division entière et opérateur ternaire","codeLang":"csharp","code":"using System;\n\nint a = 7, b = 2;\nConsole.WriteLine(a / b);              // 3 (division entière, tronquée !)\nConsole.WriteLine((double)a / b);      // 3.5 (cast explicite en double)\n\nint quantite = 12;\nbool estPair = (quantite % 2 == 0);    // modulo : reste de la division\nConsole.WriteLine($\"Quantité paire ? {estPair}\");\n\nint stock = 3;\nstring statut = (stock > 0) ? \"Disponible\" : \"Rupture de stock\"; // ternaire\nConsole.WriteLine(statut);\n\nbool client = true, montantSuffisant = false;\nif (client && montantSuffisant)\n    Console.WriteLine(\"Livraison gratuite.\");\nelse\n    Console.WriteLine(\"Frais de livraison appliqués.\");","keypoints":["La division entre deux int tronque le résultat : caster en double si besoin","% (modulo) renvoie le reste d'une division entière","&& et || combinent des conditions booléennes","L'opérateur ternaire condition ? a : b remplace un if/else simple qui retourne une valeur"],"exercise":"Écrivez une expression qui calcule le prix TTC (prix HT * 1.20) et affiche 'Prix correct' si le résultat est supérieur à 0, sinon 'Prix invalide', en utilisant l'opérateur ternaire.","difficulty":"Débutant"},{"id":"cs-conditions","module":"C# — Bases du langage","title":"Structures conditionnelles : if / else / switch","minutes":12,"theory":"**if / else if / else** : exécute un bloc de code selon qu'une condition (une expression booléenne) est vraie ou fausse.\n\n```\nif (condition1)\n{\n    // ...\n}\nelse if (condition2)\n{\n    // ...\n}\nelse\n{\n    // ...\n}\n```\n\n**switch** : alternative lisible à une longue chaîne de `if/else if` quand on teste la même variable contre plusieurs valeurs possibles. Chaque cas se termine par `break` (ou `return`) pour éviter de « tomber » dans le cas suivant.\n\n**switch expression** (C# moderne, 8.0+) : syntaxe concise `variable switch { valeur1 => résultat1, valeur2 => résultat2, _ => valeurParDéfaut }` qui retourne directement une valeur — très utilisée dans du code C# récent et idiomatique.","codeTitle":"Classifier une note avec if/else puis avec switch expression","codeLang":"csharp","code":"using System;\n\nint note = 14;\nstring mention;\n\nif (note >= 16) mention = \"Très bien\";\nelse if (note >= 14) mention = \"Bien\";\nelse if (note >= 12) mention = \"Assez bien\";\nelse if (note >= 10) mention = \"Passable\";\nelse mention = \"Insuffisant\";\n\nConsole.WriteLine($\"Mention : {mention}\");\n\n// Équivalent moderne avec switch expression\nstring mention2 = note switch\n{\n    >= 16 => \"Très bien\",\n    >= 14 => \"Bien\",\n    >= 12 => \"Assez bien\",\n    >= 10 => \"Passable\",\n    _     => \"Insuffisant\"\n};\nConsole.WriteLine($\"Mention (switch) : {mention2}\");","keypoints":["if/else if/else pour des conditions ordonnées ou complexes","switch classique nécessite un break par cas","switch expression (C# 8+) retourne directement une valeur, syntaxe concise","_ dans un switch expression représente le cas par défaut"],"exercise":"Écrivez un switch expression qui convertit un numéro de mois (1 à 12) en nom du mois en français.","difficulty":"Débutant"},{"id":"cs-boucles","module":"C# — Bases du langage","title":"Boucles : for, while, do-while, foreach","minutes":14,"theory":"**for** : boucle à nombre d'itérations connu à l'avance. Structure : `for (initialisation; condition; incrément)`.\n\n**while** : répète tant qu'une condition reste vraie ; la condition est testée **avant** chaque itération (0 exécution possible si fausse dès le départ).\n\n**do-while** : identique à `while`, mais la condition est testée **après** chaque itération — le bloc s'exécute donc **au moins une fois**.\n\n**foreach** : parcourt chaque élément d'une collection (tableau, `List<T>`, etc.) sans gérer d'index manuellement — c'est la boucle la plus utilisée pour parcourir des collections, y compris les collections Sage 100c vues dans la Partie 2 de ce cours.\n\n**break** interrompt immédiatement la boucle. **continue** passe directement à l'itération suivante sans exécuter le reste du bloc courant.","codeTitle":"Comparer les quatre types de boucles sur un même besoin","codeLang":"csharp","code":"using System;\nusing System.Collections.Generic;\n\n// for : on connaît le nombre d'itérations\nfor (int i = 1; i <= 5; i++)\n{\n    Console.WriteLine($\"Itération for n°{i}\");\n}\n\n// while : condition testée avant\nint compteur = 0;\nwhile (compteur < 3)\n{\n    Console.WriteLine($\"while : {compteur}\");\n    compteur++;\n}\n\n// do-while : s'exécute au moins une fois\nint saisie = 0;\ndo\n{\n    Console.WriteLine(\"Bloc exécuté au moins une fois.\");\n    saisie++;\n} while (saisie < 1);\n\n// foreach : parcours d'une collection\nList<string> eleves = new List<string> { \"Rina\", \"Tojo\", \"Faniry\" };\nforeach (string eleve in eleves)\n{\n    if (eleve == \"Tojo\") continue; // saute cet élément\n    Console.WriteLine($\"Élève : {eleve}\");\n}","keypoints":["for : nombre d'itérations connu ; while : condition testée avant ; do-while : au moins 1 exécution","foreach parcourt une collection élément par élément, sans indexation manuelle","break sort de la boucle, continue passe à l'itération suivante"],"exercise":"Écrivez une boucle for qui affiche la table de multiplication de 7 (de 7×1 à 7×10).","difficulty":"Débutant"},{"id":"cs-tableaux","module":"C# — Bases du langage","title":"Tableaux (arrays)","minutes":12,"theory":"Un **tableau** (`array`) est une structure de taille **fixe** contenant plusieurs valeurs du même type, accessibles par un index numérique commençant à **0**.\n\nDéclaration : `type[] nom = new type[taille];` ou directement avec des valeurs : `type[] nom = { valeur1, valeur2, ... };`.\n\n**Propriété Length** : nombre d'éléments du tableau (attention, `Length`, pas `Count`, réservé aux collections comme `List<T>`).\n\n**Tableaux à deux dimensions** : `type[,] nom = new type[lignes, colonnes];` — utile pour représenter une grille ou un tableau croisé.\n\nLimite importante : un tableau ne peut pas grandir après sa création. Pour une collection de taille variable, on utilise `List<T>` (vu dans une prochaine leçon).","codeTitle":"Manipuler un tableau de notes","codeLang":"csharp","code":"using System;\n\nint[] notes = { 12, 15, 8, 17, 10 };\n\nConsole.WriteLine($\"Nombre de notes : {notes.Length}\");\nConsole.WriteLine($\"Première note : {notes[0]}\");\nConsole.WriteLine($\"Dernière note : {notes[notes.Length - 1]}\");\n\nint somme = 0;\nforeach (int note in notes)\n{\n    somme += note;\n}\ndouble moyenne = (double)somme / notes.Length;\nConsole.WriteLine($\"Moyenne : {moyenne:F2}\");\n\n// Tableau à deux dimensions : grille 2 lignes x 3 colonnes\nint[,] grille = new int[2, 3]\n{\n    { 1, 2, 3 },\n    { 4, 5, 6 }\n};\nConsole.WriteLine($\"Élément [1,2] : {grille[1, 2]}\");  // 6","keypoints":["L'index d'un tableau commence toujours à 0","Length donne le nombre d'éléments (pas Count, réservé à List<T>)","Un tableau a une taille fixe définie à la création","Un tableau [,] à deux dimensions se manipule avec deux index [ligne, colonne]"],"exercise":"Créez un tableau de 5 prix (double), calculez et affichez le prix le plus élevé et le prix le plus bas sans utiliser de méthode LINQ.","difficulty":"Débutant"},{"id":"cs-chaines","module":"C# — Bases du langage","title":"Chaînes de caractères (string)","minutes":13,"theory":"Le type `string` représente du texte. Quelques manipulations essentielles :\n\n- **Interpolation** : `$\"Bonjour {nom}\"` insère directement des variables dans une chaîne — à privilégier sur la concaténation `+`.\n- **Concaténation** : `\"a\" + \"b\"`, ou `+=` pour ajouter à une chaîne existante.\n- **Méthodes utiles** : `.Length` (longueur), `.ToUpper()` / `.ToLower()`, `.Trim()` (supprime les espaces en début/fin), `.Contains()`, `.Replace()`, `.Split()` (découpe selon un séparateur), `.Substring()` (extrait une portion).\n- **Comparaison** : `==` compare le contenu (pas la référence) pour les strings en C# — contrairement à d'autres langages où il faudrait une méthode dédiée.\n- **Chaînes immuables** : un `string` ne change jamais « en place » ; chaque méthode qui semble le modifier (`.ToUpper()`...) retourne en réalité une **nouvelle** chaîne.\n- **Chaîne verbatim** `@\"C:\\dossier\\fichier\"` : le préfixe `@` désactive l'interprétation des antislashs d'échappement — pratique pour les chemins Windows, comme on le verra avec les bases Sage 100c.","codeTitle":"Nettoyer et analyser une saisie utilisateur","codeLang":"csharp","code":"using System;\n\nstring saisie = \"  Rakoto Andry  \";\nstring propre = saisie.Trim();  // supprime les espaces en début/fin\n\nConsole.WriteLine($\"Original: '{saisie}'\");\nConsole.WriteLine($\"Nettoyé : '{propre}'\");\nConsole.WriteLine($\"Majuscules : {propre.ToUpper()}\");\nConsole.WriteLine($\"Longueur : {propre.Length}\");\n\nstring[] motsPrenNom = propre.Split(' ');\nConsole.WriteLine($\"Nom : {motsPrenNom[0]}, Prénom : {motsPrenNom[1]}\");\n\nif (propre.Contains(\"Andry\"))\n{\n    Console.WriteLine(\"Le nom contient 'Andry'.\");\n}\n\n// Chemin de fichier : chaîne verbatim (comme pour une base Sage 100c)\nstring chemin = @\"C:\\Sage\\Bijoux.mae\";\nConsole.WriteLine(chemin);","keypoints":["L'interpolation $\"...{variable}...\" est plus lisible que la concaténation +","Un string est immuable : les méthodes retournent toujours une nouvelle chaîne",".Split() découpe une chaîne en tableau selon un séparateur","Le préfixe @ crée une chaîne verbatim, utile pour les chemins de fichiers Windows"],"exercise":"Écrivez un programme qui demande un email (simulé par une variable string), vérifie qu'il contient '@' et affiche la partie avant le '@' (nom d'utilisateur).","difficulty":"Débutant"},{"id":"cs-methodes","module":"C# — Bases du langage","title":"Méthodes : découper son code en fonctions réutilisables","minutes":16,"theory":"Une **méthode** est un bloc de code nommé, réutilisable, qui peut recevoir des **paramètres** en entrée et renvoyer une **valeur de retour**.\n\nStructure : `typeDeRetour NomDeLaMéthode(typeParam1 param1, typeParam2 param2) { ... return valeur; }`. Si la méthode ne retourne rien, on utilise `void`.\n\n**Paramètres optionnels** : `string statut = \"actif\"` donne une valeur par défaut, utilisable si l'appelant ne fournit pas cet argument.\n\n**Surcharge de méthode (overload)** : plusieurs méthodes peuvent porter le **même nom** avec des paramètres différents (nombre ou type) — le compilateur choisit la bonne version selon les arguments fournis à l'appel.\n\n**Paramètres par référence (`ref`) et de sortie (`out`)** : par défaut, les paramètres sont passés **par valeur** (une copie). `ref` permet à la méthode de modifier directement la variable de l'appelant ; `out` sert à renvoyer une valeur supplémentaire (déjà rencontré avec `int.TryParse(saisie, out int nombre)`).\n\nDécouper son code en méthodes claires, avec un nom explicite et une seule responsabilité, est la base d'un code C# lisible et maintenable — un principe qui deviendra essentiel en Partie 2 avec les fonctions d'accès aux bases Sage 100c.","codeTitle":"Calculer une remise avec paramètre optionnel et surcharge","codeLang":"csharp","code":"using System;\n\n// Méthode avec paramètre optionnel\nstatic double CalculeRemise(double montant, double tauxRemise = 0.10)\n{\n    return montant * (1 - tauxRemise);\n}\n\n// Surcharge : même nom, signature différente\nstatic double CalculeRemise(double montant, double tauxRemise, double fraisFixe)\n{\n    return montant * (1 - tauxRemise) - fraisFixe;\n}\n\nstatic void Main()\n{\n    Console.WriteLine(CalculeRemise(100));           // utilise le taux par défaut\n    Console.WriteLine(CalculeRemise(100, 0.20));      // taux personnalisé\n    Console.WriteLine(CalculeRemise(100, 0.20, 5));   // surcharge à 3 paramètres\n\n    // Paramètre ref : la méthode modifie directement la variable de l'appelant\n    int stock = 10;\n    RetirerDuStock(ref stock, 3);\n    Console.WriteLine($\"Stock restant : {stock}\");\n}\n\nstatic void RetirerDuStock(ref int stock, int quantite)\n{\n    stock -= quantite;\n}","keypoints":["Une méthode encapsule un comportement réutilisable avec des paramètres et un retour","Les paramètres optionnels évitent de multiplier les surcharges pour des cas simples","La surcharge permet plusieurs méthodes de même nom avec des signatures différentes","ref modifie directement la variable de l'appelant ; par défaut, les paramètres sont passés par valeur (copie)"],"exercise":"Écrivez une méthode CalculeMoyenne(int[] notes) qui retourne la moyenne d'un tableau de notes, puis une surcharge qui accepte un coefficient à appliquer à chaque note.","difficulty":"Débutant"},{"id":"cs-poo-intro","module":"C# — Programmation orientée objet","title":"Classes et objets : modéliser le monde réel","minutes":18,"theory":"La **programmation orientée objet (POO)** consiste à modéliser un programme comme un ensemble d'**objets** qui interagissent — exactement le modèle utilisé par Sage 100 Objets Métiers vu en Partie 2 de ce cours (un `IBOTiers3` est un objet, avec des propriétés et des méthodes).\n\n**Classe** : le plan/modèle qui décrit la structure d'un objet — ses **champs** (données) et ses **méthodes** (comportements). **Objet** : une instance concrète créée à partir de la classe, via le mot-clé `new`.\n\nStructure d'une classe C# :\n```\nclass Article\n{\n    public string Reference;\n    public double Prix;\n\n    public void Afficher()\n    {\n        Console.WriteLine($\"{Reference} : {Prix} Ar\");\n    }\n}\n```\n\nChaque objet créé avec `new Article()` possède **sa propre copie** des champs (`Reference`, `Prix`), indépendante des autres instances — comme deux fiches article distinctes dans Sage 100c.\n\nC'est le fondement de tout ce qui suivra : encapsulation (leçon suivante), héritage, polymorphisme, interfaces — et c'est exactement le modèle mental nécessaire pour comprendre l'API Sage 100 Objets Métiers (Factory, objets métier, interfaces IBOxxx).","codeTitle":"Définir une classe Article et créer plusieurs instances","codeLang":"csharp","code":"using System;\n\nclass Article\n{\n    public string Reference;\n    public string Libelle;\n    public double Prix;\n    public int Stock;\n\n    public void Afficher()\n    {\n        Console.WriteLine($\"[{Reference}] {Libelle} - {Prix} Ar - Stock: {Stock}\");\n    }\n\n    public double ValeurStock()\n    {\n        return Prix * Stock;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // Création de deux objets distincts à partir de la même classe\n        Article article1 = new Article\n        {\n            Reference = \"ART001\",\n            Libelle = \"Cahier 200 pages\",\n            Prix = 3500,\n            Stock = 120\n        };\n\n        Article article2 = new Article\n        {\n            Reference = \"ART002\",\n            Libelle = \"Stylo bleu\",\n            Prix = 500,\n            Stock = 300\n        };\n\n        article1.Afficher();\n        article2.Afficher();\n\n        Console.WriteLine($\"Valeur totale stock article1 : {article1.ValeurStock()} Ar\");\n    }\n}","keypoints":["Une classe est un plan ; un objet est une instance créée avec new","Chaque objet a sa propre copie des champs, indépendante des autres instances","C'est exactement le modèle utilisé par Sage 100 Objets Métiers (objets IBOxxx)","Une méthode d'un objet peut utiliser les champs de ce même objet sans les recevoir en paramètre"],"exercise":"Créez une classe Eleve avec Nom, Note1, Note2, Note3 et une méthode Moyenne() qui retourne la moyenne des trois notes. Instanciez 3 élèves et affichez leur moyenne.","difficulty":"Intermédiaire"},{"id":"cs-encapsulation","module":"C# — Programmation orientée objet","title":"Encapsulation : propriétés et modificateurs d'accès","minutes":16,"theory":"**L'encapsulation** consiste à protéger les données internes d'un objet et à contrôler la façon dont elles sont lues ou modifiées de l'extérieur — exactement ce que fait Sage 100 Objets Métiers avec ses propriétés « Lecture seule » vs « Lecture / Écriture » vues en Partie 2.\n\n**Modificateurs d'accès** :\n- `public` : accessible depuis n'importe où\n- `private` : accessible uniquement à l'intérieur de la classe elle-même\n- `protected` : accessible dans la classe et ses classes dérivées (héritage)\n\n**Propriétés (`get`/`set`)** : plutôt que d'exposer un champ directement en `public`, on l'encapsule dans une propriété qui contrôle la lecture (`get`) et l'écriture (`set`), avec éventuellement de la logique de validation.\n\n```\nprivate double prix;\npublic double Prix\n{\n    get { return prix; }\n    set { if (value >= 0) prix = value; }  // validation à l'écriture\n}\n```\n\n**Propriété auto-implémentée** : `public double Prix { get; set; }` — raccourci quand il n'y a pas de logique de validation particulière. `public double Prix { get; private set; }` crée une propriété **en lecture seule depuis l'extérieur**, modifiable uniquement à l'intérieur de la classe — le pendant exact de `IsModified()` en lecture seule côté Sage 100c.","codeTitle":"Propriétés avec validation, à comparer avec IsModified() de Sage 100c","codeLang":"csharp","code":"using System;\n\nclass CompteBancaire\n{\n    private double solde;         // champ privé, inaccessible de l'extérieur\n    private bool estModifie;\n\n    public double Solde\n    {\n        get { return solde; }\n        private set { solde = value; }   // set privé : lecture seule depuis l'extérieur\n    }\n\n    public bool EstModifie => estModifie;  // propriété calculée en lecture seule (comme IsModified())\n\n    public void Deposer(double montant)\n    {\n        if (montant <= 0)\n        {\n            Console.WriteLine(\"Montant invalide.\");\n            return;\n        }\n        Solde = solde + montant;\n        estModifie = true;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        CompteBancaire compte = new CompteBancaire();\n        compte.Deposer(50000);\n        // compte.Solde = 999999;  // ERREUR de compilation : set est privé\n\n        Console.WriteLine($\"Solde : {compte.Solde} Ar\");\n        Console.WriteLine($\"Modifié ? {compte.EstModifie}\");\n    }\n}","keypoints":["public/private/protected contrôlent la visibilité des membres d'une classe","Une propriété get/set contrôle finement la lecture et l'écriture d'un champ","set privé = propriété en lecture seule depuis l'extérieur (comme IsModified() côté Sage 100c)","L'encapsulation protège la cohérence interne d'un objet contre des modifications incontrôlées"],"exercise":"Modifiez la classe CompteBancaire pour ajouter une méthode Retirer(montant) qui refuse le retrait si le solde est insuffisant, en affichant un message d'erreur clair.","difficulty":"Intermédiaire"},{"id":"cs-constructeurs","module":"C# — Programmation orientée objet","title":"Constructeurs : initialiser un objet correctement","minutes":12,"theory":"Un **constructeur** est une méthode spéciale, portant le même nom que la classe, exécutée automatiquement à la création d'un objet avec `new`. Il sert à garantir qu'un objet démarre dans un **état valide**.\n\n```\nclass Article\n{\n    public string Reference { get; }\n    public double Prix { get; set; }\n\n    // Constructeur : Reference devient obligatoire à la création\n    public Article(string reference, double prix)\n    {\n        Reference = reference;\n        Prix = prix;\n    }\n}\n```\n\nUne fois qu'une classe définit un constructeur avec paramètres, le constructeur « sans paramètre » par défaut n'existe plus automatiquement — sauf si on le définit aussi explicitement (**surcharge de constructeur**, même principe que la surcharge de méthode).\n\n**Mot-clé `this`** : à l'intérieur d'une classe, `this` désigne l'objet courant — utile notamment quand un paramètre porte le même nom qu'un champ, pour lever l'ambiguïté.","codeTitle":"Constructeurs multiples pour garantir un état initial valide","codeLang":"csharp","code":"using System;\n\nclass Eleve\n{\n    public string Nom { get; }\n    public int Age { get; set; }\n    public List<double> Notes { get; }\n\n    // Constructeur principal\n    public Eleve(string nom, int age)\n    {\n        this.Nom = nom;   // this.Nom = le champ ; nom = le paramètre\n        this.Age = age;\n        Notes = new List<double>();  // toujours initialiser les collections dans le constructeur\n    }\n\n    // Constructeur surchargé : âge par défaut si non fourni\n    public Eleve(string nom) : this(nom, 15)  // appelle l'autre constructeur\n    {\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Eleve e1 = new Eleve(\"Rina\", 17);\n        Eleve e2 = new Eleve(\"Tojo\");  // utilise l'âge par défaut = 15\n\n        Console.WriteLine($\"{e1.Nom}, {e1.Age} ans\");\n        Console.WriteLine($\"{e2.Nom}, {e2.Age} ans\");\n    }\n}","keypoints":["Le constructeur garantit qu'un objet démarre dans un état valide et cohérent","Un constructeur peut en appeler un autre avec : this(...)","this désigne l'objet courant, utile en cas d'ambiguïté de nom entre champ et paramètre","Toujours initialiser les collections (List, Dictionary...) dans le constructeur pour éviter les erreurs de référence nulle"],"exercise":"Ajoutez à la classe Eleve une méthode AjouterNote(double note) et une méthode Moyenne() qui s'appuient sur la liste Notes initialisée dans le constructeur.","difficulty":"Intermédiaire"},{"id":"cs-heritage","module":"C# — Programmation orientée objet","title":"Héritage : factoriser un comportement commun","minutes":18,"theory":"**L'héritage** permet à une classe (dite **dérivée** ou **fille**) de réutiliser les champs, propriétés et méthodes d'une autre classe (dite **de base** ou **parent**), tout en ajoutant ou redéfinissant son propre comportement.\n\nC'est exactement le principe rencontré en Partie 2 avec les tiers Sage 100c : `IBOTiers3` est le socle commun, et `Client`, `Fournisseur`, `Salarié` en sont des spécialisations.\n\n```\nclass Tiers            // classe de base\n{\n    public string Nom { get; set; }\n    public virtual void Afficher() => Console.WriteLine($\"Tiers : {Nom}\");\n}\n\nclass Client : Tiers    // classe dérivée : hérite de Tiers\n{\n    public string CategorieTarifaire { get; set; }\n    public override void Afficher() => Console.WriteLine($\"Client : {Nom} ({CategorieTarifaire})\");\n}\n```\n\n- `: Tiers` déclare l'héritage.\n- `virtual` sur une méthode de la classe de base autorise sa **redéfinition**.\n- `override` dans la classe dérivée redéfinit effectivement le comportement.\n- `base.NomMethode()` permet d'appeler explicitement la version de la classe parent depuis la classe dérivée.\n\nUne classe dérivée peut toujours être manipulée comme si c'était une instance de sa classe de base (`Tiers t = new Client();`) — c'est le principe qui permet d'écrire du code générique, exactement comme on manipule n'importe quel tiers Sage 100c via l'interface commune `IBOTiers3`.","codeTitle":"Hiérarchie Tiers → Client / Fournisseur, comme dans Sage 100c","codeLang":"csharp","code":"using System;\nusing System.Collections.Generic;\n\nclass Tiers\n{\n    public string Nom { get; set; }\n    public virtual void Afficher() => Console.WriteLine($\"Tiers générique : {Nom}\");\n}\n\nclass Client : Tiers\n{\n    public string CategorieTarifaire { get; set; }\n    public override void Afficher() =>\n        Console.WriteLine($\"Client : {Nom} — catégorie {CategorieTarifaire}\");\n}\n\nclass Fournisseur : Tiers\n{\n    public int DelaiLivraisonJours { get; set; }\n    public override void Afficher() =>\n        Console.WriteLine($\"Fournisseur : {Nom} — livraison sous {DelaiLivraisonJours} jours\");\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // Code générique : une liste de Tiers peut contenir des Client ET des Fournisseur\n        List<Tiers> tousLesTiers = new List<Tiers>\n        {\n            new Client { Nom = \"SARL Bijou\", CategorieTarifaire = \"Grossiste\" },\n            new Fournisseur { Nom = \"Import Textile\", DelaiLivraisonJours = 15 }\n        };\n\n        foreach (Tiers t in tousLesTiers)\n        {\n            t.Afficher();  // appelle la bonne version (Client ou Fournisseur) automatiquement\n        }\n    }\n}","keypoints":["L'héritage (: ClasseParent) réutilise champs/méthodes d'une classe de base","virtual (classe de base) + override (classe dérivée) permettent de redéfinir un comportement","Une instance de classe dérivée peut être manipulée via le type de sa classe de base : polymorphisme","C'est exactement le modèle IBOTiers3 → Client/Fournisseur/Salarié de Sage 100c"],"exercise":"Ajoutez une classe Salarie héritant de Tiers, avec une propriété Poste et sa propre méthode Afficher() redéfinie, puis intégrez-la à la liste tousLesTiers.","difficulty":"Intermédiaire"},{"id":"cs-abstraction","module":"C# — Programmation orientée objet","title":"Classes abstraites et polymorphisme","minutes":16,"theory":"Une **classe abstraite** (`abstract class`) ne peut **jamais être instanciée directement** avec `new` — elle sert uniquement de base à d'autres classes. Elle peut contenir des méthodes **abstraites** (`abstract`, sans corps, à implémenter obligatoirement par chaque classe dérivée) et des méthodes concrètes normales, déjà implémentées et héritées telles quelles.\n\n```\nabstract class FormeGeometrique\n{\n    public abstract double Aire();          // pas de corps : obligatoire à implémenter\n    public void Presenter() => Console.WriteLine($\"Aire = {Aire()}\"); // méthode concrète héritée\n}\n\nclass Rectangle : FormeGeometrique\n{\n    public double Largeur, Hauteur;\n    public override double Aire() => Largeur * Hauteur;   // implémentation obligatoire\n}\n```\n\n**Le polymorphisme** est la capacité d'appeler la même méthode (`Aire()`, `Afficher()`...) sur des objets de types dérivés différents, et d'obtenir **automatiquement** le comportement propre à chacun — déjà utilisé dans la leçon précédente (`foreach (Tiers t in tousLesTiers) t.Afficher();`).\n\n**Différence classe abstraite / interface** (leçon suivante) : une classe abstraite peut contenir du code partagé (implémentation), une interface ne définit **que** le contrat (quelles méthodes doivent exister), sans aucune implémentation.","codeTitle":"Classe abstraite FormeGeometrique avec polymorphisme","codeLang":"csharp","code":"using System;\nusing System.Collections.Generic;\n\nabstract class FormeGeometrique\n{\n    public abstract double Aire();\n    public void Presenter() => Console.WriteLine($\"{GetType().Name} : aire = {Aire():F2}\");\n}\n\nclass Rectangle : FormeGeometrique\n{\n    public double Largeur, Hauteur;\n    public override double Aire() => Largeur * Hauteur;\n}\n\nclass Cercle : FormeGeometrique\n{\n    public double Rayon;\n    public override double Aire() => Math.PI * Rayon * Rayon;\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // FormeGeometrique f = new FormeGeometrique(); // ERREUR : classe abstraite\n\n        List<FormeGeometrique> formes = new List<FormeGeometrique>\n        {\n            new Rectangle { Largeur = 4, Hauteur = 3 },\n            new Cercle { Rayon = 2 }\n        };\n\n        foreach (var forme in formes)\n        {\n            forme.Presenter();  // polymorphisme : chaque forme calcule SON aire\n        }\n    }\n}","keypoints":["Une classe abstraite ne peut jamais être instanciée directement","abstract oblige chaque classe dérivée à fournir sa propre implémentation","Le polymorphisme : la même ligne de code appelle un comportement différent selon le type réel de l'objet","Une classe abstraite peut mélanger méthodes abstraites et méthodes déjà implémentées"],"exercise":"Ajoutez une classe Triangle héritant de FormeGeometrique (base × hauteur / 2) et intégrez-la à la liste formes.","difficulty":"Intermédiaire"},{"id":"cs-interfaces","module":"C# — Programmation orientée objet","title":"Interfaces : définir un contrat","minutes":18,"theory":"Une **interface** définit un **contrat** : une liste de méthodes et propriétés qu'une classe s'engage à implémenter, **sans aucun code** dans l'interface elle-même. C'est exactement le concept central de Sage 100 Objets Métiers (`IBOTiers3`, `IBOArticle3`...) — d'ailleurs la convention de nommage C# veut qu'une interface commence par la lettre `I`, exactement comme dans l'API Sage 100c.\n\n```\ninterface IPersistable\n{\n    bool IsModified { get; }\n    void Write();\n    void Remove();\n}\n\nclass Tiers : IPersistable    // Tiers s'engage à respecter le contrat IPersistable\n{\n    public bool IsModified { get; private set; }\n    public void Write() { /* ... enregistre en base ... */ IsModified = false; }\n    public void Remove() { /* ... supprime en base ... */ }\n}\n```\n\n**Différence essentielle avec l'héritage de classe** : une classe C# ne peut hériter que d'**une seule** classe de base, mais peut implémenter **plusieurs interfaces** à la fois — une grande souplesse de conception.\n\n**Pourquoi c'est fondamental pour la suite de ce cours** : toutes les interfaces Sage 100c (`IBOTiers3`, `IBOArticle3`, `IBICollection`, `IPMEncoder`...) sont exactement ce mécanisme — un contrat que l'implémentation réelle de la DLL Objets100c respecte, et qu'on manipule côté C# sans jamais voir le code interne.","codeTitle":"Interface IPersistable — le principe exact derrière IBIPersistObject de Sage 100c","codeLang":"csharp","code":"using System;\nusing System.Collections.Generic;\n\ninterface IPersistable\n{\n    bool IsModified { get; }\n    void Write();\n}\n\ninterface IAffichable\n{\n    void Afficher();\n}\n\n// Une classe peut implémenter PLUSIEURS interfaces à la fois\nclass Article : IPersistable, IAffichable\n{\n    public string Reference { get; set; }\n    public double Prix { get; set; }\n    public bool IsModified { get; private set; }\n\n    public void ChangerPrix(double nouveauPrix)\n    {\n        Prix = nouveauPrix;\n        IsModified = true;\n    }\n\n    public void Write()\n    {\n        Console.WriteLine($\"Écriture en base de {Reference}...\");\n        IsModified = false;\n    }\n\n    public void Afficher() => Console.WriteLine($\"{Reference} : {Prix} Ar\");\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Article a = new Article { Reference = \"ART010\", Prix = 1000 };\n        a.ChangerPrix(1200);\n\n        if (a.IsModified)\n        {\n            a.Write();  // exactement le principe de Write()/IsModified() vu en Partie 2 (Sage 100c)\n        }\n        a.Afficher();\n    }\n}","keypoints":["Une interface définit un contrat (signatures) sans aucune implémentation","La convention C# nomme les interfaces avec un I initial — identique à la convention Sage 100c (IBOxxx)","Une classe peut implémenter plusieurs interfaces, contrairement à l'héritage limité à une seule classe de base","IPersistable illustré ici est le principe exact derrière IBIPersistObject côté Sage 100 Objets Métiers"],"exercise":"Créez une interface IRemarquable avec une méthode Remove(), implémentez-la sur la classe Article, et appelez-la depuis Main() après avoir vérifié IsModified.","difficulty":"Intermédiaire"},{"id":"cs-collections","module":"C# — Collections & LINQ","title":"Collections génériques : List<T> et Dictionary<K,V>","minutes":18,"theory":"Contrairement aux tableaux (taille fixe), les **collections génériques** du namespace `System.Collections.Generic` s'adaptent dynamiquement.\n\n**List<T>** : liste de taille variable d'éléments de type `T` (le `<T>` est un paramètre générique : `List<string>`, `List<Article>`...).\n- `.Add(élément)` ajoute, `.Remove(élément)` retire, `.Count` (pas `Length` !) donne le nombre d'éléments.\n- Accès par index comme un tableau : `maListe[0]`.\n\n**Dictionary<K,V>** : associe une **clé** unique à une **valeur** — l'équivalent d'une table de correspondance (comme un tiers identifié par son code).\n- `dico[\"clé\"] = valeur;` ajoute ou remplace.\n- `.ContainsKey(\"clé\")` teste l'existence avant lecture, pour éviter une exception.\n- `.TryGetValue(\"clé\", out valeur)` lit en toute sécurité.\n\nC'est directement transposable à Sage 100c : une `IBICollection` de tiers vue en Partie 2 se manipule côté C# exactement comme une `List<IBOTiers3>`, avec les mêmes réflexes de parcours en `foreach`.","codeTitle":"Gérer un catalogue d'articles avec List et Dictionary","codeLang":"csharp","code":"using System;\nusing System.Collections.Generic;\n\nList<string> panier = new List<string>();\npanier.Add(\"Cahier\");\npanier.Add(\"Stylo\");\npanier.Remove(\"Stylo\");\nConsole.WriteLine($\"Articles dans le panier : {panier.Count}\");   // Count, pas Length\n\n// Dictionary : code article -> prix\nDictionary<string, double> catalogue = new Dictionary<string, double>\n{\n    { \"ART001\", 3500 },\n    { \"ART002\", 500 }\n};\ncatalogue[\"ART003\"] = 1200;   // ajout\n\nif (catalogue.ContainsKey(\"ART001\"))\n{\n    Console.WriteLine($\"Prix ART001 : {catalogue[\"ART001\"]} Ar\");\n}\n\nif (catalogue.TryGetValue(\"ART999\", out double prix))\n{\n    Console.WriteLine($\"Prix : {prix}\");\n}\nelse\n{\n    Console.WriteLine(\"Article introuvable dans le catalogue.\");\n}\n\nforeach (KeyValuePair<string, double> ligne in catalogue)\n{\n    Console.WriteLine($\"{ligne.Key} -> {ligne.Value} Ar\");\n}","keypoints":["List<T> = collection de taille variable, .Count (pas .Length)","Dictionary<K,V> associe une clé unique à une valeur, accès rapide par clé","TryGetValue()/ContainsKey() évitent les exceptions sur une clé absente","Une IBICollection Sage 100c se manipule côté C# comme une List<T> classique"],"exercise":"Créez un Dictionary<string,int> représentant le stock de 4 articles (code -> quantité), puis affichez uniquement les articles dont le stock est inférieur à 10.","difficulty":"Intermédiaire"},{"id":"cs-linq","module":"C# — Collections & LINQ","title":"LINQ : interroger des collections en une ligne","minutes":18,"theory":"**LINQ** (Language Integrated Query) permet d'interroger des collections (`List<T>`, tableaux...) avec une syntaxe déclarative très proche du SQL — directement en C#, sans base de données.\n\nNécessite `using System.Linq;`. Méthodes essentielles (utilisables en chaîne, façon « pipeline ») :\n- `.Where(condition)` : filtre les éléments (équivalent d'un `WHERE` SQL, ou d'un prédicat Sage 100c vu en Partie 2)\n- `.Select(transformation)` : transforme chaque élément (projection)\n- `.OrderBy(clé)` / `.OrderByDescending(clé)` : trie\n- `.FirstOrDefault(condition)` : premier élément correspondant, ou valeur par défaut si aucun\n- `.Sum()`, `.Average()`, `.Max()`, `.Min()`, `.Count()` : agrégations\n- `.Any(condition)` : `true` si au moins un élément correspond\n\nLa syntaxe utilise des **expressions lambda** : `article => article.Prix > 1000` se lit « pour l'article donné, retourne article.Prix > 1000 » — une fonction anonyme très concise.\n\nLINQ est l'outil à privilégier dès qu'on manipule une collection en C#, y compris une collection convertie depuis Sage 100c — bien plus lisible qu'une boucle manuelle avec des variables intermédiaires.","codeTitle":"Filtrer, trier et agréger un catalogue d'articles avec LINQ","codeLang":"csharp","code":"using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nclass Article\n{\n    public string Reference { get; set; }\n    public double Prix { get; set; }\n    public int Stock { get; set; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Article> articles = new List<Article>\n        {\n            new Article { Reference = \"ART001\", Prix = 3500, Stock = 120 },\n            new Article { Reference = \"ART002\", Prix = 500,  Stock = 5   },\n            new Article { Reference = \"ART003\", Prix = 12000, Stock = 0  },\n        };\n\n        // Filtrer : articles en rupture ou stock faible\n        var stockFaible = articles.Where(a => a.Stock < 10).ToList();\n        Console.WriteLine($\"Articles à réapprovisionner : {stockFaible.Count}\");\n\n        // Trier par prix décroissant et projeter uniquement les références\n        var referencesTriees = articles\n            .OrderByDescending(a => a.Prix)\n            .Select(a => a.Reference)\n            .ToList();\n        Console.WriteLine(string.Join(\", \", referencesTriees));\n\n        // Agrégations\n        double valeurTotale = articles.Sum(a => a.Prix * a.Stock);\n        Console.WriteLine($\"Valeur totale du stock : {valeurTotale} Ar\");\n\n        bool aUneRupture = articles.Any(a => a.Stock == 0);\n        Console.WriteLine($\"Rupture de stock présente ? {aUneRupture}\");\n\n        Article leMoinsCher = articles.OrderBy(a => a.Prix).FirstOrDefault();\n        Console.WriteLine($\"Article le moins cher : {leMoinsCher?.Reference}\");\n    }\n}","keypoints":["LINQ interroge une collection avec une syntaxe déclarative proche du SQL","Where filtre, Select transforme, OrderBy trie, Sum/Average/Max/Min/Count agrègent","Une expression lambda x => condition est une fonction anonyme concise","LINQ remplace avantageusement les boucles manuelles pour manipuler des collections, y compris issues de Sage 100c"],"exercise":"À partir de la liste articles, écrivez une requête LINQ qui retourne le nombre d'articles dont le prix est supérieur à 1000 ET le stock supérieur à 0.","difficulty":"Intermédiaire"},{"id":"cs-exceptions","module":"C# — Gestion des erreurs & I/O","title":"Gestion des exceptions : try / catch / finally","minutes":16,"theory":"Une **exception** est une erreur qui survient à l'exécution (division par zéro, fichier introuvable, connexion refusée...) et qui, si elle n'est pas gérée, **arrête brutalement** le programme.\n\nStructure de base :\n```\ntry\n{\n    // code potentiellement risqué\n}\ncatch (TypeException ex)\n{\n    // que faire en cas d'erreur : ex.Message donne le détail\n}\nfinally\n{\n    // s'exécute TOUJOURS, qu'il y ait eu une erreur ou non (ex. fermeture de ressource)\n}\n```\n\n**Types d'exceptions courants** : `Exception` (le type de base, capture tout), `FormatException` (conversion invalide), `NullReferenceException` (accès à un objet non initialisé), `DivideByZeroException`, `IOException` (fichiers), et — spécifique à ce qu'on verra en Partie 2 — `COMException` pour toute erreur remontée par la DLL Sage 100c.\n\n**Bonne pratique** : cibler le type d'exception le plus précis possible plutôt que `Exception` générique, pour réagir différemment selon la cause réelle de l'erreur. On peut aussi **lever soi-même** une exception avec `throw new Exception(\"message\")` pour signaler une situation anormale dans son propre code.","codeTitle":"Gérer une conversion risquée et une division par zéro","codeLang":"csharp","code":"using System;\n\nstatic double DiviserSaisieUtilisateur(string texteA, string texteB)\n{\n    try\n    {\n        int a = int.Parse(texteA);   // peut lever FormatException\n        int b = int.Parse(texteB);\n        return a / b;                 // peut lever DivideByZeroException\n    }\n    catch (FormatException)\n    {\n        Console.WriteLine(\"Erreur : veuillez saisir des nombres valides.\");\n        return 0;\n    }\n    catch (DivideByZeroException)\n    {\n        Console.WriteLine(\"Erreur : division par zéro impossible.\");\n        return 0;\n    }\n    catch (Exception ex)  // filet de sécurité pour toute autre erreur imprévue\n    {\n        Console.WriteLine($\"Erreur inattendue : {ex.Message}\");\n        return 0;\n    }\n    finally\n    {\n        Console.WriteLine(\"Tentative de calcul terminée.\");  // s'exécute toujours\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(DiviserSaisieUtilisateur(\"10\", \"2\"));\n        Console.WriteLine(DiviserSaisieUtilisateur(\"10\", \"0\"));\n        Console.WriteLine(DiviserSaisieUtilisateur(\"abc\", \"2\"));\n    }\n}","keypoints":["try/catch capture une exception pour éviter l'arrêt brutal du programme","finally s'exécute toujours, erreur ou non — idéal pour libérer des ressources","Cibler le type d'exception le plus précis possible plutôt qu'Exception générique","COMException, que l'on rencontrera en Partie 2, est le type levé par toute erreur Sage 100c"],"exercise":"Réécrivez la méthode pour qu'elle utilise int.TryParse() plutôt que int.Parse(), afin d'éviter complètement le catch(FormatException).","difficulty":"Intermédiaire"},{"id":"cs-enums","module":"C# — Types avancés","title":"Énumérations (enum)","minutes":10,"difficulty":"Débutant","theory":"Une **énumération** (`enum`) est un type qui définit un ensemble fermé de valeurs nommées, bien plus lisible et sûr qu'une suite de constantes numériques ou de chaînes libres.\n\n```\nenum StatutCommande\n{\n    EnAttente,   // vaut 0 par défaut\n    Validee,     // vaut 1\n    Expediee,    // vaut 2\n    Livree       // vaut 3\n}\n```\n\nChaque valeur reçoit implicitement un entier croissant à partir de 0, mais on peut forcer des valeurs explicites (`Validee = 10`). On peut convertir un `enum` en `int` par cast, et inversement, mais c'est déconseillé si on peut éviter — le compilateur vérifie la cohérence des valeurs nommées, pas des entiers bruts.\n\nUtiliser un `enum` plutôt qu'un `string` ou un `int` pour représenter un statut, une catégorie ou un mode évite les fautes de frappe (`\"Valide\"` vs `\"validée\"`) et permet l'auto-complétion de l'IDE — exactement le rôle joué par les énumérateurs de Sage 100c (`eTypeDocument`...).","codeTitle":"Modéliser un statut de commande avec enum et switch","codeLang":"csharp","code":"using System;\n\nenum StatutCommande { EnAttente, Validee, Expediee, Livree }\n\nclass Program\n{\n    static string Describe(StatutCommande statut) => statut switch\n    {\n        StatutCommande.EnAttente => \"En attente de validation\",\n        StatutCommande.Validee   => \"Validée, prête à expédier\",\n        StatutCommande.Expediee  => \"En cours de livraison\",\n        StatutCommande.Livree    => \"Livrée au client\",\n        _ => \"Statut inconnu\"\n    };\n\n    static void Main()\n    {\n        StatutCommande commande = StatutCommande.Expediee;\n        Console.WriteLine(Describe(commande));\n        Console.WriteLine((int)commande);  // 2 : conversion explicite en entier\n    }\n}","keypoints":["enum définit un ensemble fermé de valeurs nommées, plus sûr qu'un string ou int libre","Chaque valeur a un entier implicite (0, 1, 2...) sauf valeur explicite forcée","Un switch (ou switch expression) sur un enum couvre naturellement tous les cas possibles"],"exercise":"Créez un enum NiveauUrgence (Basse, Moyenne, Haute, Critique) et une méthode qui retourne une couleur (string) associée à chaque niveau."},{"id":"cs-structs","module":"C# — Types avancés","title":"Struct vs Class : types valeur et types référence","minutes":14,"difficulty":"Intermédiaire","theory":"Deux catégories fondamentales de types en C# :\n\n**Type référence (`class`)** : une variable contient une **référence** (une adresse) vers l'objet, stocké séparément. Copier la variable copie la référence, pas l'objet — deux variables peuvent alors pointer vers **le même objet** en mémoire.\n\n**Type valeur (`struct`)** : une variable contient **directement** la donnée. Copier la variable copie **entièrement** la donnée — deux variables sont alors totalement indépendantes.\n\n```\nstruct Point { public int X, Y; }   // type valeur\nclass Personne { public string Nom; } // type référence\n```\n\nQuand choisir un `struct` ? Pour de petites structures de données immuables et légères (coordonnées, montant + devise...) où la copie systématique n'est pas coûteuse. Dans la grande majorité des cas en C# métier, `class` reste le choix par défaut — les `struct` sont l'exception, réservée à des cas de performance ciblés.\n\nLes types de base déjà rencontrés (`int`, `double`, `bool`, `char`, `DateTime`) sont en réalité tous des `struct` prédéfinis du framework .NET — voilà pourquoi copier un `int` dans une autre variable donne deux entiers totalement indépendants.","codeTitle":"Démontrer la différence de comportement à la copie","codeLang":"csharp","code":"using System;\n\nstruct PointStruct { public int X, Y; }\nclass PointClasse { public int X, Y; }\n\nclass Program\n{\n    static void Main()\n    {\n        // --- struct : copie indépendante ---\n        PointStruct p1 = new PointStruct { X = 1, Y = 1 };\n        PointStruct p2 = p1;      // COPIE complète des valeurs\n        p2.X = 99;\n        Console.WriteLine($\"p1.X = {p1.X}, p2.X = {p2.X}\");  // p1.X = 1, p2.X = 99\n\n        // --- class : référence partagée ---\n        PointClasse c1 = new PointClasse { X = 1, Y = 1 };\n        PointClasse c2 = c1;      // COPIE de la référence, même objet visé\n        c2.X = 99;\n        Console.WriteLine($\"c1.X = {c1.X}, c2.X = {c2.X}\");  // c1.X = 99, c2.X = 99 !\n    }\n}","keypoints":["class = type référence : deux variables peuvent pointer vers le même objet","struct = type valeur : chaque copie est totalement indépendante","int, double, bool, DateTime sont en réalité des struct prédéfinis du framework","class reste le choix par défaut en C# métier ; struct est réservé à des cas ciblés"],"exercise":"Prévoyez sur papier ce qu'affiche le code si p2 = p1 est remplacé par une méthode ModifierX(PointStruct p) qui fait p.X = 99 puis appelée avec ModifierX(p1) — p1.X change-t-il ?"},{"id":"cs-nullable","module":"C# — Types avancés","title":"Valeurs nulles : null, ?., ?? et types nullable","minutes":14,"difficulty":"Intermédiaire","theory":"`null` représente **l'absence de valeur** pour un type référence (`string`, un objet...). Accéder à un membre d'une variable qui vaut `null` lève une `NullReferenceException` — l'une des erreurs les plus fréquentes en C#.\n\n**Opérateur null-conditionnel `?.`** : `client?.Nom` retourne `null` automatiquement si `client` est `null`, au lieu de lever une exception — pratique pour naviguer un graphe d'objets potentiellement incomplet, comme une propriété liée absente côté Sage 100c.\n\n**Opérateur de coalescence null `??`** : `valeur ?? valeurParDefaut` retourne `valeur` si elle n'est pas `null`, sinon `valeurParDefaut`. Sa variante d'affectation `??=` : `x ??= valeurParDefaut;` n'affecte que si `x` était `null`.\n\n**Types valeur nullable (`int?`, `bool?`...)** : un `int` normal ne peut jamais être `null` — ajouter `?` (`int?`) l'autorise, utile pour représenter « pas encore renseigné » (ex. une note d'élève pas encore corrigée).\n\n**Nullable reference types (C# 8+)** : avec `#nullable enable`, le compilateur **avertit** si une variable de type référence risque de contenir `null` là où ce n'est pas prévu — une aide précieuse pour éviter les `NullReferenceException` avant même l'exécution.","codeTitle":"Naviguer un objet potentiellement incomplet sans exception","codeLang":"csharp","code":"using System;\n\nclass Adresse { public string Ville; }\nclass Client { public string Nom; public Adresse Adresse; }  // Adresse peut être null\n\nclass Program\n{\n    static void Main()\n    {\n        Client client1 = new Client { Nom = \"Rina\", Adresse = new Adresse { Ville = \"Fianarantsoa\" } };\n        Client client2 = new Client { Nom = \"Tojo\", Adresse = null };  // pas d'adresse renseignée\n\n        // ?. évite le crash si Adresse est null\n        string ville1 = client1.Adresse?.Ville ?? \"Ville inconnue\";\n        string ville2 = client2.Adresse?.Ville ?? \"Ville inconnue\";\n        Console.WriteLine(ville1);  // Fianarantsoa\n        Console.WriteLine(ville2);  // Ville inconnue (pas d'exception !)\n\n        // int? : une note pas encore corrigée\n        int? note = null;\n        note ??= 0;   // affecte seulement si note était null\n        Console.WriteLine($\"Note : {note}\");\n    }\n}","keypoints":["null représente l'absence de valeur pour un type référence","?. évite une NullReferenceException en cas de valeur null intermédiaire","?? fournit une valeur par défaut, ??= n'affecte que si la variable était null","int?, bool?... rendent un type valeur nullable pour représenter 'non renseigné'"],"exercise":"Écrivez une méthode qui prend une List<Client> et retourne, avec ?., la liste des villes (ou 'Inconnue' si absente) sans jamais lever d'exception."},{"id":"cs-generiques","module":"C# — Fonctionnalités avancées","title":"Génériques : écrire du code réutilisable pour n'importe quel type","minutes":18,"difficulty":"Avancé","theory":"Les **génériques** permettent d'écrire une classe ou une méthode qui fonctionne avec **n'importe quel type**, déterminé au moment de l'utilisation — `List<T>` et `Dictionary<K,V>`, déjà utilisés, sont eux-mêmes des classes génériques du framework.\n\n**Méthode générique** :\n```\nstatic T Premier<T>(List<T> liste) => liste[0];\n```\n`<T>` est un paramètre de type : à l'appel, `Premier<int>(...)` ou simplement `Premier(mesEntiers)` (le compilateur déduit `T` automatiquement).\n\n**Classe générique** :\n```\nclass Boite<T>\n{\n    public T Contenu { get; set; }\n}\n```\n`Boite<int>`, `Boite<string>`, `Boite<Article>`... sont autant de versions spécialisées générées à partir du même code source.\n\n**Contraintes de type (`where`)** : `where T : IComparable<T>` restreint `T` aux types qui respectent un contrat donné — permettant par exemple d'utiliser `.CompareTo()` en toute sécurité à l'intérieur d'une méthode générique.\n\nIntérêt majeur : éviter de dupliquer la même logique pour chaque type concret (une classe `BoiteInt`, une `BoiteString`...) tout en gardant la **sécurité de typage** à la compilation — contrairement à un simple `object` qui perdrait cette vérification.","codeTitle":"Une pile générique réutilisable pour n'importe quel type","codeLang":"csharp","code":"using System;\nusing System.Collections.Generic;\n\nclass PileSimple<T>\n{\n    private List<T> elements = new List<T>();\n\n    public void Empiler(T element) => elements.Add(element);\n\n    public T Depiler()\n    {\n        if (elements.Count == 0)\n            throw new InvalidOperationException(\"La pile est vide.\");\n        T dernier = elements[elements.Count - 1];\n        elements.RemoveAt(elements.Count - 1);\n        return dernier;\n    }\n\n    public int Count => elements.Count;\n}\n\n// Méthode générique avec contrainte de type\nstatic T PlusGrand<T>(T a, T b) where T : IComparable<T>\n{\n    return a.CompareTo(b) > 0 ? a : b;\n}\n\nclass Program\n{\n    static void Main()\n    {\n        PileSimple<string> pileTextes = new PileSimple<string>();\n        pileTextes.Empiler(\"Premier\");\n        pileTextes.Empiler(\"Second\");\n        Console.WriteLine(pileTextes.Depiler());  // \"Second\" (dernier entré, premier sorti)\n\n        PileSimple<int> pileEntiers = new PileSimple<int>();\n        pileEntiers.Empiler(10);\n        pileEntiers.Empiler(20);\n        Console.WriteLine(pileEntiers.Depiler());  // 20\n\n        Console.WriteLine(PlusGrand(5, 12));         // 12\n        Console.WriteLine(PlusGrand(\"abc\", \"abd\"));  // abd\n    }\n}","keypoints":["Un type générique <T> fonctionne avec n'importe quel type tout en restant sûr à la compilation","List<T> et Dictionary<K,V>, déjà utilisés, sont eux-mêmes génériques","where T : Contrainte restreint T aux types respectant une interface ou une classe donnée","Les génériques évitent de dupliquer du code pour chaque type concret"],"exercise":"Ajoutez à PileSimple<T> une méthode Sommet() qui retourne le dernier élément sans le retirer de la pile, en gérant le cas où la pile est vide."},{"id":"cs-delegates","module":"C# — Fonctionnalités avancées","title":"Delegates et événements : passer une méthode en paramètre","minutes":18,"difficulty":"Avancé","theory":"Un **delegate** est un type qui représente **une méthode elle-même** (sa signature), permettant de la passer en paramètre, de la stocker dans une variable, ou de l'appeler indirectement — le fondement de la programmation événementielle en C#.\n\n```\ndelegate bool Filtre(int nombre);   // signature : prend un int, retourne un bool\n\nstatic bool EstPair(int n) => n % 2 == 0;\n\nFiltre filtre = EstPair;   // le delegate référence la méthode\nConsole.WriteLine(filtre(4));  // appelle EstPair(4) indirectement\n```\n\n**Expressions lambda** (déjà rencontrées avec LINQ) sont en réalité des delegates anonymes : `x => x % 2 == 0` peut être assigné directement à une variable de type `Filtre`.\n\n**Delegates prédéfinis du framework**, à privilégier plutôt que de déclarer son propre delegate :\n- `Action` : méthode sans retour (`Action<string>` prend un paramètre string, ne retourne rien)\n- `Func<T,TResult>` : méthode avec retour (`Func<int,bool>` prend un int, retourne un bool)\n- `Predicate<T>` : équivalent à `Func<T,bool>`, utilisé notamment par `List<T>.Find()`\n\n**Événements (`event`)** : un cas d'usage spécialisé des delegates, permettant à un objet de **notifier** d'autres parties du code qu'un événement s'est produit (ex. un article passe en rupture de stock) — chaque abonné réagit sans que la classe qui déclenche l'événement ait besoin de le connaître à l'avance.","codeTitle":"Func, Action et un événement de rupture de stock","codeLang":"csharp","code":"using System;\n\nclass Article\n{\n    public string Reference;\n    private int stock;\n\n    // Événement : d'autres parties du code peuvent s'y abonner\n    public event Action<string> RuptureStock;\n\n    public int Stock\n    {\n        get => stock;\n        set\n        {\n            stock = value;\n            if (stock == 0)\n                RuptureStock?.Invoke(Reference);  // notifie tous les abonnés\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // Func<T,TResult> : prend un int, retourne un bool\n        Func<int, bool> estPair = n => n % 2 == 0;\n        Console.WriteLine(estPair(7));  // False\n\n        // Action<T> : prend un string, ne retourne rien\n        Action<string> afficherAlerte = msg => Console.WriteLine($\"ALERTE : {msg}\");\n\n        Article article = new Article { Reference = \"ART001\", Stock = 5 };\n        article.RuptureStock += afficherAlerte;         // abonnement à l'événement\n        article.RuptureStock += ref_ => Console.WriteLine($\"Commander {ref_} d'urgence !\");\n\n        article.Stock = 0;   // déclenche RuptureStock -> les 2 abonnés réagissent\n    }\n}","keypoints":["Un delegate représente une méthode elle-même, passable en paramètre ou stockable","Func<T,TResult> retourne une valeur, Action<T> n'en retourne pas","Une expression lambda est un delegate anonyme concis","event permet à un objet de notifier plusieurs abonnés sans les connaître à l'avance"],"exercise":"Ajoutez un second événement StockFaible déclenché quand le stock passe sous 3, avec au moins un abonné qui affiche un message."},{"id":"cs-fichiers","module":"C# — Fonctionnalités avancées","title":"Fichiers et flux : lire et écrire sur le disque","minutes":16,"difficulty":"Intermédiaire","theory":"Le namespace `System.IO` fournit les outils pour lire et écrire des fichiers. Les méthodes statiques de la classe `File` couvrent la majorité des besoins simples :\n\n- `File.WriteAllText(chemin, texte)` : écrit (en écrasant) tout le contenu d'un fichier texte.\n- `File.AppendAllText(chemin, texte)` : ajoute du texte à la fin d'un fichier existant.\n- `File.ReadAllText(chemin)` : lit tout le contenu d'un fichier en une seule chaîne.\n- `File.ReadAllLines(chemin)` : lit le fichier sous forme de tableau de lignes (`string[]`).\n- `File.Exists(chemin)` : teste l'existence avant de lire, pour éviter une exception.\n\nPour des fichiers volumineux ou un traitement ligne par ligne sans tout charger en mémoire, on utilise `StreamReader` / `StreamWriter`, à toujours encadrer d'un `using` (libère automatiquement la ressource, même en cas d'exception) :\n\n```\nusing (StreamWriter sw = new StreamWriter(chemin))\n{\n    sw.WriteLine(\"Une ligne\");\n}   // le fichier est automatiquement refermé ici, même en cas d'erreur\n```\n\n**Gestion d'erreurs spécifique aux fichiers** : `FileNotFoundException`, `UnauthorizedAccessException`, `IOException` (fichier verrouillé par un autre programme) — à capturer explicitement autour de toute opération sur fichier, exactement comme on l'a fait pour `COMException` avec Sage 100c.\n\nCas d'usage typique en classe : exporter la liste d'élèves ou d'articles saisis en mémoire vers un fichier `.txt` ou `.csv`, ou au contraire charger un catalogue depuis un fichier au démarrage du programme.","codeTitle":"Exporter puis relire une liste d'articles au format CSV","codeLang":"csharp","code":"using System;\nusing System.IO;\nusing System.Collections.Generic;\n\nclass Article\n{\n    public string Reference, Libelle;\n    public double Prix;\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string chemin = \"articles.csv\";\n\n        List<Article> articles = new List<Article>\n        {\n            new Article { Reference = \"ART001\", Libelle = \"Cahier\", Prix = 3500 },\n            new Article { Reference = \"ART002\", Libelle = \"Stylo\",  Prix = 500  },\n        };\n\n        // Écriture : une ligne CSV par article\n        using (StreamWriter sw = new StreamWriter(chemin))\n        {\n            foreach (var a in articles)\n                sw.WriteLine($\"{a.Reference};{a.Libelle};{a.Prix}\");\n        }\n        Console.WriteLine(\"Export terminé.\");\n\n        // Lecture et reconstruction des objets\n        try\n        {\n            if (File.Exists(chemin))\n            {\n                string[] lignes = File.ReadAllLines(chemin);\n                foreach (string ligne in lignes)\n                {\n                    string[] champs = ligne.Split(';');\n                    Console.WriteLine($\"Relu : {champs[0]} - {champs[1]} - {champs[2]} Ar\");\n                }\n            }\n        }\n        catch (IOException ex)\n        {\n            Console.WriteLine($\"Erreur de lecture : {ex.Message}\");\n        }\n    }\n}","keypoints":["File.WriteAllText/ReadAllText/ReadAllLines couvrent la majorité des besoins simples","using (StreamWriter/StreamReader ...) { } libère automatiquement la ressource","Toujours tester File.Exists() ou capturer IOException avant/pendant une lecture","Le format CSV (valeurs séparées par ; ou ,) est une façon simple de persister des objets ligne par ligne"],"exercise":"Modifiez l'exemple pour que la lecture reconstruise réellement des objets Article (pas seulement un affichage), stockés dans une nouvelle List<Article>."},{"id":"cs-async","module":"C# — Fonctionnalités avancées","title":"Programmation asynchrone : async / await","minutes":18,"difficulty":"Avancé","theory":"Une opération **asynchrone** (lecture réseau, accès fichier volumineux, appel à un service externe) peut prendre du temps sans bloquer le reste du programme pendant l'attente — essentiel pour une application réactive (interface graphique qui ne « gèle » pas, serveur qui traite plusieurs requêtes en parallèle).\n\n**`Task`** représente une opération en cours, dont le résultat sera disponible plus tard. **`async`** marque une méthode comme asynchrone ; **`await`** suspend l'exécution de cette méthode (sans bloquer le thread) jusqu'à ce que la tâche attendue soit terminée.\n\n```\nstatic async Task<string> TelechargerAsync(string url)\n{\n    // ... opération longue simulée ...\n    await Task.Delay(1000);   // suspend sans bloquer, ici 1 seconde\n    return \"Contenu téléchargé\";\n}\n```\n\nRègles essentielles :\n- Une méthode `async` retourne généralement `Task` (rien à renvoyer) ou `Task<T>` (renvoie un `T`), jamais directement `T`.\n- `await` ne peut être utilisé qu'à l'intérieur d'une méthode marquée `async`.\n- Appeler une méthode asynchrone sans `await` la lance mais **ne garantit pas** qu'elle soit terminée avant la suite du code — source d'erreurs classique.\n- Convention de nommage : suffixer les méthodes asynchrones par `Async` (`TelechargerAsync`).\n\nCe mécanisme deviendra pertinent dès qu'une application C# interagit avec des ressources externes lentes — fichiers volumineux, appels réseau, bases de données — un contexte que l'on retrouve au-delà de ce cours, par exemple pour des opérations longues sur de grosses bases Sage 100c.","codeTitle":"Simuler deux téléchargements en parallèle avec async/await","codeLang":"csharp","code":"using System;\nusing System.Threading.Tasks;\n\nclass Program\n{\n    static async Task<string> TelechargerAsync(string nomFichier, int dureeMs)\n    {\n        Console.WriteLine($\"Début téléchargement de {nomFichier}...\");\n        await Task.Delay(dureeMs);   // simule une attente réseau sans bloquer le programme\n        Console.WriteLine($\"{nomFichier} terminé.\");\n        return $\"Contenu de {nomFichier}\";\n    }\n\n    static async Task Main()\n    {\n        // Lancement des deux tâches en parallèle (pas l'une après l'autre)\n        Task<string> t1 = TelechargerAsync(\"rapport.pdf\", 2000);\n        Task<string> t2 = TelechargerAsync(\"catalogue.csv\", 1000);\n\n        // await attend que les deux soient terminées, sans bloquer entretemps\n        string[] resultats = await Task.WhenAll(t1, t2);\n\n        foreach (var r in resultats)\n            Console.WriteLine(r);\n\n        Console.WriteLine(\"Les deux téléchargements sont terminés.\");\n    }\n}","keypoints":["async/await permet d'attendre une opération longue sans bloquer le programme","Une méthode async retourne Task (rien) ou Task<T> (une valeur), jamais T directement","Task.WhenAll() attend plusieurs tâches lancées en parallèle","Convention : suffixer les méthodes asynchrones par Async"],"exercise":"Ajoutez une troisième tâche TelechargerAsync('images.zip', 3000) au Task.WhenAll et vérifiez que l'ordre d'affichage des 'terminé' ne suit pas forcément l'ordre de lancement."},{"id":"cs-extensions","module":"C# — Fonctionnalités avancées","title":"Méthodes d'extension : enrichir un type existant","minutes":12,"difficulty":"Avancé","theory":"Une **méthode d'extension** permet d'ajouter une méthode à un type **déjà existant** (même un type du framework comme `string` ou `List<T>`) sans modifier son code source ni créer de classe dérivée — c'est ainsi que fonctionnent la plupart des méthodes LINQ (`.Where()`, `.Select()`...), qui sont en réalité des extensions de `IEnumerable<T>`.\n\nRègles de déclaration :\n- La méthode doit être `static`, dans une classe `static`.\n- Le premier paramètre est précédé de `this` : il désigne le type étendu.\n\n```\nstatic class StringExtensions\n{\n    public static bool EstEmailValide(this string texte)\n    {\n        return texte.Contains(\"@\") && texte.Contains(\".\");\n    }\n}\n```\n\nUne fois définie (et son namespace importé via `using`), l'extension s'utilise comme une méthode native du type : `\"test@mail.com\".EstEmailValide()` — alors qu'il s'agit en réalité d'un appel déguisé à `StringExtensions.EstEmailValide(\"test@mail.com\")`.\n\nIntérêt pédagogique direct : comprendre les méthodes d'extension explique **pourquoi** `.Where()` ou `.Sum()` semblent « appartenir » à `List<T>` alors qu'elles sont définies ailleurs, dans la classe statique `Enumerable` du framework.","codeTitle":"Créer sa propre méthode d'extension sur List<T>","codeLang":"csharp","code":"using System;\nusing System.Collections.Generic;\n\nstatic class ListeExtensions\n{\n    // Extension générique : fonctionne sur List<T> quel que soit T\n    public static void AfficherTous<T>(this List<T> liste, string separateur = \", \")\n    {\n        Console.WriteLine(string.Join(separateur, liste));\n    }\n}\n\nstatic class StringExtensions\n{\n    public static bool EstEmailValide(this string texte)\n    {\n        return texte.Contains(\"@\") && texte.Contains(\".\");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<string> eleves = new List<string> { \"Rina\", \"Tojo\", \"Faniry\" };\n        eleves.AfficherTous(\" | \");   // s'utilise comme une méthode native de List<T>\n\n        string email = \"eleve@ecole.mg\";\n        Console.WriteLine(email.EstEmailValide());  // True\n    }\n}","keypoints":["Une méthode d'extension ajoute un comportement à un type existant sans le modifier","static class + static méthode + this sur le 1er paramètre = signature d'une extension","C'est exactement le mécanisme derrière .Where(), .Select(), .Sum() de LINQ","Une extension s'appelle comme une méthode native une fois son namespace importé"],"exercise":"Créez une méthode d'extension EstMajeur(this int age) qui retourne true si age >= 18, et testez-la sur plusieurs valeurs."},{"id":"cs-records","module":"C# — Fonctionnalités avancées","title":"Records : modéliser des données immuables","minutes":12,"difficulty":"Avancé","theory":"Un **record** (C# 9+) est une variante de classe optimisée pour représenter des **données** plutôt qu'un comportement — typiquement une valeur qui, une fois créée, ne doit plus changer (immuabilité).\n\n```\nrecord Coordonnees(double Latitude, double Longitude);\n```\n\nCette seule ligne génère automatiquement : les propriétés `Latitude`/`Longitude` en lecture seule, un constructeur, une comparaison d'**égalité par valeur** (deux records avec les mêmes données sont considérés égaux, contrairement à une `class` classique comparée par référence), et un affichage lisible via `ToString()`.\n\n**Différence clé avec `class`** :\n```\nCoordonnees c1 = new(48.85, 2.35);\nCoordonnees c2 = new(48.85, 2.35);\nConsole.WriteLine(c1 == c2);   // True pour un record (égalité par valeur)\n                                // False pour une class équivalente (égalité par référence)\n```\n\n**`with` expression** : `Coordonnees c3 = c1 with { Latitude = 50.0 };` crée une **nouvelle** copie de `c1` avec seulement `Latitude` modifiée — `c1` reste inchangé. C'est le moyen idiomatique de « modifier » un record tout en préservant son immuabilité.\n\nCas d'usage typique : représenter un résultat de calcul, un DTO (objet de transfert de données), une configuration — partout où l'on veut garantir qu'une donnée, une fois créée, ne sera jamais modifiée par erreur ailleurs dans le code.","codeTitle":"Comparer record et class sur l'égalité et l'immuabilité","codeLang":"csharp","code":"using System;\n\nrecord ArticlePanier(string Reference, int Quantite);   // immuable, égalité par valeur\n\nclass Program\n{\n    static void Main()\n    {\n        ArticlePanier a1 = new(\"ART001\", 2);\n        ArticlePanier a2 = new(\"ART001\", 2);\n\n        Console.WriteLine(a1 == a2);   // True : égalité par VALEUR, pas par référence\n        Console.WriteLine(a1);          // ArticlePanier { Reference = ART001, Quantite = 2 }\n\n        // with : crée une NOUVELLE copie modifiée, a1 reste inchangé\n        ArticlePanier a3 = a1 with { Quantite = 5 };\n        Console.WriteLine(a1);  // toujours Quantite = 2\n        Console.WriteLine(a3);  // Quantite = 5\n\n        // a1.Quantite = 10;   // ERREUR de compilation : propriété en lecture seule (immuable)\n    }\n}","keypoints":["record modélise une donnée immuable avec égalité par valeur automatique","== compare le contenu pour un record, la référence pour une class classique","with crée une copie modifiée sans altérer l'original (immuabilité préservée)","Cas d'usage type : DTO, résultat de calcul, configuration — toute donnée qui ne doit pas changer après création"],"exercise":"Créez un record ResultatExamen(string Eleve, double Note) et, à partir d'un ResultatExamen existant, produisez une copie avec with où seule la Note change."}];
+const EXERCISES = [{"id":"ex-fizzbuzz","title":"FizzBuzz","difficulty":"Débutant","themes":["Boucles","Conditions"],"statement":"Affichez les nombres de 1 à 100. Pour les multiples de 3, affichez « Fizz » à la place du nombre. Pour les multiples de 5, affichez « Buzz ». Pour les multiples de 3 ET 5, affichez « FizzBuzz ».","hints":["Testez d'abord la condition la plus restrictive (multiple de 3 ET 5) avant les conditions simples.","L'opérateur % (modulo) donne le reste d'une division : n % 3 == 0 teste un multiple de 3."],"solutionSketch":"for (int i = 1; i <= 100; i++)\n{\n    if (i % 15 == 0) Console.WriteLine(\"FizzBuzz\");\n    else if (i % 3 == 0) Console.WriteLine(\"Fizz\");\n    else if (i % 5 == 0) Console.WriteLine(\"Buzz\");\n    else Console.WriteLine(i);\n}"},{"id":"ex-palindrome","title":"Palindrome","difficulty":"Débutant","themes":["Chaînes","Boucles"],"statement":"Écrivez une méthode EstPalindrome(string mot) qui retourne true si le mot se lit de la même façon à l'endroit et à l'envers (ex. 'radar'), en ignorant la casse.","hints":["Comparez le mot à sa version inversée.","string.ToLower() uniformise la casse avant comparaison.","Pour inverser une chaîne : construire un nouveau string en la parcourant à l'envers, ou utiliser Array.Reverse sur un tableau de char."],"solutionSketch":"static bool EstPalindrome(string mot)\n{\n    string m = mot.ToLower();\n    char[] lettres = m.ToCharArray();\n    Array.Reverse(lettres);\n    string inverse = new string(lettres);\n    return m == inverse;\n}"},{"id":"ex-tri-bulle","title":"Tri à bulles","difficulty":"Intermédiaire","themes":["Tableaux","Boucles"],"statement":"Implémentez l'algorithme du tri à bulles pour trier un tableau d'entiers dans l'ordre croissant, sans utiliser Array.Sort().","hints":["Deux boucles imbriquées : la boucle externe répète les passages, l'interne compare deux éléments voisins.","Si un élément est plus grand que son voisin de droite, échangez-les (variable temporaire)."],"solutionSketch":"static void TriBulles(int[] tab)\n{\n    for (int i = 0; i < tab.Length - 1; i++)\n    {\n        for (int j = 0; j < tab.Length - 1 - i; j++)\n        {\n            if (tab[j] > tab[j + 1])\n            {\n                int tmp = tab[j];\n                tab[j] = tab[j + 1];\n                tab[j + 1] = tmp;\n            }\n        }\n    }\n}"},{"id":"ex-compte-mots","title":"Compteur de mots","difficulty":"Intermédiaire","themes":["Chaînes","Dictionary","LINQ"],"statement":"Écrivez une méthode qui prend un texte et retourne un Dictionary<string,int> donnant, pour chaque mot (en minuscules), le nombre d'occurrences dans le texte.","hints":["string.Split(' ') découpe le texte en mots.","Parcourez les mots et incrémentez un compteur dans le dictionnaire (ContainsKey ou TryGetValue).","Pensez à nettoyer la ponctuation avec .Trim(',','.','!','?') si besoin."],"solutionSketch":"static Dictionary<string,int> CompterMots(string texte)\n{\n    var compteur = new Dictionary<string,int>();\n    string[] mots = texte.ToLower().Split(' ');\n    foreach (string mot in mots)\n    {\n        string propre = mot.Trim(',', '.', '!', '?');\n        if (propre == \"\") continue;\n        if (compteur.ContainsKey(propre)) compteur[propre]++;\n        else compteur[propre] = 1;\n    }\n    return compteur;\n}"},{"id":"ex-pile-genrique","title":"Pile générique bornée","difficulty":"Avancé","themes":["Génériques","Exceptions"],"statement":"Créez une classe générique PileBornee<T> avec une capacité maximale fixée au constructeur. Empiler() doit lever une exception explicite si la pile est pleine, et Depiler() si elle est vide.","hints":["Stockez les éléments dans une List<T> interne.","Comparez List.Count à la capacité avant d'ajouter.","throw new InvalidOperationException(\"message\") est adapté à ce cas."],"solutionSketch":"class PileBornee<T>\n{\n    private List<T> elements = new List<T>();\n    private int capacite;\n\n    public PileBornee(int capacite) { this.capacite = capacite; }\n\n    public void Empiler(T item)\n    {\n        if (elements.Count >= capacite)\n            throw new InvalidOperationException(\"Pile pleine.\");\n        elements.Add(item);\n    }\n\n    public T Depiler()\n    {\n        if (elements.Count == 0)\n            throw new InvalidOperationException(\"Pile vide.\");\n        T last = elements[^1];\n        elements.RemoveAt(elements.Count - 1);\n        return last;\n    }\n}"},{"id":"ex-hierarchie-employes","title":"Hiérarchie d'employés polymorphe","difficulty":"Intermédiaire","themes":["Héritage","Polymorphisme"],"statement":"Créez une classe abstraite Employe (Nom, méthode abstraite CalculerSalaire()) puis deux classes dérivées EmployeFixe (salaire fixe) et EmployeCommission (salaire de base + commission sur ventes). Affichez le salaire de chaque employé d'une liste polymorphe via une boucle unique.","hints":["EmployeCommission a besoin d'un champ ventes en plus du salaire de base.","Utilisez List<Employe> pour stocker les deux types dans la même collection."],"solutionSketch":"abstract class Employe\n{\n    public string Nom;\n    public abstract double CalculerSalaire();\n}\nclass EmployeFixe : Employe\n{\n    public double Salaire;\n    public override double CalculerSalaire() => Salaire;\n}\nclass EmployeCommission : Employe\n{\n    public double SalaireBase, Ventes, TauxCommission;\n    public override double CalculerSalaire() => SalaireBase + Ventes * TauxCommission;\n}\n// foreach (Employe e in listeEmployes) Console.WriteLine($\"{e.Nom}: {e.CalculerSalaire()}\");"},{"id":"ex-linq-eleves","title":"Analyse LINQ d'une classe","difficulty":"Intermédiaire","themes":["LINQ","Collections"],"statement":"À partir d'une List<Eleve> (Nom, List<double> Notes), écrivez en LINQ : (1) la moyenne générale de la classe, (2) le nom de l'élève ayant la meilleure moyenne, (3) la liste des élèves en dessous de 10 de moyenne, triée par ordre alphabétique.","hints":["Une propriété calculée Moyenne sur Eleve simplifie beaucoup les requêtes.",".Average() sur une liste de moyennes donne la moyenne générale.",".OrderByDescending(e => e.Moyenne).First() donne le meilleur élève."],"solutionSketch":"// Eleve avec propriété calculée :\n// public double Moyenne => Notes.Average();\n\ndouble moyenneClasse = eleves.Average(e => e.Moyenne);\nstring meilleurEleve = eleves.OrderByDescending(e => e.Moyenne).First().Nom;\nvar enDifficulte = eleves.Where(e => e.Moyenne < 10)\n                          .OrderBy(e => e.Nom)\n                          .Select(e => e.Nom)\n                          .ToList();"},{"id":"ex-validation-formulaire","title":"Validateur de formulaire","difficulty":"Intermédiaire","themes":["Exceptions","Chaînes","Nullable"],"statement":"Écrivez une méthode ValiderInscription(string nom, string email, int? age) qui lève une ArgumentException avec un message précis si : nom est vide, email ne contient pas '@', ou age est null ou négatif.","hints":["Une exception par condition, avec un message explicite pour chaque cas.","string.IsNullOrWhiteSpace(nom) teste proprement une chaîne vide ou uniquement des espaces."],"solutionSketch":"static void ValiderInscription(string nom, string email, int? age)\n{\n    if (string.IsNullOrWhiteSpace(nom))\n        throw new ArgumentException(\"Le nom est obligatoire.\");\n    if (!email.Contains(\"@\"))\n        throw new ArgumentException(\"Email invalide.\");\n    if (age == null || age < 0)\n        throw new ArgumentException(\"Âge invalide.\");\n}"},{"id":"ex-fichier-notes","title":"Carnet de notes persistant","difficulty":"Avancé","themes":["Fichiers","Collections","Exceptions"],"statement":"Écrivez un programme qui charge une liste de notes depuis un fichier notes.txt (une note par ligne) au démarrage — s'il n'existe pas, démarrer avec une liste vide — permet d'ajouter une note, puis sauvegarde la liste mise à jour dans le fichier avant de quitter.","hints":["File.Exists() avant de lire évite une exception au premier lancement.","Convertissez chaque ligne en double avec double.Parse ou double.TryParse.","File.WriteAllLines() accepte un IEnumerable<string> : convertissez vos doubles avec .Select(n => n.ToString())."],"solutionSketch":"List<double> notes = new List<double>();\nif (File.Exists(\"notes.txt\"))\n{\n    foreach (string ligne in File.ReadAllLines(\"notes.txt\"))\n        if (double.TryParse(ligne, out double n)) notes.Add(n);\n}\n\nnotes.Add(15.5);  // exemple d'ajout\n\nFile.WriteAllLines(\"notes.txt\", notes.Select(n => n.ToString()));"},{"id":"ex-async-simulateur","title":"Simulateur de commandes asynchrone","difficulty":"Avancé","themes":["Async/await","Delegates"],"statement":"Écrivez une méthode TraiterCommandeAsync(string id) qui simule un traitement de 500 à 2000 ms (aléatoire) puis affiche 'Commande {id} traitée'. Lancez le traitement de 5 commandes en parallèle avec Task.WhenAll et mesurez le temps total avec un Stopwatch.","hints":["System.Diagnostics.Stopwatch : sw.Start(), sw.Stop(), sw.ElapsedMilliseconds.","new Random().Next(500,2000) pour un délai aléatoire.","Le temps total doit être proche du délai le plus long, pas de la somme de tous les délais (preuve du parallélisme)."],"solutionSketch":"static async Task TraiterCommandeAsync(string id)\n{\n    int delai = new Random().Next(500, 2000);\n    await Task.Delay(delai);\n    Console.WriteLine($\"Commande {id} traitée ({delai} ms)\");\n}\n\nvar sw = System.Diagnostics.Stopwatch.StartNew();\nvar taches = new[] { \"C1\",\"C2\",\"C3\",\"C4\",\"C5\" }.Select(TraiterCommandeAsync);\nawait Task.WhenAll(taches);\nsw.Stop();\nConsole.WriteLine($\"Temps total : {sw.ElapsedMilliseconds} ms\");"},{"id":"ex-record-immuable","title":"Panier immuable avec records","difficulty":"Avancé","themes":["Records","Immuabilité"],"statement":"En utilisant un record LigneCommande(string Article, int Quantite, double PrixUnitaire), écrivez une méthode qui calcule le total d'une liste de LigneCommande, puis créez une nouvelle ligne à partir d'une existante avec une quantité doublée, sans modifier l'originale.","hints":["Un record permet with { Propriete = nouvelleValeur } pour créer une copie modifiée.","Total d'une ligne = Quantite * PrixUnitaire ; sommez avec .Sum() en LINQ."],"solutionSketch":"record LigneCommande(string Article, int Quantite, double PrixUnitaire);\n\ndouble total = lignes.Sum(l => l.Quantite * l.PrixUnitaire);\n\nLigneCommande ligneDoublee = ligneOriginale with { Quantite = ligneOriginale.Quantite * 2 };\n// ligneOriginale reste inchangée"}];
+const PROJECTS = [{"id":"proj-bibliotheque","title":"Gestionnaire de bibliothèque scolaire","difficulty":"Débutant → Intermédiaire","duration":"2 à 3 séances","concepts":["Classes","Encapsulation","Collections","LINQ"],"description":"Un petit programme console pour gérer les emprunts de livres d'une bibliothèque de classe : catalogue de livres, liste de membres, emprunts et retours, avec recherche.","requirements":["Classe Livre (Titre, Auteur, ISBN, Disponible)","Classe Membre (Nom, List<Livre> LivresEmpruntes)","Classe Bibliotheque qui centralise List<Livre> et List<Membre>","Méthode Emprunter(membre, livre) : refuse si le livre n'est pas disponible, marque Disponible = false","Méthode Retourner(membre, livre) : remet Disponible = true","Une recherche par titre ou par auteur avec LINQ (.Where + Contains, insensible à la casse)","Un menu console en boucle (switch) proposant : Emprunter / Retourner / Rechercher / Lister les livres disponibles / Quitter"],"hints":["Commencez par les classes sans le menu, testez-les depuis Main() avec des données codées en dur.","Le menu console est une boucle while(true) avec un switch sur la saisie, et un cas 'Quitter' qui fait break."]},{"id":"proj-notes","title":"Système de gestion des notes de classe","difficulty":"Intermédiaire","duration":"2 séances","concepts":["Classes","LINQ","Fichiers","Tri"],"description":"Un programme qui gère les notes d'une classe sur plusieurs matières, calcule des moyennes pondérées par coefficient, classe les élèves, et exporte un bulletin en fichier texte.","requirements":["Classe Matiere (Nom, Coefficient)","Classe Eleve (Nom, Dictionary<Matiere,double> Notes)","Méthode MoyennePonderee(eleve) : somme(note*coef) / somme(coef)","Classement de la classe par moyenne décroissante avec LINQ (OrderByDescending)","Export d'un bulletin par élève dans un fichier .txt (nom, notes par matière, moyenne, rang dans la classe)","Gestion des cas limites : élève sans aucune note (éviter une division par zéro)"],"hints":["Pour le rang, calculez d'abord la liste triée, puis utilisez son index (+1) plutôt qu'un tri par élève.","Sum(kv => kv.Value * kv.Key.Coefficient) sur un Dictionary<Matiere,double> calcule le numérateur pondéré directement."]},{"id":"proj-inventaire","title":"Mini-inventaire avec persistance CSV","difficulty":"Intermédiaire → Avancé","duration":"2 à 3 séances","concepts":["POO","Fichiers","Exceptions","LINQ"],"description":"Une application de gestion de stock qui persiste son catalogue dans un fichier CSV entre deux exécutions, avec alertes de rupture de stock via un événement.","requirements":["Classe Article (Reference, Libelle, Prix, Quantite) avec un event StockFaible déclenché sous un seuil défini","Chargement du catalogue depuis inventaire.csv au démarrage (créer un catalogue vide si le fichier n'existe pas)","Sauvegarde automatique du catalogue dans le même fichier à chaque modification","Opérations : ajouter un article, vendre (diminue la quantité, vérifie qu'elle ne devient pas négative), réapprovisionner","Rapport LINQ : valeur totale du stock, top 3 articles les plus chers, articles en rupture","Toute erreur de lecture/écriture fichier doit être interceptée avec un message clair, sans faire planter le programme"],"hints":["Le format CSV proposé en leçon 'Fichiers et flux' (séparateur ;) suffit, pas besoin de bibliothèque externe.","Le seuil de l'event StockFaible peut être un simple paramètre du constructeur d'Article."]},{"id":"proj-quiz","title":"Quiz interactif chronométré","difficulty":"Avancé","duration":"2 séances","concepts":["Async/await","Delegates/events","Collections","Exceptions"],"description":"Un quiz en ligne de commande avec un chronomètre par question, un système de score, et un événement déclenché en cas de bonne réponse.","requirements":["Classe Question (Enonce, List<string> Choix, IndexReponseCorrecte)","Un event BonneReponse déclenché à chaque réponse correcte (utilisé pour incrémenter un score et afficher un encouragement)","Chaque question dispose d'un délai limite (ex. 10 secondes) : au-delà, la question est comptée comme fausse (utiliser Task.WhenAny entre la saisie utilisateur et un Task.Delay)","Un score final avec pourcentage de réussite et une appréciation (Excellent / Bien / À revoir) via switch expression","Gestion propre d'une saisie invalide (ex. lettre au lieu d'un chiffre) sans planter le quiz"],"hints":["Task.WhenAny(tacheSaisie, Task.Delay(10000)) permet de savoir laquelle des deux tâches finit en premier.","La lecture clavier bloquante (Console.ReadLine) doit être lancée dans une Task séparée pour être 'course' contre le délai."]}];
+const GLOSSARY = [{"terme":"Variable","def":"Espace mémoire nommé stockant une valeur d'un type donné, pouvant changer au cours du programme."},{"terme":"Type valeur / type référence","def":"Un type valeur (struct, int, bool...) copie la donnée elle-même ; un type référence (class) copie une adresse vers l'objet."},{"terme":"Classe","def":"Le plan/modèle décrivant la structure (champs) et le comportement (méthodes) d'un objet."},{"terme":"Objet","def":"Une instance concrète créée à partir d'une classe avec le mot-clé new."},{"terme":"Encapsulation","def":"Protection des données internes d'un objet, exposées de façon contrôlée via des propriétés et modificateurs d'accès."},{"terme":"Héritage","def":"Mécanisme permettant à une classe dérivée de réutiliser champs/méthodes d'une classe de base, via : ClasseParent."},{"terme":"Polymorphisme","def":"Capacité à appeler la même méthode sur des objets de types dérivés différents et obtenir le comportement propre à chacun."},{"terme":"Classe abstraite","def":"Classe ne pouvant jamais être instanciée directement, servant de base commune avec des méthodes abstraites à implémenter."},{"terme":"Interface","def":"Contrat définissant des méthodes/propriétés qu'une classe s'engage à implémenter, sans aucune implémentation dans l'interface elle-même."},{"terme":"Générique (Generic)","def":"Mécanisme permettant à une classe ou méthode de fonctionner avec n'importe quel type, déterminé à l'utilisation (List<T>...)."},{"terme":"Delegate","def":"Type représentant une méthode elle-même, permettant de la passer en paramètre ou de la stocker dans une variable."},{"terme":"Événement (event)","def":"Mécanisme basé sur les delegates permettant à un objet de notifier plusieurs abonnés qu'une action s'est produite."},{"terme":"LINQ","def":"Ensemble de méthodes (Where, Select, OrderBy...) permettant d'interroger une collection avec une syntaxe déclarative proche du SQL."},{"terme":"Exception","def":"Erreur survenant à l'exécution, interceptable avec try/catch pour éviter l'arrêt brutal du programme."},{"terme":"async / await","def":"Mots-clés permettant d'attendre une opération longue (Task) sans bloquer le reste du programme pendant l'attente."},{"terme":"Enum","def":"Type définissant un ensemble fermé de valeurs nommées, plus sûr qu'un string ou int libre."},{"terme":"Nullable","def":"Un type valeur suffixé de ? (int?, bool?...) peut alors contenir null pour représenter une absence de valeur."},{"terme":"Record","def":"Variante de classe optimisée pour des données immuables, avec égalité par valeur générée automatiquement."},{"terme":"Méthode d'extension","def":"Méthode statique ajoutant un comportement à un type existant sans le modifier, via this sur le 1er paramètre."},{"terme":"LINQ lambda","def":"Expression x => condition, une fonction anonyme concise très utilisée avec LINQ et les delegates."},{"terme":"List<T>","def":"Collection générique de taille variable, à privilégier sur les tableaux dès que la taille peut évoluer."},{"terme":"Dictionary<K,V>","def":"Collection associant une clé unique à une valeur, pour un accès rapide par clé."},{"terme":"Constructeur","def":"Méthode spéciale exécutée automatiquement à la création d'un objet, garantissant un état initial valide."},{"terme":"Namespace","def":"Espace de noms regroupant logiquement du code lié, importé avec le mot-clé using."}];
+</script>
+<script>
+/* ===================== ÉTAT & UTILITAIRES ===================== */
+const MODULE_ORDER = ["C# — Bases du langage","C# — Programmation orientée objet","C# — Collections & LINQ","C# — Gestion des erreurs & I/O","C# — Types avancés","C# — Fonctionnalités avancées"];
+const MODULE_DESC = {
+  "C# — Bases du langage":"Variables, types, opérateurs, conditions, boucles, tableaux, chaînes et méthodes — le socle indispensable avant toute POO.",
+  "C# — Programmation orientée objet":"Classes, objets, encapsulation, constructeurs, héritage, classes abstraites et interfaces.",
+  "C# — Collections & LINQ":"List<T>, Dictionary<K,V> et LINQ pour manipuler des ensembles de données efficacement.",
+  "C# — Gestion des erreurs & I/O":"try/catch/finally pour sécuriser l'exécution d'un programme.",
+  "C# — Types avancés":"Enum, struct vs class, et gestion propre des valeurs nulles.",
+  "C# — Fonctionnalités avancées":"Génériques, delegates/événements, fichiers, async/await, extensions et records."
+};
+
+let state = {
+  route: {view:"home"},
+  progress: {},
+  exFilter: {difficulty:"all", theme:"all"},
+  revealed: {},   // exerciseId -> bool (solution shown)
+};
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function renderTheory(txt){
+  const lines = txt.split("\n");
+  let html = "";
+  let inList = false, inTable = false, tableRows = [];
+  function closeList(){ if(inList){ html += "</ul>"; inList=false; } }
+  function flushTable(){
+    if(tableRows.length){
+      html += "<table><thead><tr>" + tableRows[0].map(c=>`<th>${inlineMd(c)}</th>`).join("") + "</tr></thead><tbody>";
+      for(let i=1;i<tableRows.length;i++){
+        html += "<tr>" + tableRows[i].map(c=>`<td>${inlineMd(c)}</td>`).join("") + "</tr>";
+      }
+      html += "</tbody></table>";
+      tableRows = [];
+    }
+    inTable = false;
+  }
+  function inlineMd(s){
+    s = escapeHtml(s);
+    s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/`(.+?)`/g, "<code>$1</code>");
+    s = s.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, "<em>$1</em>");
+    return s;
+  }
+  for(let raw of lines){
+    const line = raw.trim();
+    if(line.startsWith("```")){ continue; }
+    if(line.startsWith("|")){
+      inTable = true;
+      const cells = line.split("|").map(c=>c.trim()).filter((c,i,arr)=> !(c==="" && (i===0 || i===arr.length-1)));
+      tableRows.push(cells);
+      continue;
+    } else if(inTable){ flushTable(); }
+    if(line === ""){ closeList(); continue; }
+    if(line.startsWith("- ")){
+      if(!inList){ html += "<ul>"; inList = true; }
+      html += `<li>${inlineMd(line.slice(2))}</li>`;
+      continue;
+    }
+    closeList();
+    html += `<p>${inlineMd(line)}</p>`;
+  }
+  closeList(); flushTable();
+  return html;
+}
+
+function highlightCode(code, lang){
+  let c = escapeHtml(code);
+  c = c.replace(/(\/\/.*$)/gm, '<span class="tok-com">$1</span>');
+  c = c.replace(/(&quot;.*?&quot;)/g, '<span class="tok-str">$1</span>');
+  c = c.replace(/\b(using|new|static|void|if|else|foreach|in|return|try|catch|finally|class|struct|record|enum|interface|abstract|override|virtual|public|private|protected|readonly|var|true|false|null|this|throw|async|await|base|const|switch|case|default|get|set|where)\b/g,
+    '<span class="tok-kw">$1</span>');
+  c = c.replace(/\b(string|int|bool|double|DateTime|byte|List|Dictionary|Task|Func|Action|IEnumerable|Exception|COMException|IOException|Console|File|StreamReader|StreamWriter|Random|Stopwatch|Array)\b/g,
+    '<span class="tok-type">$1</span>');
+  c = c.replace(/\b(\d+\.?\d*)\b/g, '<span class="tok-num">$1</span>');
+  return c;
+}
+
+function saveProgress(){
+  try{ if(window.storage) window.storage.set('csharp-course-progress', JSON.stringify(state.progress), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    if(window.storage){
+      const r = await window.storage.get('csharp-course-progress', false);
+      if(r && r.value) state.progress = JSON.parse(r.value);
+    }
+  }catch(e){}
+  renderApp();
+}
+function toggleDone(lessonId){
+  state.progress[lessonId] = !state.progress[lessonId];
+  saveProgress();
+  renderApp();
+}
+
+function go(route){
+  state.route = route;
+  window.scrollTo(0,0);
+  renderApp();
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+/* ===================== SIDEBAR ===================== */
+function renderSidebar(){
+  const grouped = {};
+  MODULE_ORDER.forEach(m => grouped[m] = []);
+  THEORY.forEach(l => { if(!grouped[l.module]) grouped[l.module]=[]; grouped[l.module].push(l); });
+
+  let html = `<div class="side-nav-top">
+    <div class="side-item ${state.route.view==='home'?'active':''}" onclick="go({view:'home'})"><span class="dot"></span> Accueil</div>
+    <div class="side-item ${state.route.view==='practice'?'active':''}" onclick="go({view:'practice'})"><span class="dot"></span> Partie Pratique <span style="margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--text-dim)">${EXERCISES.length+PROJECTS.length}</span></div>
+    <div class="side-item ${state.route.view==='glossaire'?'active':''}" onclick="go({view:'glossaire'})"><span class="dot"></span> Glossaire</div>
+  </div>
+  <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:var(--gold);padding:6px 10px 8px;">Partie théorique</div>`;
+
+  MODULE_ORDER.forEach(mod => {
+    const items = grouped[mod];
+    if(!items.length) return;
+    const doneCount = items.filter(l=>state.progress[l.id]).length;
+    html += `<div class="side-group">
+      <div class="side-group-title">${mod} <span class="n">${doneCount}/${items.length}</span></div>`;
+    items.forEach(l => {
+      const active = state.route.view==='lesson' && state.route.id===l.id;
+      const done = !!state.progress[l.id];
+      html += `<div class="side-item ${active?'active':''} ${done?'done':''}" onclick="go({view:'lesson', id:'${l.id}'})">
+        <span class="dot"></span> ${escapeHtml(l.title)}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('sidebar').innerHTML = html;
+}
+
+/* ===================== HOME ===================== */
+function renderHome(){
+  const total = THEORY.length;
+  const done = Object.values(state.progress).filter(Boolean).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  let tracks = MODULE_ORDER.map(mod => {
+    const items = THEORY.filter(l=>l.module===mod);
+    if(!items.length) return "";
+    const doneCount = items.filter(l=>state.progress[l.id]).length;
+    return `<div class="track-card" onclick="go({view:'lesson', id:'${items[0].id}'})">
+      <div class="tc-top"><h3>${mod}</h3><span class="tc-count">${doneCount}/${items.length}</span></div>
+      <p>${MODULE_DESC[mod]}</p>
+    </div>`;
+  }).join("");
+
+  return `
+  <div class="hero">
+    <div class="hero-eyebrow">Cours complet · Console C# / .NET</div>
+    <h1>Apprendre le <em>C#</em> de A à Z</h1>
+    <p class="lead">Un cours structuré en deux grandes parties : la <strong>théorie</strong> — ${total} leçons, des variables aux fonctionnalités avancées (génériques, async/await, records) — et la <strong>pratique</strong> — une banque d'exercices notés par difficulté et des mini-projets complets à réaliser en classe.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="mark-done-btn" style="background:var(--gold);color:#1a1305;border-color:var(--gold);" onclick="go({view:'lesson', id:'${THEORY[0].id}'})">Commencer la théorie →</button>
+      <button class="mark-done-btn" onclick="go({view:'practice'})">Aller à la pratique</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="num">${total}</div><div class="lbl">Leçons théoriques</div></div>
+      <div class="hstat"><div class="num">${EXERCISES.length}</div><div class="lbl">Exercices notés</div></div>
+      <div class="hstat"><div class="num">${PROJECTS.length}</div><div class="lbl">Mini-projets complets</div></div>
+      <div class="hstat"><div class="num">${pct}%</div><div class="lbl">Progression théorie</div></div>
+    </div>
+  </div>
+
+  <div class="split-hero-grid">
+    <div class="split-card theory" onclick="go({view:'lesson', id:'${THEORY[0].id}'})">
+      <div class="sc-eyebrow">Partie 1 · Théorie</div>
+      <h2>Apprendre les concepts</h2>
+      <p>Des variables au premier programme jusqu'aux génériques, delegates, async/await et records — chaque leçon combine explication, exemple de code commenté et points clés.</p>
+      <div class="sc-stat">${total} leçons · 6 modules progressifs</div>
+    </div>
+    <div class="split-card practice" onclick="go({view:'practice'})">
+      <div class="sc-eyebrow">Partie 2 · Pratique</div>
+      <h2>S'entraîner et produire</h2>
+      <p>Une banque de ${EXERCISES.length} exercices classés par difficulté avec indices et piste de correction, plus ${PROJECTS.length} mini-projets complets à réaliser sur plusieurs séances.</p>
+      <div class="sc-stat">${EXERCISES.length} exercices · ${PROJECTS.length} projets</div>
+    </div>
+  </div>
+
+  <div class="section-label">Programme théorique détaillé</div>
+  <div class="track-grid">${tracks}</div>
+
+  <div class="footer-note">Cours de C# généraliste (console, .NET), conçu pour un usage en classe : chaque leçon a une case « Marquer comme terminée » pour suivre la progression des élèves.</div>
+  `;
+}
+
+/* ===================== LESSON ===================== */
+function renderLesson(id){
+  const idx = THEORY.findIndex(l=>l.id===id);
+  const l = THEORY[idx];
+  if(!l) return `<p>Leçon introuvable.</p>`;
+  const prev = THEORY[idx-1], next = THEORY[idx+1];
+  const done = !!state.progress[l.id];
+
+  return `
+  <div class="crumb"><a onclick="go({view:'home'})">Accueil</a> / ${escapeHtml(l.module)}</div>
+  <div class="lesson-head">
+    <div class="lesson-tag"><b>${escapeHtml(l.module)}</b> · Leçon ${idx+1} / ${THEORY.length} <span class="diff-badge ${l.difficulty}" style="margin-left:8px;">${l.difficulty}</span></div>
+    <h1>${escapeHtml(l.title)}</h1>
+    <div class="lesson-meta">
+      <span class="time">⏱ ${l.minutes} min de lecture</span>
+      <button class="mark-done-btn ${done?'is-done':''}" onclick="toggleDone('${l.id}')">${done? '✓ Leçon terminée' : 'Marquer comme terminée'}</button>
+    </div>
+  </div>
+
+  <div class="theory">${renderTheory(l.theory)}</div>
+
+  <div class="code-block">
+    <div class="cb-head">
+      <span class="cb-title">${escapeHtml(l.codeTitle)}</span>
+      <span style="display:flex;align-items:center;">
+        <span class="cb-lang">${l.codeLang}</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+      </span>
+    </div>
+    <pre><code>${highlightCode(l.code, l.codeLang)}</code></pre>
+  </div>
+
+  <div class="keypoints">
+    <div class="kp-label">À retenir</div>
+    <ul>${l.keypoints.map(k=>`<li>${escapeHtml(k)}</li>`).join("")}</ul>
+  </div>
+
+  <div class="exercise-box">
+    <div class="ex-label">✎ Exercice pratique</div>
+    <p>${escapeHtml(l.exercise)}</p>
+  </div>
+
+  <div class="lesson-nav">
+    ${prev ? `<div class="lesson-nav-btn" onclick="go({view:'lesson',id:'${prev.id}'})"><div class="dir">← Précédent</div><div class="ttl">${escapeHtml(prev.title)}</div></div>` : `<div></div>`}
+    ${next ? `<div class="lesson-nav-btn next" onclick="go({view:'lesson',id:'${next.id}'})"><div class="dir">Suivant →</div><div class="ttl">${escapeHtml(next.title)}</div></div>` : `<div class="lesson-nav-btn next" onclick="go({view:'practice'})"><div class="dir">Suivant →</div><div class="ttl">Passer à la Partie Pratique</div></div>`}
+  </div>
+  `;
+}
+
+function copyCode(btn){
+  const code = btn.closest('.code-block').querySelector('code').innerText;
+  navigator.clipboard.writeText(code).then(()=>{
+    const old = btn.innerText; btn.innerText = "Copié ✓";
+    setTimeout(()=>btn.innerText=old, 1500);
+  }).catch(()=>{});
+}
+
+/* ===================== PRATIQUE (hub) ===================== */
+function allThemes(){
+  const s = new Set();
+  EXERCISES.forEach(e => e.themes.forEach(t=>s.add(t)));
+  return [...s].sort();
+}
+
+function exFiltered(){
+  return EXERCISES.filter(e => {
+    if(state.exFilter.difficulty!=='all' && e.difficulty!==state.exFilter.difficulty) return false;
+    if(state.exFilter.theme!=='all' && !e.themes.includes(state.exFilter.theme)) return false;
+    return true;
+  });
+}
+
+function renderPractice(){
+  const exs = exFiltered();
+  const themes = allThemes();
+  return `
+  <div class="crumb"><a onclick="go({view:'home'})">Accueil</a> / Partie Pratique</div>
+  <div class="lesson-head">
+    <div class="lesson-tag"><b>S'entraîner</b></div>
+    <h1>Partie Pratique</h1>
+    <p style="color:var(--text-mid);font-size:14.5px;max-width:680px;">Une banque d'exercices indépendants (avec indices et piste de correction) et des mini-projets complets à réaliser sur plusieurs séances, pour mettre en application la théorie.</p>
+  </div>
+
+  <div class="section-label">Mini-projets</div>
+  <div>
+    ${PROJECTS.map(p=>`
+      <div class="proj-card" onclick="go({view:'project', id:'${p.id}'})">
+        <div class="pc-top">
+          <h3>${escapeHtml(p.title)}</h3>
+          <span class="diff-badge Intermédiaire" style="background:rgba(212,167,61,.15);color:var(--gold-bright);">${escapeHtml(p.difficulty)}</span>
+          <span class="pc-duration">⏱ ${escapeHtml(p.duration)}</span>
+        </div>
+        <p class="pdesc">${escapeHtml(p.description)}</p>
+        <div class="pc-themes">${p.concepts.map(c=>`<span class="theme-chip">${escapeHtml(c)}</span>`).join("")}</div>
+      </div>
+    `).join("")}
+  </div>
+
+  <div class="section-label">Banque d'exercices <span style="color:var(--text-dim);font-weight:400;margin-left:6px;">(${exs.length}/${EXERCISES.length})</span></div>
+
+  <div class="filter-row">
+    <span class="chip ${state.exFilter.difficulty==='all'?'active':''}" onclick="setExDiff('all')">Toutes difficultés</span>
+    <span class="chip ${state.exFilter.difficulty==='Débutant'?'active':''}" onclick="setExDiff('Débutant')">Débutant</span>
+    <span class="chip ${state.exFilter.difficulty==='Intermédiaire'?'active':''}" onclick="setExDiff('Intermédiaire')">Intermédiaire</span>
+    <span class="chip ${state.exFilter.difficulty==='Avancé'?'active':''}" onclick="setExDiff('Avancé')">Avancé</span>
+  </div>
+  <div class="filter-row">
+    <span class="chip ${state.exFilter.theme==='all'?'active':''}" onclick="setExTheme('all')">Tous les thèmes</span>
+    ${themes.map(t=>`<span class="chip ${state.exFilter.theme===t?'active':''}" onclick="setExTheme('${t.replace(/'/g,"\\'")}')">${escapeHtml(t)}</span>`).join("")}
+  </div>
+
+  <div>
+    ${exs.map(e=>`
+      <div class="ex-card" onclick="go({view:'exercise', id:'${e.id}'})">
+        <div class="ex-top">
+          <h3>${escapeHtml(e.title)}</h3>
+          <span class="diff-badge ${e.difficulty}">${e.difficulty}</span>
+        </div>
+        <p class="stmt">${escapeHtml(e.statement.slice(0,140))}${e.statement.length>140?'…':''}</p>
+        <div class="ex-themes">${e.themes.map(t=>`<span class="theme-chip">${escapeHtml(t)}</span>`).join("")}</div>
+      </div>
+    `).join("") || `<p style="color:var(--text-dim);font-size:13px;">Aucun exercice ne correspond à ces filtres.</p>`}
+  </div>
+  `;
+}
+function setExDiff(d){ state.exFilter.difficulty=d; renderMain(); }
+function setExTheme(t){ state.exFilter.theme=t; renderMain(); }
+
+function renderExercise(id){
+  const e = EXERCISES.find(x=>x.id===id);
+  if(!e) return `<p>Exercice introuvable.</p>`;
+  const shown = !!state.revealed[id];
+  return `
+  <div class="crumb"><a onclick="go({view:'home'})">Accueil</a> / <a onclick="go({view:'practice'})">Partie Pratique</a></div>
+  <div class="lesson-head">
+    <div class="lesson-tag"><span class="diff-badge ${e.difficulty}">${e.difficulty}</span></div>
+    <h1>${escapeHtml(e.title)}</h1>
+    <div class="ex-themes" style="margin-top:8px;">${e.themes.map(t=>`<span class="theme-chip">${escapeHtml(t)}</span>`).join("")}</div>
+  </div>
+
+  <div class="theory"><p>${escapeHtml(e.statement)}</p></div>
+
+  <div class="detail-section">
+    <div class="ds-label">Indices</div>
+    ${e.hints.map(h=>`<div class="hint-item">💡 ${escapeHtml(h)}</div>`).join("")}
+  </div>
+
+  <div class="detail-section">
+    <button class="reveal-btn" onclick="toggleReveal('${id}')">${shown?'Masquer la piste de correction':'Afficher une piste de correction'}</button>
+    <div class="solution-block ${shown?'shown':''}">
+      <div class="code-block" style="margin-top:16px;">
+        <div class="cb-head"><span class="cb-title">Piste de correction (une approche possible)</span><span class="cb-lang">C#</span></div>
+        <pre><code>${highlightCode(e.solutionSketch, 'csharp')}</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-nav">
+    <div class="lesson-nav-btn" onclick="go({view:'practice'})"><div class="dir">← Retour</div><div class="ttl">Tous les exercices</div></div>
+    <div></div>
+  </div>
+  `;
+}
+function toggleReveal(id){ state.revealed[id] = !state.revealed[id]; renderMain(); }
+
+function renderProject(id){
+  const p = PROJECTS.find(x=>x.id===id);
+  if(!p) return `<p>Projet introuvable.</p>`;
+  return `
+  <div class="crumb"><a onclick="go({view:'home'})">Accueil</a> / <a onclick="go({view:'practice'})">Partie Pratique</a></div>
+  <div class="lesson-head">
+    <div class="lesson-tag"><b>Mini-projet</b> · ${escapeHtml(p.difficulty)} · ⏱ ${escapeHtml(p.duration)}</div>
+    <h1>${escapeHtml(p.title)}</h1>
+    <div class="ex-themes" style="margin-top:8px;">${p.concepts.map(c=>`<span class="theme-chip">${escapeHtml(c)}</span>`).join("")}</div>
+  </div>
+
+  <div class="theory"><p>${escapeHtml(p.description)}</p></div>
+
+  <div class="detail-section">
+    <div class="ds-label">Cahier des charges</div>
+    <ul class="req-list">${p.requirements.map(r=>`<li>${escapeHtml(r)}</li>`).join("")}</ul>
+  </div>
+
+  <div class="detail-section">
+    <div class="ds-label">Pistes pour démarrer</div>
+    ${p.hints.map(h=>`<div class="hint-item">💡 ${escapeHtml(h)}</div>`).join("")}
+  </div>
+
+  <div class="lesson-nav">
+    <div class="lesson-nav-btn" onclick="go({view:'practice'})"><div class="dir">← Retour</div><div class="ttl">Tous les projets</div></div>
+    <div></div>
+  </div>
+  `;
+}
+
+/* ===================== GLOSSAIRE ===================== */
+function renderGlossaire(){
+  return `
+  <div class="crumb"><a onclick="go({view:'home'})">Accueil</a> / Glossaire</div>
+  <div class="lesson-head">
+    <div class="lesson-tag"><b>${GLOSSARY.length} termes</b></div>
+    <h1>Glossaire</h1>
+  </div>
+  <div class="gloss-grid">
+    ${GLOSSARY.map(g=>`<div class="gloss-item"><div class="g-term">${escapeHtml(g.terme)}</div><div class="g-def">${escapeHtml(g.def)}</div></div>`).join("")}
+  </div>
+  `;
+}
+
+/* ===================== ROUTER ===================== */
+function renderMain(){
+  const r = state.route;
+  let html = "";
+  if(r.view==='home') html = renderHome();
+  else if(r.view==='lesson') html = renderLesson(r.id);
+  else if(r.view==='practice') html = renderPractice();
+  else if(r.view==='exercise') html = renderExercise(r.id);
+  else if(r.view==='project') html = renderProject(r.id);
+  else if(r.view==='glossaire') html = renderGlossaire();
+  document.getElementById('main').innerHTML = html;
+  updateProgressPill();
+}
+function updateProgressPill(){
+  const total = THEORY.length;
+  const done = Object.values(state.progress).filter(Boolean).length;
+  const pill = document.getElementById('progressPill');
+  if(pill) pill.innerHTML = `<b>${done}</b>/${total} leçons`;
+}
+function renderApp(){ renderSidebar(); renderMain(); }
+
+/* ===================== GLOBAL SEARCH ===================== */
+function openSearch(){
+  document.getElementById('searchOverlay').classList.add('open');
+  document.getElementById('globalSearchInput').value = '';
+  document.getElementById('globalSearchInput').focus();
+  renderSearchResults('');
+}
+function closeSearch(){ document.getElementById('searchOverlay').classList.remove('open'); }
+function renderSearchResults(q){
+  const ql = q.trim().toLowerCase();
+  let results = [];
+  THEORY.forEach(l=>{
+    if(!ql || l.title.toLowerCase().includes(ql) || l.module.toLowerCase().includes(ql)){
+      results.push({type:'Leçon', title:l.title, sub:l.module, action:()=>go({view:'lesson',id:l.id})});
+    }
+  });
+  EXERCISES.forEach(e=>{
+    if(!ql || e.title.toLowerCase().includes(ql)){
+      results.push({type:'Exercice', title:e.title, sub:e.difficulty, action:()=>go({view:'exercise',id:e.id})});
+    }
+  });
+  PROJECTS.forEach(p=>{
+    if(!ql || p.title.toLowerCase().includes(ql)){
+      results.push({type:'Projet', title:p.title, sub:p.difficulty, action:()=>go({view:'project',id:p.id})});
+    }
+  });
+  results = results.slice(0,40);
+  document.getElementById('searchResults').innerHTML = results.map((r,i)=>`
+    <div class="search-result" data-i="${i}" onclick='(${r.action.toString()})();closeSearch();'>
+      <div class="sr-title">${escapeHtml(r.title)}</div>
+      <div class="sr-sub">${r.type} · ${escapeHtml(r.sub)}</div>
+    </div>
+  `).join("") || `<div style="padding:20px;color:var(--text-dim);font-size:13px;">Aucun résultat.</div>`;
+}
+
+/* ===================== THEME ===================== */
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  try{
+    if(window.storage) window.storage.set('csharp-course-theme', document.body.classList.contains('light')?'light':'dark', false);
+  }catch(e){}
+}
+async function loadTheme(){
+  try{
+    if(window.storage){
+      const r = await window.storage.get('csharp-course-theme', false);
+      if(r && r.value === 'light') document.body.classList.add('light');
+    }
+  }catch(e){}
+}
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await loadTheme();
+  document.getElementById('menuToggle').addEventListener('click', ()=>{
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  document.getElementById('searchTrigger').addEventListener('click', openSearch);
+  document.getElementById('searchOverlay').addEventListener('click', (e)=>{
+    if(e.target.id==='searchOverlay') closeSearch();
+  });
+  document.getElementById('globalSearchInput').addEventListener('input', (e)=>renderSearchResults(e.target.value));
+  document.addEventListener('keydown', (e)=>{
+    if((e.metaKey||e.ctrlKey) && e.key==='k'){ e.preventDefault(); openSearch(); }
+    if(e.key==='Escape') closeSearch();
+  });
+  renderApp();
+  await loadProgress();
+});
+</script>
+</body></html>

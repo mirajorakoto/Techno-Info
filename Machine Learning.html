@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Praxis ML — Apprendre le Machine Learning de zéro à expert</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f2f4ef; --bg2:#fdfdfb; --bg3:#e9ede5; --ink:#14201a; --mut:#5d6e64; --line:#d8ded4;
+  --c-ml:#0f8a5f; --c-py:#c07a08; --c-math:#0f7bb0; --c-dl:#c22f57; --env:#6b7280;
+  --code-bg:#0f1a15; --code-ink:#d8e6dd;
+  --shadow:0 1px 2px rgba(20,32,26,.05),0 8px 24px -12px rgba(20,32,26,.14);
+  --grid:rgba(20,32,26,.045);
+}
+html[data-theme="dark"]{
+  --bg:#0c120f; --bg2:#131b16; --bg3:#1a241e; --ink:#e9f0ea; --mut:#98a89d; --line:#26332b;
+  --c-ml:#3dd68f; --c-py:#f0b23e; --c-math:#4db8e8; --c-dl:#f4738f; --env:#9aa5ad;
+  --code-bg:#0a120e; --code-ink:#cfe0d5;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px -14px rgba(0,0,0,.6);
+  --grid:rgba(233,240,234,.035);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:15.5px;line-height:1.6;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:34px 34px}
+#bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+h1,h2,h3,h4,.num,.lvl-n{font-family:'Space Grotesk',sans-serif}
+code,pre,.mono{font-family:'IBM Plex Mono',monospace}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+::selection{background:var(--c-ml);color:#fff}
+[hidden]{display:none!important}
+.app{display:grid;grid-template-columns:262px 1fr;min-height:100vh;position:relative;z-index:1}
+main{min-width:0}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:14px;padding:12px 28px;
+  background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--ink)}
+.tb-title{font-family:'Space Grotesk';font-weight:600;font-size:15px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search{position:relative;flex:1;max-width:430px;margin-left:auto}
+.search input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--ink);font:inherit;font-size:14px;outline:none;transition:.2s}
+.search input:focus{border-color:var(--c-ml);box-shadow:0 0 0 3px color-mix(in srgb,var(--c-ml) 18%,transparent)}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
+#searchDrop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--bg2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);max-height:380px;overflow:auto;padding:6px}
+#searchDrop .sg{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);padding:8px 10px 3px}
+#searchDrop .si{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px}
+#searchDrop .si:hover{background:var(--bg3)}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line);border-radius:99px;background:var(--bg2);font-size:13px;font-weight:600;white-space:nowrap}
+.pill b{color:var(--c-ml)}
+#overlay{position:fixed;inset:0;background:rgba(10,16,12,.45);z-index:55;opacity:0;pointer-events:none;transition:.25s}
+body.nav-open #overlay{opacity:1;pointer-events:auto}
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:20px 14px;z-index:60}
+.brand{display:flex;align-items:center;gap:11px;padding:2px 8px 20px}
+.brand .mark{width:40px;height:40px;border-radius:11px;background:var(--ink);color:var(--bg);display:grid;place-items:center;flex:none}
+.brand .bt{font-family:'Space Grotesk';font-weight:700;font-size:17px;letter-spacing:.01em;line-height:1.1}
+.brand .bs{font-size:11px;color:var(--mut);letter-spacing:.06em;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:500;color:var(--mut);position:relative;transition:.18s}
+.nav a svg{flex:none;opacity:.75}
+.nav a:hover{background:var(--bg3);color:var(--ink)}
+.nav a.on{background:color-mix(in srgb,var(--c-ml) 11%,transparent);color:var(--ink);font-weight:600}
+.nav a.on::before{content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--c-ml)}
+.nav a .cnt{margin-left:auto;font-size:11px;font-weight:600;background:var(--bg3);border-radius:99px;padding:1px 7px;color:var(--mut)}
+.side-foot{padding-top:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.theme-btn{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:13.5px;font-weight:500;color:var(--ink)}
+.theme-btn:hover{border-color:var(--c-ml)}
+.side-note{font-size:11px;color:var(--mut);padding:0 6px;line-height:1.45}
+.view{padding:34px 34px 90px;max-width:1180px;margin:auto}
+.kicker{font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--c-ml)}
+.h1{font-size:clamp(28px,3.6vw,42px);line-height:1.08;font-weight:700;letter-spacing:-.015em}
+.h2{font-size:23px;font-weight:700;letter-spacing:-.01em;margin-bottom:14px}
+.sub{color:var(--mut);max-width:62ch}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.pad{padding:20px}
+.sec{margin-top:44px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.sec-head .h2{margin:0}
+.sec-head .lnk{margin-left:auto;font-size:13.5px;font-weight:600;color:var(--c-ml);background:none;border:none;text-decoration:none}
+.sec-head .lnk:hover{text-decoration:underline}
+.hero{display:grid;grid-template-columns:1.15fr .95fr;gap:28px;align-items:center;margin-bottom:8px}
+.hero .chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 22px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border:1px solid var(--line);border-radius:99px;font-size:12.5px;font-weight:600;background:var(--bg2)}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--pc,var(--c-ml))}
+.hero .cta{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:11px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:600;font-size:14.5px;text-decoration:none;transition:.18s;cursor:pointer}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--bg3)}
+.btn.sm{padding:8px 14px;font-size:13.5px;border-radius:9px}
+.console{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--bg2);box-shadow:var(--shadow)}
+.console .chd{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;font-family:'IBM Plex Mono';color:var(--mut)}
+.console .chd i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.console canvas{width:100%;height:230px;display:block}
+.console .cft{display:flex;justify-content:space-between;padding:9px 14px;font-size:12px;font-family:'IBM Plex Mono';color:var(--mut);border-top:1px solid var(--line)}
+.console .cft b{color:var(--c-ml)}
+.blink{animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.statband{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:30px}
+.stat{padding:18px 20px;position:relative;overflow:hidden;transition:.2s}
+.stat:hover{transform:translateY(-3px)}
+.stat .num{font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.stat .lb{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-top:6px;font-weight:600}
+.stat::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:3px;background:var(--pc,var(--c-ml));opacity:.85}
+.bar{height:8px;border-radius:99px;background:var(--bg3);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--pc,var(--c-ml));width:0;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.bar.lg{height:11px}
+.pillars{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px}
+.pcard{padding:20px;position:relative;overflow:hidden;transition:.2s}
+.pcard:hover{transform:translateY(-3px)}
+.pcard::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--pc)}
+.pcard .pt{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:700;font-size:16px}
+.pcard .pt .pic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--pc) 14%,transparent);color:var(--pc)}
+.pcard .pct{font-family:'Space Grotesk';font-weight:700;font-size:26px;margin:14px 0 6px}
+.pcard .nx{font-size:13px;color:var(--mut);margin-top:12px}
+.pcard .nx a{color:var(--pc);font-weight:600;text-decoration:none}
+.pcard .nx a:hover{text-decoration:underline}
+.pcard ul{list-style:none;margin-top:10px;font-size:13px;color:var(--mut)}
+.pcard ul li{padding:4px 0 4px 18px;position:relative}
+.pcard ul li::before{content:"▸";position:absolute;left:2px;color:var(--pc)}
+.lvlstrip{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 14px;scrollbar-width:thin}
+.lvlchip{flex:none;width:122px;border:1px solid var(--line);background:var(--bg2);border-radius:12px;padding:12px;cursor:pointer;transition:.18s;position:relative}
+.lvlchip:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--c-ml)}
+.lvlchip .n{font-family:'Space Grotesk';font-weight:700;font-size:20px}
+.lvlchip .t{font-size:11.5px;color:var(--mut);line-height:1.3;margin-top:2px;min-height:30px}
+.lvlchip .bar{margin-top:8px}
+.lvlchip.done .n{color:var(--c-ml)}
+.flow{display:flex;flex-wrap:wrap;gap:0;align-items:center;margin-top:8px}
+.flow .st{display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--line);border-radius:99px;background:var(--bg2);font-size:13px;font-weight:600}
+.flow .ar{color:var(--mut);padding:0 6px}
+.lane-hd{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.lane-hd .lh{display:flex;align-items:center;gap:9px;font-weight:700;font-family:'Space Grotesk';font-size:15px;padding:10px 14px;border-radius:11px;background:color-mix(in srgb,var(--pc) 10%,transparent);color:var(--pc);border:1px solid color-mix(in srgb,var(--pc) 30%,transparent)}
+.lane-hd .lh small{font-weight:500;color:var(--mut);font-family:'IBM Plex Sans';font-size:12px}
+.level-block{position:relative;padding:22px 0 26px 66px;border-top:1px dashed var(--line)}
+.level-block .lvnum{position:absolute;left:0;top:22px;width:46px;height:46px;border-radius:13px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:'Space Grotesk';font-weight:700;font-size:19px}
+.level-block .lvnum small{font-size:9px;letter-spacing:.1em;display:block;text-align:center;opacity:.7;font-weight:500}
+.level-block .lvnum span{line-height:1}
+.level-block .lt{font-family:'Space Grotesk';font-weight:700;font-size:19px}
+.level-block .ld{color:var(--mut);font-size:14px;margin:3px 0 16px;max-width:70ch}
+.lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}
+.lane{display:flex;flex-direction:column;gap:9px}
+.lcard{display:block;text-align:left;width:100%;background:var(--bg2);border:1px solid var(--line);border-left:4px solid var(--pc);border-radius:11px;padding:11px 13px;transition:.18s;position:relative}
+.lcard:hover{transform:translateX(4px);box-shadow:var(--shadow)}
+.lcard .tt{font-weight:600;font-size:13.8px;line-height:1.35;display:flex;gap:8px;align-items:flex-start}
+.lcard .mt{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;align-items:center}
+.tag{font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:99px;text-transform:uppercase}
+.tag.full{background:color-mix(in srgb,var(--c-ml) 15%,transparent);color:var(--c-ml)}
+.tag.syn{background:var(--bg3);color:var(--mut)}
+.tag.dur{background:transparent;border:1px solid var(--line);color:var(--mut);text-transform:none;font-weight:500}
+.chk{width:17px;height:17px;border-radius:50%;border:2px solid var(--line);flex:none;margin-top:2px;display:grid;place-items:center;font-size:10px;color:#fff;transition:.2s}
+.lcard.isdone .chk{background:var(--c-ml);border-color:var(--c-ml)}
+.lcard.isdone .tt{opacity:.72}
+.lane-empty{border:1px dashed var(--line);border-radius:11px;padding:14px;font-size:12.5px;color:var(--mut);text-align:center}
+.lhero{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.lhero .meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.lhero h1{font-size:clamp(24px,3vw,34px);letter-spacing:-.01em}
+.lsec{margin-top:38px;scroll-margin-top:90px}
+.lsec>.stt{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.lsec>.stt .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--pc,var(--c-ml)) 14%,transparent);color:var(--pc,var(--c-ml));flex:none}
+.lsec>.stt h2{font-size:19px;font-weight:700}
+.lsec .bd{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.lsec .bd h4{font-size:15px;margin:16px 0 6px;color:var(--c-ml)}
+.lsec .bd h4:first-child{margin-top:0}
+.lsec .bd p{margin:8px 0}
+.lsec .bd ul,.lsec .bd ol{margin:8px 0 8px 22px}
+.lsec .bd li{margin:5px 0}
+.lsec .bd table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+.lsec .bd th,.lsec .bd td{border:1px solid var(--line);padding:8px 11px;text-align:left}
+.lsec .bd th{background:var(--bg3);font-family:'Space Grotesk';font-size:13px}
+.callout{border-left:4px solid var(--cc,var(--c-ml));background:color-mix(in srgb,var(--cc,var(--c-ml)) 7%,transparent);border-radius:0 11px 11px 0;padding:13px 16px;margin:14px 0;font-size:14.5px}
+.callout.warn{--cc:var(--c-py)}
+.callout.danger{--cc:var(--c-dl)}
+.callout b.t{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;color:var(--cc,var(--c-ml))}
+.formula{background:var(--bg3);border:1px solid var(--line);border-radius:11px;padding:14px 18px;font-family:'IBM Plex Mono';font-size:15px;text-align:center;margin:12px 0;overflow-x:auto}
+.objgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.linkrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.pchip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;font-size:12.5px;font-weight:600;border:1px solid color-mix(in srgb,var(--pc) 35%,transparent);background:color-mix(in srgb,var(--pc) 9%,transparent);color:var(--pc);cursor:pointer;transition:.15s}
+.pchip:hover{transform:translateY(-2px)}
+.code{border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin:14px 0;background:var(--code-bg)}
+.code-hd{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.07)}
+.code-hd span{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#7fa392}
+.copy{background:transparent;border:1px solid rgba(255,255,255,.16);color:#bcd6c8;font-size:11.5px;padding:3px 10px;border-radius:7px;transition:.15s}
+.copy:hover{background:rgba(255,255,255,.1)}
+.copy.ok{border-color:#3dd68f;color:#3dd68f}
+.code pre{padding:15px 17px;overflow-x:auto;font-size:13.3px;line-height:1.65;color:var(--code-ink)}
+.tok-k{color:#6ee7a8;font-weight:600}.tok-s{color:#f0c674}.tok-c{color:#6d8578;font-style:italic}.tok-n{color:#82c7f0}
+.out{border:1px dashed var(--line);border-radius:11px;background:var(--bg3);padding:12px 16px;font-family:'IBM Plex Mono';font-size:13px;margin:6px 0 14px;color:var(--mut);white-space:pre-wrap}
+.out::before{content:"▸ Résultat attendu";display:block;font-family:'IBM Plex Sans';font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--c-ml);margin-bottom:5px}
+.expl-toggle{background:none;border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--ink);margin:6px 0}
+.expl-toggle:hover{border-color:var(--c-ml);color:var(--c-ml)}
+.expl-list{border:1px solid var(--line);border-radius:11px;overflow:hidden;margin:8px 0}
+.expl-list .er{display:grid;grid-template-columns:40px 1fr;gap:10px;padding:9px 13px;border-top:1px solid var(--line);font-size:13.5px}
+.expl-list .er:first-child{border-top:none}
+.expl-list .er:nth-child(odd){background:var(--bg3)}
+.expl-list .er b{font-family:'IBM Plex Mono';color:var(--c-ml);font-weight:600}
+.quiz{border:1px solid var(--line);border-radius:13px;background:var(--bg2);padding:18px 20px;margin:12px 0}
+.quiz .qq{font-weight:600;font-size:15px;display:flex;gap:10px}
+.quiz .qq .qtag{flex:none;font-size:10.5px;font-weight:700;letter-spacing:.08em;padding:3px 9px;border-radius:99px;background:var(--bg3);color:var(--mut);height:fit-content;text-transform:uppercase}
+.quiz .opts{display:flex;flex-direction:column;gap:8px;margin-top:13px}
+.opt{display:flex;align-items:center;gap:11px;text-align:left;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:14px;transition:.15s;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--c-ml);transform:translateX(3px)}
+.opt .k{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);display:grid;place-items:center;font-family:'Space Grotesk';font-weight:700;font-size:12px;flex:none}
+.opt.good{background:color-mix(in srgb,var(--c-ml) 13%,transparent);border-color:var(--c-ml);animation:pop .35s}
+.opt.good .k{background:var(--c-ml);color:#fff;border-color:var(--c-ml)}
+.opt.bad{background:color-mix(in srgb,var(--c-dl) 12%,transparent);border-color:var(--c-dl);animation:shake .4s}
+.opt.bad .k{background:var(--c-dl);color:#fff;border-color:var(--c-dl)}
+.opt:disabled{cursor:default}
+@keyframes pop{50%{transform:scale(1.02)}}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.qfb{margin-top:13px;border-radius:11px;padding:14px 16px;font-size:14px;background:var(--bg3);border:1px solid var(--line);animation:fadein .4s}
+.qfb .v{font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+.qfb .v.ok{color:var(--c-ml)}.qfb .v.ko{color:var(--c-dl)}
+.qfb .why{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);color:var(--mut)}
+.qfb .why li{margin:4px 0 4px 18px}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}}
+.viz{border:1px solid var(--line);border-radius:14px;background:var(--bg2);overflow:hidden;margin:16px 0}
+.viz .vhd{display:flex;align-items:center;gap:10px;padding:10px 15px;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--mut);font-family:'IBM Plex Mono'}
+.viz .vhd i{width:8px;height:8px;border-radius:50%;background:var(--c-ml);animation:blink 1.6s steps(1) infinite}
+.viz canvas{width:100%;display:block}
+.viz .vct{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:12px 15px;border-top:1px solid var(--line);font-size:13px}
+.viz .vct label{display:flex;align-items:center;gap:8px;font-weight:600}
+.viz input[type=range]{accent-color:var(--c-ml);width:120px}
+.viz .btn{padding:7px 13px;font-size:12.5px;border-radius:8px}
+.viz .ro{font-family:'IBM Plex Mono';font-size:12.5px;color:var(--mut);margin-left:auto}
+.viz .ro b{color:var(--c-ml)}
+.neuro{display:grid;grid-template-columns:1fr 220px;gap:0}
+.neuro .nmain{padding:18px}
+.neuro .nctl{border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px;font-size:13px}
+.neuro .nctl label{display:flex;flex-direction:column;gap:4px;font-weight:600}
+.neuro .bulb{width:74px;height:74px;border-radius:50%;margin:8px auto;background:radial-gradient(circle,var(--c-py),color-mix(in srgb,var(--c-py) 40%,transparent))}
+.proj{border:1px solid var(--line);border-radius:14px;background:var(--bg2);overflow:hidden;transition:.2s}
+.proj:hover{box-shadow:var(--shadow)}
+.proj .ph{padding:18px 20px;cursor:pointer;display:flex;gap:16px;align-items:flex-start}
+.proj .pn{font-family:'Space Grotesk';font-weight:700;font-size:26px;color:var(--c-ml);line-height:1;flex:none;width:44px}
+.proj .ptt{font-family:'Space Grotesk';font-weight:700;font-size:17px}
+.proj .pd{color:var(--mut);font-size:13.5px;margin-top:3px}
+.proj .pm{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.proj .pbody{border-top:1px dashed var(--line);padding:18px 20px;background:color-mix(in srgb,var(--bg3) 45%,transparent)}
+.proj .pbody h4{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ml);margin:14px 0 6px}
+.proj .pbody h4:first-child{margin-top:0}
+.proj ol,.proj ul{margin-left:20px;font-size:14px}
+.proj li{margin:4px 0}
+.chev{margin-left:auto;transition:.25s;flex:none;color:var(--mut)}
+.proj.open .chev{transform:rotate(180deg)}
+.envgrid{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:start}
+.envtabs{display:flex;flex-direction:column;gap:5px;position:sticky;top:86px}
+.envtabs button{display:flex;align-items:center;gap:9px;text-align:left;padding:10px 13px;border-radius:10px;border:1px solid transparent;background:none;font-size:14px;font-weight:500;color:var(--mut);transition:.15s}
+.envtabs button:hover{background:var(--bg2);color:var(--ink)}
+.envtabs button.on{background:var(--bg2);border-color:var(--line);color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
+.glosearch{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.glosearch input{flex:1;min-width:220px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--ink);font:inherit}
+.gterm{padding:16px 18px;transition:.18s}
+.gterm:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.gterm .t{font-family:'Space Grotesk';font-weight:700;font-size:15.5px}
+.gterm .c{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--c-math);float:right}
+.gterm .d{font-size:13.5px;color:var(--mut);margin-top:5px}
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.rankbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.rank{padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:var(--bg2);text-align:center;flex:1;min-width:130px}
+.rank .r{font-family:'Space Grotesk';font-weight:700;font-size:15px}
+.rank .s{font-size:11.5px;color:var(--mut)}
+.rank.on{border-color:var(--c-ml);background:color-mix(in srgb,var(--c-ml) 9%,transparent)}
+.rank.on .r{color:var(--c-ml)}
+.prog-row{display:grid;grid-template-columns:190px 1fr 60px;gap:14px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.prog-row:last-child{border:none}
+.prog-row .pc-t{font-weight:600}
+.prog-row .pc-n{text-align:right;font-family:'Space Grotesk';font-weight:600;color:var(--mut)}
+.foot{border-top:1px solid var(--line);padding:26px 34px;color:var(--mut);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:none}
+@media(max-width:1020px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;width:270px;transform:translateX(-105%);transition:.28s;box-shadow:var(--shadow)}
+  body.nav-open .sidebar{transform:none}
+  .burger{display:block}
+  .hero{grid-template-columns:1fr}
+  .pillars{grid-template-columns:1fr}
+  .statband{grid-template-columns:repeat(2,1fr)}
+  .lane-hd,.lanes{grid-template-columns:1fr}
+  .level-block{padding-left:0;padding-top:70px}
+  .objgrid{grid-template-columns:1fr}
+  .envgrid{grid-template-columns:1fr}
+  .envtabs{position:static;flex-direction:row;overflow-x:auto}
+  .neuro{grid-template-columns:1fr}
+  .neuro .nctl{border-left:none;border-top:1px solid var(--line)}
+  .view{padding:24px 18px 70px}
+  .tb-title{display:none}
+}
+</style>
+</head>
+<body>
+<canvas id="bgfx"></canvas>
+<div id="overlay" onclick="document.body.classList.remove('nav-open')"></div>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="18" r="2.4"/><circle cx="12" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M7.4 16.2 10.8 8.2M13.2 8.2l3.4 8M8.4 18h7.2"/></svg></div>
+    <div><div class="bt">PRAXIS&nbsp;ML</div><div class="bs">de zéro à expert</div></div>
+  </div>
+  <nav class="nav" id="nav"></nav>
+  <div class="side-foot">
+    <button class="theme-btn" id="themeBtn">🌙 <span id="themeLbl">Thème sombre</span></button>
+    <div class="side-note">3 piliers, 13 niveaux, 46 leçons.<br>Progression sauvegardée automatiquement.</div>
+  </div>
+</aside>
+<main>
+  <header class="topbar">
+    <button class="burger" onclick="document.body.classList.toggle('nav-open')" aria-label="menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+    <div class="tb-title" id="tbTitle">Tableau de bord</div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="searchIn" type="text" placeholder="Rechercher une leçon, un terme, un projet…  ( / )" autocomplete="off">
+      <div id="searchDrop" hidden></div>
+    </div>
+    <div class="pill">Parcours&nbsp;: <b id="hdrPct">0%</b></div>
+  </header>
+  <section class="view" id="v-dash"></section>
+  <section class="view" id="v-parcours" hidden></section>
+  <section class="view" id="v-pillar" hidden></section>
+  <section class="view" id="v-lesson" hidden></section>
+  <section class="view" id="v-projets" hidden></section>
+  <section class="view" id="v-exercices" hidden></section>
+  <section class="view" id="v-env" hidden></section>
+  <section class="view" id="v-glossaire" hidden></section>
+  <section class="view" id="v-progression" hidden></section>
+  <footer class="foot">
+    <span>© 2026 Praxis ML — plateforme d'auto-formation Machine Learning.</span>
+    <span>🧠 ML · 🐍 Python ·  Maths — toujours ensemble.</span>
+  </footer>
+</main>
+</div>
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function hl(src,lang){
+  let s=esc(src);
+  if(lang==="bash") return s.replace(/(^|\n)(#[^\n]*)/g,'$1<span class="tok-c">$2</span>')
+    .replace(/\b(pip|python|python3|git|docker|jupyter|cd|mkdir|ls|source)\b/g,'<span class="tok-k">$1</span>');
+  return s
+    .replace(/("""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*')/g,'<span class="tok-s">$1</span>')
+    .replace(/\b(import|from|def|return|for|while|if|elif|else|in|not|and|or|True|False|None|class|with|as|lambda|try|except|range|len|print|type|int|float|str|bool|input)\b/g,'<span class="tok-k">$1</span>')
+    .replace(/\b(\d+\.?\d*)\b/g,'<span class="tok-n">$1</span>');
+}
+function codeBlock(src,lang,label){
+  return `<div class="code"><div class="code-hd"><span>${label||lang||"python"}</span><button class="copy" data-raw="${encodeURIComponent(src)}">Copier</button></div><pre><code>${hl(src,lang)}</code></pre></div>`;
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".copy"); if(!b)return;
+  navigator.clipboard.writeText(decodeURIComponent(b.dataset.raw));
+  b.textContent="Copié ✓"; b.classList.add("ok"); setTimeout(()=>{b.textContent="Copier";b.classList.remove("ok")},1500);
+});
+const LS="praxisml_v1";
+let S={done:{},theme:"light",quiz:{}};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem(LS)||"{}"))}catch(e){}
+const save=()=>localStorage.setItem(LS,JSON.stringify(S));
+const isDone=id=>!!S.done[id];
+
+const PIL={
+  ml:{n:"Machine Learning",c:"var(--c-ml)"},
+  py:{n:"Python & Programmation",c:"var(--c-py)"},
+  math:{n:"Mathématiques",c:"var(--c-math)"},
+  env:{n:"Environnement & Outils",c:"var(--env)"}
+};
+const NAV=[
+ {v:"dash",t:"Tableau de bord",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="10" rx="2"/><rect x="13" y="3" width="8" height="6" rx="2"/><rect x="13" y="11" width="8" height="10" rx="2"/><rect x="3" y="15" width="8" height="6" rx="2"/></svg>'},
+ {v:"parcours",t:"Parcours complet",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4a1 1 0 0 1 1-1h11l-2.5 4L17 11H6"/></svg>'},
+ {v:"p-ml",t:"Machine Learning",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="14" height="14" rx="3"/><circle cx="10" cy="10" r="1.4" fill="currentColor"/><circle cx="14.5" cy="13.5" r="1.4" fill="currentColor"/><path d="M10.8 11 13.6 13M5 10H2M5 14H2M22 10h-3M22 14h-3"/></svg>'},
+ {v:"p-py",t:"Python",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m7 8-4 4 4 4M17 8l4 4-4 4M13 5l-2.5 14"/></svg>'},
+ {v:"p-math",t:"Mathématiques",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 5H7l5.5 7L7 19h11M4 3h4"/></svg>'},
+ {v:"p-dl",t:"Deep Learning",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="6" r="1.7"/><circle cx="12" cy="18" r="1.7"/><circle cx="19" cy="12" r="1.7"/><path d="M6.5 11 10.4 7M6.5 13l3.9 4M13.7 6.8l3.8 4M13.7 17.2l3.8-4"/></svg>'},
+ {v:"projets",t:"Projets",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V4a1 1 0 0 1 1-1h11l-2.5 4L17 11H5"/></svg>'},
+ {v:"exercices",t:"Exercices",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>'},
+ {v:"env",t:"Environnement",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-2.4z"/></svg>'},
+ {v:"glossaire",t:"Glossaire",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>'},
+ {v:"progression",t:"Progression",ic:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 17l6-6 4 4 8-8M17 7h4v4"/></svg>'}
+];
+
+/* ================= LEÇONS ================= */
+const L={};
+L["env-decouverte"]={t:`L'ordinateur, les fichiers et le terminal`,l:0,p:"env",d:`25 min`,
+ obj:[`Se repérer dans les fichiers et dossiers de son ordinateur`,`Ouvrir un terminal et utiliser les commandes essentielles (cd, ls, mkdir)`,`Comprendre pourquoi le terminal est indispensable en ML`],
+ pre:[],
+ th:`<p>Avant de programmer, il faut savoir <b>où l'on range ses fichiers</b> et comment y accéder. En machine learning, vous manipulerez des dizaines de datasets, de scripts et de modèles : une organisation rigoureuse est votre premier outil.</p>
+ <p>Le <b>terminal</b> est une télécommande textuelle pour l'ordinateur. Au lieu de cliquer dans des dossiers, on tape une commande. C'est ainsi qu'on installe Python, qu'on lance des entraînements et qu'on utilise Git.</p>
+ <table><tr><th>Commande</th><th>Effet</th></tr><tr><td><code>cd mon_dossier</code></td><td>entrer dans un dossier</td></tr><tr><td><code>cd ..</code></td><td>remonter d'un niveau</td></tr><tr><td><code>ls</code> (Mac/Linux) / <code>dir</code> (Windows)</td><td>lister le contenu</td></tr><tr><td><code>mkdir projet</code></td><td>créer un dossier</td></tr><tr><td><code>pwd</code></td><td>afficher le dossier courant</td></tr></table>
+ <div class="callout"><b class="t">Habitude d'expert</b>Créez un dossier racine unique, par exemple <code>~/ml-projects/</code>, avec un sous-dossier par projet. Vous ne chercherez jamais un fichier.</div>`,
+ quiz:[{type:"qcm",q:`Quelle commande permet d'entrer dans le dossier <code>data</code> ?`,o:[`ls data`,`cd data`,`mkdir data`],g:1,
+ e:`<code>cd</code> (change directory) déplace le terminal dans le dossier indiqué.`,w:[`<code>ls</code> liste le contenu mais n'y entre pas.`,`<code>mkdir</code> crée un dossier, il n'y entre pas.`]}],
+ sk:[`Naviguer dans l'arborescence`,`Utiliser cd, ls, mkdir`],res:[`Le terminal remplace la souris pour tout ce qui est technique`,`Un dossier par projet, toujours`],nx:[`py-decouverte`,`Votre premier code Python s'écrit dans un fichier, quelque part dans un dossier.`]};
+
+L["py-decouverte"]={t:`Python découverte : variables, types et print`,l:0,p:"py",d:`45 min`,full:1,
+ obj:[`Créer et modifier des variables`,`Distinguer int, float, str et bool`,`Afficher un résultat avec print() et demander une valeur avec input()`,`Lire le type d'une valeur avec type()`],
+ pre:[`env-decouverte`],
+ th:`<p>Python est le langage du machine learning : NumPy, Pandas, scikit-learn et PyTorch sont tous écrits pour lui. Bonne nouvelle : c'est aussi l'un des plus simples à apprendre.</p>
+ <h4>Une variable = une boîte avec une étiquette</h4>
+ <p>Quand vous écrivez <code>age = 25</code>, vous collez l'étiquette <code>age</code> sur la valeur <code>25</code>. Plus tard, <code>age</code> vous redonne cette valeur. En ML, chaque <b>feature</b> d'un dataset est exactement cela : une colonne avec un nom et des valeurs.</p>
+ <h4>Les 4 types de base</h4>
+ <table><tr><th>Type</th><th>Exemple</th><th>Usage ML</th></tr><tr><td><code>int</code></td><td><code>25</code></td><td>âge, quantité</td></tr><tr><td><code>float</code></td><td><code>19.99</code></td><td>prix, température, poids d'un modèle</td></tr><tr><td><code>str</code></td><td><code>"Ada"</code></td><td>texte, catégories</td></tr><tr><td><code>bool</code></td><td><code>True</code></td><td>oui/non, 0/1</td></tr></table>`,
+ int:`<p>Imaginez une fiche de renseignements : nom, âge, taille, « est étudiant ? ». Chaque case a un type différent. Un dataset ML n'est rien d'autre qu'un empilement de ces fiches — et Python sait déjà manipuler chaque case individuellement.</p>`,
+ py:{code:`# Mes premières variables
+age = 25                  # int   : nombre entier
+prix = 19.99              # float : nombre à virgule
+nom = "Ada"               # str   : texte (entre guillemets)
+est_etudiant = True       # bool  : vrai ou faux
+
+print(nom, "a", age, "ans")
+print("Type de prix :", type(prix))
+
+age = age + 1             # on met à jour la variable
+print("Année prochaine :", age)`,
+ out:`Ada a 25 ans
+Type de prix : <class 'float'>
+Année prochaine : 26`,
+ expl:[[1,`Un commentaire : Python l'ignore, il sert aux humains.`],[2,`Crée la variable <code>age</code> contenant l'entier 25.`],[3,`<code>prix</code> contient un nombre à virgule (float). Attention : point, pas virgule.`],[4,`Une chaîne de caractères, toujours entre guillemets.`],[5,`Un booléen : <code>True</code> ou <code>False</code> (majuscule obligatoire).`],[7,`<code>print</code> affiche plusieurs valeurs séparées par des espaces.`],[8,`<code>type()</code> révèle le type d'une valeur.`],[10,`On recalcule et on range le résultat dans la même variable : l'étiquette se déplace.`]]},
+ ml:`<p>En ML, on ne programme pas les règles : on fournit des <b>données</b>. Mais pour décrire ces données, on utilise exactement ce que vous venez d'apprendre. La suite logique : stocker plusieurs valeurs ensemble (listes) puis dans des tableaux (NumPy).</p>`,
+ ex:`<p>Le dataset <b>Iris</b> (le « bonjour » du ML) décrit 150 fleurs avec 4 mesures float et 1 nom d'espèce str. Vous savez déjà décrire chaque ligne !</p>`,
+ quiz:[
+  {type:"qcm",q:`Après <code>x = "5"</code>, quel est le type de <code>x</code> ?`,o:[`int`,`str`,`float`],g:1,e:`Les guillemets créent toujours du texte, même avec des chiffres.`,w:[`Sans guillemets, oui — mais ici il y en a.`,`Pas de guillemets et un point décimal auraient donné un float.`]},
+  {type:"qcm",q:`Que vaut <code>type(3.0)</code> ?`,o:[`<class 'int'>`,`<class 'float'>`,`<class 'str'>`],g:1,e:`Le <code>.0</code> indique un nombre à virgule flottante, même si la valeur est entière.`,w:[`<code>3</code> sans point serait un int.`,`Rien n'est entre guillemets.`]},
+  {type:"vf",q:`<code>Age = 25</code> et <code>age = 30</code> sont la même variable.`,o:[`Vrai`,`Faux`],g:1,e:`Python distingue majuscules et minuscules : ce sont deux variables différentes.`,w:[`Non : la casse fait partie du nom.`]}],
+ mp:{n:`Carte d'identité d'un dataset`,d:`Créez des variables décrivant le dataset Iris (<code>nb_lignes = 150</code>, <code>nb_features = 4</code>, <code>nom = "iris"</code>, <code>est_classe = True</code>), puis affichez une phrase récapitulative avec un seul <code>print</code>.`,ch:`Ajoutez une variable <code>features</code> contenant la liste des noms de colonnes (on verra les listes juste après).`},
+ res:[`Une variable est une étiquette sur une valeur`,`4 types de base : int, float, str, bool`,`print() affiche, type() renseigne, input() demande`],
+ sk:[`Créer et mettre à jour des variables`,`Reconnaître les types de base`,`Afficher et convertir des valeurs`],
+ liens:[[`env-decouverte`,`Terminal`],[`ml-donnees`,`Dataset & features`]],
+ nx:[`m-nombres`,`Les nombres et leurs opérations sont la matière première de tous les calculs du ML.`]};
+
+L["m-nombres"]={t:`Nombres, fractions, puissances et logarithmes`,l:0,p:"math",d:`40 min`,full:1,
+ obj:[`Manipuler fractions, puissances et racines`,`Comprendre ce que fait un logarithme`,`Savoir pourquoi ces outils reviennent sans cesse en ML`],
+ pre:[],
+ th:`<p>Pas de panique : tout ici se calcule avec un stylo. Nous construisons uniquement les outils qui serviront plus tard.</p>
+ <h4>Fractions et pourcentages</h4><p>Une fraction est une division : <code>3/4 = 0,75 = 75 %</code>. En ML, l'accuracy d'un modèle (« 87 % de bonnes réponses ») est exactement cela : <b>bonnes prédictions ÷ total</b>.</p>
+ <h4>Puissances</h4><p><code>2³ = 2 × 2 × 2 = 8</code>. Le petit nombre indique combien de fois on multiplie. Le MSE (erreur quadratique, niveau 4) élève les erreurs au carré pour pénaliser les grandes erreurs.</p>
+ <h4>Logarithme : l'opération inverse</h4><p>Le logarithme répond à la question : « 10 élevé à quelle puissance donne ce nombre ? » → <code>log₁₀(1000) = 3</code>. Il <b>écrase les grandes valeurs</b> : c'est lui qu'on utilise dans la loss logistique et l'entropie des arbres de décision.</p>`,
+ int:`<p>Le logarithme est une échelle de Richter : passer de 1 à 10 « compte » autant que passer de 1000 à 10 000. Quand un modèle compare des probabilités minuscules (0,0001), le log évite les nombres illisibles.</p>`,
+ maths:`<div class="formula">a^n = a × a × … × a &nbsp;&nbsp;|&nbsp;&nbsp; log(x) = y ⟺ e^y = x &nbsp;&nbsp;|&nbsp;&nbsp; √x = x^(1/2)</div>
+ <p>Exemple numérique : <code>2⁴ = 16</code>, donc <code>log₂(16) = 4</code>. Et <code>ln(e) = 1</code> car <code>e¹ = e ≈ 2,718</code> — ce <code>e</code> reviendra dans la fonction sigmoïde.</p>`,
+ py:{code:`print(3/4)        # fraction -> 0.75
+print(2**10)      # puissance : 1024
+print(9**0.5)     # racine carrée : 3.0
+
+import math
+print(math.log(1000))      # ln(1000) ≈ 6.908
+print(math.log10(1000))    # log base 10 : 3.0
+
+# Pourcentage de réussite d'un modèle
+bonnes = 87
+total = 100
+print("Accuracy :", bonnes/total*100, "%")`,
+ out:`0.75
+1024
+3.0
+6.907755278982137
+3.0
+Accuracy : 87.0 %`,
+ expl:[[1,`La division donne un float.`],[2,`<code>**</code> est l'opérateur puissance.`],[3,`Puissance 0.5 = racine carrée.`],[5,`On importe le module math.`],[6,`<code>log</code> sans précision = logarithme népérien (base e).`]]},
+ ml:`<p>Retenez le réflexe : <b>pourcentage = ratio</b>, <b>carré = punir les grandes erreurs</b>, <b>log = dompter les très petits et très grands nombres</b>. Vous retrouverez ces trois gestes dans chaque algorithme.</p>`,
+ ex:`<p>La fonction de coût d'une régression logistique est <code>−log(p)</code> si la réponse est 1. Plus le modèle est sûr à tort, plus la punition explose — grâce au log.</p>`,
+ quiz:[{type:"qcm",q:`Que vaut <code>2⁵</code> ?`,o:[`10`,`25`,`32`],g:2,e:`2×2×2×2×2 = 32.`,w:[`Confusion multiplication/puissance.`,`On ne multiplie pas 2 par 5.`]},
+ {type:"qcm",q:`Pourquoi utilise-t-on des logarithmes en ML ?`,o:[`Pour arrondir les résultats`,`Pour gérer des valeurs très petites ou très grandes`,`Pour accélérer Python`],g:1,e:`Le log compresse l'échelle : idéal pour les probabilités minuscules.`,w:[`Le log transforme, il n'arrondit pas.`,`La vitesse dépend du matériel et du code.`]}],
+ mp:{n:`Calculatrice de croissance`,d:`Un dataset double chaque année. Écrivez un script qui affiche sa taille après 10 ans (2¹⁰) puis le nombre d'années nécessaires pour atteindre 1 million (indice : <code>math.log2</code>).`,ch:`Refaites-le avec une boucle <code>while</code> au lieu du logarithme.`},
+ res:[`Fraction = division ; pourcentage = fraction × 100`,`x² amplifie les grandes valeurs (MSE)`,`log écrase les grandes échelles (loss, entropie)`],
+ sk:[`Calculer puissances et racines en Python`,`Utiliser math.log`,`Traduire un ratio en pourcentage`],
+ liens:[[`py-decouverte`,`Variables Python`],[`eval-classif`,`Accuracy`]],
+ nx:[`ia-ml-dl`,`La boîte à outils de base est prête : place aux concepts du ML.`]};
+
+L["ia-ml-dl"]={t:`IA, Machine Learning, Deep Learning : la grande famille`,l:1,p:"ml",d:`35 min`,full:1,
+ obj:[`Expliquer avec ses mots la différence entre IA, ML et Deep Learning`,`Reconnaître des exemples réels de chaque niveau`,`Comprendre le changement de paradigme : règles apprises vs règles écrites`],
+ pre:[`py-decouverte`,`m-nombres`],
+ th:`<p>Trois cercles emboîtés :</p>
+ <ul><li><b>Intelligence Artificielle (IA)</b> : tout programme capable d'une tâche « intelligente » — y compris avec des règles écrites à la main (un échiquier des années 1990 est une IA).</li>
+ <li><b>Machine Learning (ML)</b> : le sous-ensemble où la machine <b>apprend des données</b> au lieu de recevoir des règles. On lui montre des exemples, elle en déduit le motif.</li>
+ <li><b>Deep Learning (DL)</b> : le sous-ensemble du ML qui utilise des <b>réseaux de neurones artificiels</b> à plusieurs couches. C'est lui qui reconnaît les visages et traduit les langues.</li></ul>
+ <h4>Le changement de paradigme</h4>
+ <table><tr><th></th><th>Entrée</th><th>Sortie</th></tr><tr><td><b>Programme classique</b></td><td>données + <b>règles</b> écrites par l'humain</td><td>réponses</td></tr><tr><td><b>Machine Learning</b></td><td>données + <b>réponses</b> (exemples)</td><td>règles (le modèle)</td></tr></table>
+ <p>Repères : 1950, Turing pose la question « les machines pensent-elles ? » · 1997, Deep Blue bat Kasparov (IA à règles) · 2012, AlexNet explose la reconnaissance d'images (début du DL moderne) · 2022+, les grands modèles de langage grand public.</p>`,
+ int:`<p><b>Le filtre anti-spam.</b> Version classique : vous écrivez des règles (« si le mail contient GAGNER, spam »). Les escrocs changent leurs mots, vos règles deviennent obsolètes. Version ML : on montre à la machine 10 000 mails déjà étiquetés spam/non-spam ; elle découvre elle-même les indices — et s'adapte. C'est exactement ce renversement : <i>on ne programme plus la règle, on entraîne un modèle</i>.</p>`,
+ py:{code:`def est_spam(mail):
+    if "gagner" in mail or "gratuit" in mail:
+        return True
+    return False`},
+ pyExpl:[[2,`La version « règles » : des <code>if</code> écrits à la main. La version ML remplacera ce <code>if</code> par <code>modele.predict(mail)</code> — un modèle entraîné sur des exemples. Tout le niveau 4 construit ce remplacement.`]],
+ maths:`<p>Aucune formule pour l'instant — mais notez-le : le ML transforme un problème du monde réel en <b>problème d'optimisation numérique</b> (« trouver les nombres qui minimisent l'erreur »). Les maths arrivent pile au moment où elles servent, au niveau 3.</p>`,
+ ex:`<p>Recommandations Netflix (ML), déverrouillage facial (DL), traduction automatique (DL), scoring bancaire (ML classique), joueur de Go AlphaGo (DL + renforcement).</p>`,
+ quiz:[
+  {type:"qcm",q:`Un filtre anti-spam qui apprend de mails étiquetés est…`,o:[`de l'IA symbolique à règles`,`du Machine Learning`,`une simple boucle while`],g:1,e:`Il apprend des exemples au lieu d'appliquer des règles écrites : c'est la définition du ML.`,w:[`L'IA symbolique applique des règles explicites — l'opposé de l'apprentissage.`,`Une boucle ne « apprend » rien du tout.`]},
+  {type:"vf",q:`Le Deep Learning est un sous-ensemble du Machine Learning.`,o:[`Vrai`,`Faux`],g:0,e:`Oui : tout DL est du ML, mais tout ML n'est pas du DL (ex. régression linéaire).`,w:[`Regardez les cercles emboîtés : DL ⊂ ML ⊂ IA.`]},
+  {type:"qcm",q:`Dans l'approche ML, on fournit à la machine :`,o:[`des règles et on attend des données`,`des données et des réponses attendues`,`uniquement des mathématiques`],g:1,e:`Données + étiquettes → la machine en déduit les règles (le modèle).`,w:[`C'est l'inverse : c'est le programme classique.`,`Les maths sont l'outil, pas la matière première.`]}],
+ mp:{n:`Classez 6 technologies`,d:`Pour chaque exemple (voiture autonome, thermostat programmable, recommandation YouTube, correcteur orthographique à dictionnaire, ChatGPT, calculatrice), indiquez : IA à règles, ML ou DL. Justifiez en une phrase.`,ch:`Trouvez un exemple qui combine les trois.`},
+ res:[`IA ⊃ ML ⊃ DL`,`ML = apprendre des données plutôt que programmer des règles`,`On fournit données + réponses, on récupère un modèle`],
+ sk:[`Situer IA / ML / DL`,`Identifier un problème de ML`,`Expliquer le paradigme données → règles`],
+ liens:[[`py-decouverte`,`Le if/else classique`],[`m-nombres`,`Premiers calculs`]],
+ nx:[`m-fonctions`,`Un modèle ML est une fonction : comprenons cet objet mathématique avant de l'entraîner.`]};
+
+L["m-fonctions"]={t:`Les fonctions : la brique de tout modèle`,l:1,p:"math",d:`35 min`,
+ obj:[`Lire et tracer f(x) = ax + b`,`Comprendre entrée → sortie`,`Faire le lien : un modèle ML est une fonction`],pre:[`m-nombres`],
+ th:`<p>Une fonction est une machine : on entre un nombre, il en ressort un autre, toujours de la même façon. <code>f(x) = 2x + 1</code> transforme 3 en 7. En ML, un <b>modèle est une fonction</b> : entrée = les features, sortie = la prédiction, et les coefficients (a, b) sont justement ce que l'entraînement va régler.</p><p>La forme <code>y = ax + b</code> est une droite : <code>a</code> est la pente (combien y augmente quand x augmente de 1), <code>b</code> l'ordonnée à l'origine. C'est littéralement le modèle du niveau 4 (régression linéaire).</p>`,
+ quiz:[{type:"qcm",q:`Si f(x) = 3x − 2, que vaut f(4) ?`,o:[`10`,`14`,`7`],g:0,e:`3 × 4 − 2 = 10.`,w:[`Vous avez oublié le −2 ? Recalculez : 12 − 2.`,`3 × 4 + 2 donnerait 14 : mauvais signe.`]}],
+ sk:[`Évaluer une fonction en un point`,`Interpréter pente et ordonnée à l'origine`],res:[`Un modèle = une fonction dont on règle les coefficients`],nx:[`py-listes`,`Un dataset contient beaucoup d'exemples : il faut des structures pour les stocker.`]};
+
+L["py-listes"]={t:`Listes, tuples et dictionnaires`,l:1,p:"py",d:`50 min`,
+ obj:[`Créer et parcourir listes, tuples et dictionnaires`,`Choisir la bonne structure selon le besoin`,`Préparer le terrain pour NumPy et Pandas`],pre:[`py-decouverte`],
+ th:`<p>Une <b>liste</b> (<code>[10, 20, 30]</code>) stocke plusieurs valeurs dans l'ordre — c'est l'ancêtre du tableau NumPy. Un <b>tuple</b> (<code>(10, 20)</code>) est une liste non modifiable. Un <b>dictionnaire</b> (<code>{"age": 25, "ville": "Paris"}</code>) associe des clés à des valeurs — c'est l'ancêtre d'une ligne de dataset ou d'un fichier JSON d'API.</p>
+ ${codeBlock(`notes = [12, 15, 9, 18]          # liste
+eleve = {"nom": "Ada", "moyenne": 13.5}  # dictionnaire
+
+print(eleve["nom"])              # accès par clé
+notes.append(17)                 # ajout
+print(sum(notes)/len(notes))     # moyenne : 14.2`)}`,
+ quiz:[{type:"qcm",q:`Que renvoie <code>len([4, 8, 15, 16])</code> ?`,o:[`16`,`4`,`3`],g:1,e:`len compte le nombre d'éléments : 4.`,w:[`16 est la valeur du dernier élément.`,`L'index du dernier est 3, mais len compte les éléments.`]}],
+ sk:[`Manipuler listes et dictionnaires`,`Accéder par index et par clé`],res:[`Liste = collection ordonnée ; dict = association clé→valeur`],nx:[`py-boucles`,`Pour traiter un dataset entier, il faut automatiser la répétition.`]};
+
+L["py-boucles"]={t:`Conditions et boucles : automatiser`,l:2,p:"py",d:`50 min`,
+ obj:[`Écrire if / elif / else`,`Répéter avec for et range`,`Parcourir une liste pour la transformer`],pre:[`py-listes`],
+ th:`<p>Un dataset contient des milliers de lignes : personne ne les traite à la main. <code>for</code> répète, <code>if</code> décide.</p>
+ ${codeBlock(`notes = [12, 15, 9, 18, 7]
+reussite = 0
+for n in notes:            # pour chaque note
+    if n >= 10:            # décision
+        reussite = reussite + 1
+print(reussite / len(notes) * 100, "% de réussite")`)}
+ <p>En ML, la boucle d'entraînement est exactement ce motif : <i>pour chaque exemple, prédire, mesurer l'erreur, corriger</i>.</p>`,
+ quiz:[{type:"qcm",q:`Combien de fois tourne <code>for i in range(5)</code> ?`,o:[`4`,`5`,`6`],g:1,e:`range(5) produit 0,1,2,3,4 : cinq valeurs.`,w:[`range commence à 0 mais contient bien 5 valeurs.`,`Il s'arrête avant 5, donc 5 tours et non 6.`]}],
+ sk:[`Structurer une boucle sur des données`,`Compter avec un accumulateur`],res:[`for parcourt, if décide : le duo de base du traitement de données`],nx:[`py-fonctions`,`Regroupons ces traitements en briques réutilisables.`]};
+
+L["py-fonctions"]={t:`Fonctions Python : def et return`,l:2,p:"py",d:`45 min`,
+ obj:[`Définir une fonction avec paramètres`,`Renvoyer un résultat avec return`,`Écrire sa première fonction de prédiction`],pre:[`py-boucles`],
+ th:`<p>Une fonction regroupe du code sous un nom réutilisable. Conceptuellement, c'est la même chose que la fonction mathématique f(x) : entrée → sortie.</p>
+ ${codeBlock(`def predire_loyer(surface, a=19.0, b=30.0):
+    """Prédit un loyer à partir de la surface."""
+    return a * surface + b
+
+print(predire_loyer(45))   # 885.0`)}
+ <div class="callout"><b class="t">Le déclic</b>Un modèle de régression linéaire entraîné, c'est <i>exactement</i> cette fonction : les paramètres <code>a</code> et <code>b</code> ont simplement été appris automatiquement au lieu d'être écrits à la main.</div>`,
+ quiz:[{type:"qcm",q:`Que fait <code>return</code> dans une fonction ?`,o:[`Affiche la valeur à l'écran`,`Renvoie la valeur à l'appelant et termine la fonction`,`Sauvegarde dans un fichier`],g:1,e:`return renvoie la valeur ; print ne fait que l'afficher.`,w:[`print affiche, return renvoie : confusion classique.`,`Aucun fichier n'est écrit.`]}],
+ sk:[`Écrire une fonction paramétrée`,`Distinguer print et return`],res:[`def/return créent des briques réutilisables — un modèle est une fonction apprise`],nx:[`py-fichiers`,`Les données réelles vivent dans des fichiers : apprenons à les lire.`]};
+
+L["py-fichiers"]={t:`Fichiers, CSV et exceptions`,l:2,p:"py",d:`45 min`,
+ obj:[`Lire un fichier CSV ligne par ligne`,`Protéger son code avec try / except`,`Comprendre les erreurs sans paniquer`],pre:[`py-fonctions`],
+ th:`<p>Les datasets arrivent en fichiers CSV : du texte, une ligne par exemple, une virgule par colonne.</p>
+ ${codeBlock(`with open("maisons.csv") as f:       # with ferme le fichier tout seul
+    lignes = f.readlines()
+
+for ligne in lignes[1:6]:            # on saute l'en-tête
+    surface, loyer = ligne.strip().split(",")
+    print(float(surface), "m2 ->", float(loyer), "euros")
+
+try:
+    valeur = float("abc")            # conversion impossible !
+except ValueError:
+    print("Donnée invalide, on l'ignore")`)}`,
+ quiz:[{type:"qcm",q:`À quoi sert <code>with open(...)</code> ?`,o:[`À ouvrir plus vite`,`À garantir la fermeture du fichier, même en cas d'erreur`,`À ouvrir en lecture seule`],g:1,e:`Le bloc with ferme automatiquement la ressource à la fin.`,w:[`La vitesse n'a rien à voir.`,`On peut ouvrir en écriture avec with aussi.`]}],
+ sk:[`Lire un CSV brut`,`Gérer les erreurs de données`],res:[`with + split + float : le trio du CSV artisanal ; try/except absorbe les données sales`],nx:[`py-numpy`,`Dès que les données grossissent, on passe aux tableaux NumPy.`]};
+
+L["py-numpy"]={t:`NumPy : tableaux, vecteurs et vitesse`,l:2,p:"py",d:`60 min`,
+ obj:[`Créer et manipuler des arrays NumPy`,`Faire des calculs sur des tableaux entiers sans boucle`,`Préparer les données pour scikit-learn`],pre:[`py-fichiers`,`m-fonctions`],
+ th:`<p>NumPy est LE socle numérique de Python. Son objet central, l'<b>array</b>, stocke des nombres homogènes et calcule <b>en bloc</b> : <code>array * 2</code> multiplie chaque élément, sans boucle. C'est 50 à 100× plus rapide qu'une liste Python.</p>
+ ${codeBlock(`import numpy as np
+
+surfaces = np.array([20, 30, 40, 50, 60])
+loyers   = surfaces * 19 + 30        # calcul vectorisé !
+print(loyers)                        # [410 600 790 980 1170]
+
+print(surfaces.mean())               # 40.0  : moyenne
+print(surfaces.reshape(5, 1).shape)  # (5, 1) : format scikit-learn`)}`,
+ quiz:[{type:"qcm",q:`Que vaut <code>np.array([1, 2, 3]) * 2</code> ?`,o:[`[1, 2, 3, 1, 2, 3] (répétition)`,`[2, 4, 6]`,`Une erreur`],g:1,e:`Sur un array, * s'applique élément par élément.`,w:[`Ça, c'est le comportement des listes Python !`,`Non, c'est parfaitement valide.`]}],
+ sk:[`Calcul vectorisé`,`mean, reshape, shape`],res:[`NumPy = calculs en bloc sur tableaux ; le format (n,1) est celui qu'attend scikit-learn`],nx:[`py-pandas`,`Un tableau de nombres ne suffit pas : les vrais datasets ont des colonnes nommées.`]};
+
+L["py-pandas"]={t:`Pandas : le DataFrame, votre tableau de bord`,l:2,p:"py",d:`60 min`,
+ obj:[`Charger un CSV avec read_csv`,`Explorer : head, describe, info`,`Filtrer des lignes et créer des colonnes`],pre:[`py-numpy`],
+ th:`<p>Pandas ajoute des <b>noms de colonnes</b> et des outils d'analyse aux tableaux NumPy. Le DataFrame est un tableur programmable.</p>
+ ${codeBlock(`import pandas as pd
+
+df = pd.read_csv("maisons.csv")
+print(df.head())          # 5 premières lignes
+print(df.describe())      # statistiques par colonne
+print(df["loyer"].mean()) # moyenne d'une colonne
+
+grandes = df[df["surface"] > 40]      # filtre
+df["prix_m2"] = df["loyer"] / df["surface"]  # nouvelle colonne`)}`,
+ quiz:[{type:"qcm",q:`Quelle méthode donne un résumé statistique rapide d'un DataFrame ?`,o:[`.summary()`,`.describe()`,`.stats()`],g:1,e:`describe() renvoie moyenne, écart-type, min/max, quartiles.`,w:[`N'existe pas.`,`N'existe pas non plus.`]}],
+ sk:[`Charger et explorer un dataset`,`Filtrer et enrichir un DataFrame`],res:[`read_csv → head → describe : le rituel d'ouverture de tout dataset`],nx:[`py-matplotlib`,`Les chiffres résument, les graphiques révèlent.`]};
+
+L["py-matplotlib"]={t:`Matplotlib : voir ses données`,l:2,p:"py",d:`40 min`,
+ obj:[`Tracer nuages de points et courbes`,`Ajouter titres et étiquettes d'axes`,`Lire un graphique en data scientist`],pre:[`py-pandas`],
+ th:`<p>Avant tout modèle : <b>regarder</b>. Un scatter plot révèle une tendance, une anomalie, une classe déséquilibrée — des choses qu'aucun chiffre ne montre.</p>
+ ${codeBlock(`import matplotlib.pyplot as plt
+
+surfaces = [20, 30, 40, 50, 60, 70]
+loyers   = [410, 560, 730, 890, 1050, 1190]
+
+plt.scatter(surfaces, loyers)
+plt.xlabel("Surface (m2)")
+plt.ylabel("Loyer (euros)")
+plt.title("Loyer selon la surface")
+plt.show()`)}`,
+ quiz:[{type:"qcm",q:`Quelle fonction trace un nuage de points ?`,o:[`plt.plot()`,`plt.scatter()`,`plt.bar()`],g:1,e:`scatter dessine des points individuels, parfait pour deux variables.`,w:[`plot relie les points par des lignes.`,`bar trace des barres.`]}],
+ sk:[`Tracer un scatter plot`,`Étiqueter un graphique`],res:[`scatter + xlabel/ylabel/title/show : le squelette de tout graphique`],nx:[`m-stats`,`Décrivons ces données avec les bons outils mathématiques.`]};
+
+L["m-stats"]={t:`Statistiques descriptives : résumer des données`,l:2,p:"math",d:`45 min`,
+ obj:[`Calculer moyenne, médiane, variance, écart-type`,`Repérer les valeurs extrêmes`,`Comprendre ce que describe() affiche`],pre:[`m-nombres`,`py-pandas`],
+ th:`<p>La <b>moyenne</b> donne le centre, mais elle est sensible aux valeurs extrêmes ; la <b>médiane</b> résiste mieux. La <b>variance</b> mesure la dispersion moyenne (au carré), l'<b>écart-type</b> sa version dans l'unité des données.</p>
+ <div class="formula">moyenne = (Σxᵢ)/n &nbsp;&nbsp;·&nbsp;&nbsp; variance = Σ(xᵢ − moyenne)² / n</div>
+ <p>Exemple : [2, 4, 6] → moyenne 4, variance ((−2)²+0²+2²)/3 = 8/3 ≈ 2,67, écart-type ≈ 1,63. En ML, ces chiffres servent à <b>normaliser</b> les features (niveau 6) et à détecter les anomalies.</p>`,
+ quiz:[{type:"qcm",q:`Moyenne de [2, 4, 6] ?`,o:[`3`,`4`,`6`],g:1,e:`(2+4+6)/3 = 4.`,w:[`Addition incomplète ?`,`6 est le maximum, pas la moyenne.`]}],
+ sk:[`Calculer moyenne, variance, écart-type`,`Choisir médiane vs moyenne`],res:[`Centre + dispersion = le portrait-robot de toute colonne numérique`],nx:[`m-vecteurs`,`Plusieurs features ensemble forment un vecteur : passons en plusieurs dimensions.`]};
+
+L["m-vecteurs"]={t:`Vecteurs : la forme d'un exemple`,l:3,p:"math",d:`50 min`,full:1,
+ obj:[`Définir un vecteur et le dessiner`,`Additionner, multiplier par un scalaire`,`Calculer norme et produit scalaire`,`Comprendre : un exemple ML est un vecteur`],
+ pre:[`m-fonctions`,`py-numpy`],
+ th:`<p>Un <b>vecteur</b> est une liste ordonnée de nombres : <code>v = (2, 3)</code>. Géométriquement, c'est une flèche depuis l'origine ; algébriquement, une fiche de données.</p>
+ <h4>Trois opérations à connaître</h4>
+ <ul><li><b>Addition</b> : composante par composante — (1,2)+(3,1) = (4,3).</li>
+ <li><b>Norme</b> ‖v‖ : la longueur de la flèche. <code>‖(3,4)‖ = √(9+16) = 5</code>. K-Means et KNN ne font que mesurer des distances entre vecteurs.</li>
+ <li><b>Produit scalaire</b> : a·b = a₁b₁ + a₂b₂. C'est LA formule centrale du ML : chaque neurone, chaque régression, chaque attention de Transformer calcule un produit scalaire.</li></ul>`,
+ int:`<p>Décrivez un appartement par 3 nombres : surface, nombre de pièces, étage. L'appartement devient le point (65, 3, 2) dans un « espace des appartements ». Deux appartements <b>proches</b> dans cet espace se ressemblent — c'est toute l'intuition de KNN (« mes voisins me ressemblent ») et du clustering.</p>`,
+ maths:`<div class="formula">v = (v₁, v₂, …, vₙ) &nbsp;·&nbsp; ‖v‖ = √(v₁² + … + vₙ²) &nbsp;·&nbsp; a·b = Σ aᵢbᵢ</div>
+ <p>Exemple : (1, 2, 3)·(4, −1, 2) = 4 − 2 + 6 = <b>8</b>. Si le produit scalaire est grand, les vecteurs « pointent dans la même direction » ; nul, ils sont perpendiculaires. Un modèle de prédiction calcule <code>ŷ = w·x + b</code> : le produit scalaire des poids et de l'exemple.</p>`,
+ py:{code:`import numpy as np
+
+a = np.array([1, 2, 3])     # un exemple = un vecteur
+b = np.array([4, -1, 2])
+
+print(a + b)                # [5 1 5]
+print(np.linalg.norm(a))    # 3.74... : longueur
+print(np.dot(a, b))         # 8 : produit scalaire
+print(a @ b)                # 8 aussi : notation matricielle`,
+ out:`[5 1 5]
+3.7416573867739413
+8
+8`,
+ expl:[[3,`a est le vecteur-ligne d'un dataset.`],[6,`Addition élément par élément.`],[7,`norme = longueur de la flèche (Pythagore généralisé).`],[8,`dot = produit scalaire : la brique n°1 du ML.`]]},
+ ml:`<p>Traduction immédiate : la régression linéaire multiple s'écrit <code>ŷ = w·x + b</code>. Le modèle apprend le vecteur de poids <code>w</code> ; prédire, c'est un produit scalaire. KNN, c'est « trouve les vecteurs x les plus proches (norme de la différence) ».</p>`,
+ ex:`<p>Moteur de recherche : votre requête et chaque document sont des vecteurs ; les résultats sont classés par similarité (produit scalaire / cosinus).</p>`,
+ quiz:[{type:"qcm",q:`Que vaut (2, 1)·(3, 4) ?`,o:[`10`,`14`,`7`],g:0,e:`2×3 + 1×4 = 6 + 4 = 10.`,w:[`Vous avez peut-être calculé la norme de (3,4) ?`,`Mauvaise combinaison de composantes.`]},
+ {type:"vf",q:`Un exemple d'un dataset avec 5 features peut se voir comme un vecteur à 5 dimensions.`,o:[`Vrai`,`Faux`],g:0,e:`Exactement : chaque feature est une coordonnée.`,w:[`Si : features = dimensions du vecteur.`]}],
+ mp:{n:`Comparateur d'appartements`,d:`Trois appartements : A=(65,3,2), B=(60,2,1), C=(90,4,5). Calculez à la main puis avec NumPy la distance ‖A−B‖ et ‖A−C‖. Lequel ressemble le plus à A ?`,ch:`Ajoutez une 4ᵉ feature « loyer » et observez comme les distances changent.`},
+ res:[`Un exemple ML = un vecteur`,`La norme mesure la ressemblance (KNN, K-Means)`,`Le produit scalaire est partout (w·x + b)`],
+ sk:[`Calculer norme et produit scalaire avec NumPy`,`Interpréter une distance entre exemples`],
+ liens:[[`py-numpy`,`np.dot`],[`knn`,`Distance`],[`reg-lin`,`w·x + b`]],
+ nx:[`m-matrices`,`Beaucoup de vecteurs ensemble forment une matrice — et un dataset.`]};
+
+L["m-matrices"]={t:`Matrices : des tableaux de vecteurs`,l:3,p:"math",d:`50 min`,
+ obj:[`Lire la forme (lignes, colonnes) d'une matrice`,`Effectuer un produit matriciel`,`Comprendre : dataset = matrice, image = matrice`],pre:[`m-vecteurs`],
+ th:`<p>Une <b>matrice</b> est un tableau de nombres : le dataset entier est une matrice X (n exemples × p features). Le produit matriciel A @ B applique une transformation à tous les vecteurs d'un coup. Une image en niveaux de gris <i>est</i> une matrice de pixels ; le PCA (niveau 4) décompose une matrice pour en extraire les directions principales.</p>`,
+ quiz:[{type:"qcm",q:`A a la forme (2, 3) et B la forme (3, 4). Quelle est la forme de A @ B ?`,o:[`(2, 4)`,`(3, 3)`,`(2, 3)`],g:0,e:`Les dimensions internes (3) doivent coïncider ; il reste lignes de A × colonnes de B.`,w:[`Les dimensions internes disparaissent dans la contraction.`,`La forme de A toute seule.`]}],
+ sk:[`Multiplier des matrices avec @`,`Lire shape d'un tableau`],res:[`X (n×p) @ w (p×1) = prédictions pour tous les exemples en un calcul`],nx:[`m-probas`,`Le ML doit aussi raisonner sur l'incertain : place aux probabilités.`]};
+
+L["m-probas"]={t:`Probabilités : raisonner sur l'incertain`,l:3,p:"math",d:`50 min`,
+ obj:[`Manipuler probabilités, événements, indépendance`,`Connaître la loi normale`,`Comprendre ce que prédit un modèle probabiliste`],pre:[`m-nombres`,`m-stats`],
+ th:`<p>Une probabilité est un nombre entre 0 (impossible) et 1 (certain). Un classifieur ne répond pas « chat » : il répond « chat avec probabilité 0,87 ». La <b>loi normale</b> (courbe en cloche) décrit une infinité de phénomènes ; ses deux paramètres sont la moyenne (centre) et l'écart-type (largeur). L'espérance est la moyenne pondérée par les probabilités — c'est elle que minimise une loss.</p>`,
+ quiz:[{type:"qcm",q:`Probabilité d'obtenir face avec une pièce équilibrée ?`,o:[`0,25`,`0,5`,`1`],g:1,e:`Deux issues équiprobables : 1/2.`,w:[`Ça ce serait deux faces sur quatre issues.`,`Ce serait une certitude.`]}],
+ sk:[`Convertir fréquence en probabilité`,`Lire une courbe normale`],res:[`Prédire = estimer une probabilité ; la loi normale est partout`],nx:[`m-derivees`,`Entraîner un modèle, c'est descendre une pente : il nous faut la dérivée.`]};
+
+L["m-derivees"]={t:`Dérivées et gradient : la pente qui fait apprendre`,l:3,p:"math",d:`55 min`,
+ obj:[`Interpréter une dérivée comme une pente`,`Dériver x², ax + b`,`Passer de dérivée à gradient`],pre:[`m-fonctions`],
+ th:`<p>La <b>dérivée</b> de f en un point mesure à quelle vitesse f change quand x bouge : c'est la pente. f(x) = x² a pour dérivée f'(x) = 2x : au point x=3, la pente vaut 6, « si j'augmente x de 1, f augmente d'environ 6 ».</p>
+ <p>Le <b>gradient</b> généralise aux fonctions de plusieurs variables : c'est le vecteur des dérivées partielles, et il pointe vers la plus forte montée. Pour minimiser une erreur, on marche donc <b>à l'opposé du gradient</b> : c'est la descente de gradient, moteur de tout l'apprentissage.</p>
+ <div class="formula">f(x) = x² → f'(x) = 2x &nbsp;·&nbsp; ∇J = (∂J/a, ∂J/b)</div>`,
+ quiz:[{type:"qcm",q:`Dérivée de f(x) = x² en x = 3 ?`,o:[`3`,`6`,`9`],g:1,e:`f′(x) = 2x donc f′(3) = 6.`,w:[`C'est la valeur de f… à √3.`,`9 est f(3), pas la pente.`]}],
+ sk:[`Dériver des fonctions simples`,`Interpréter le gradient comme direction de montée`],res:[`Dérivée = pente ; gradient = direction de plus forte montée ; on apprend en descendant`],nx:[`ml-donnees`,`Avant d'entraîner, préparons correctement les données.`]};
+
+L["ml-donnees"]={t:`Dataset : features, labels et découpage train/test`,l:4,p:"ml",d:`45 min`,
+ obj:[`Distinguer features et labels`,`Découper en train / validation / test`,`Éviter la fuite de données (leakage)`],pre:[`py-pandas`,`m-vecteurs`],
+ th:`<p>Un <b>dataset</b> = une matrice X de <b>features</b> (ce qu'on observe) et un vecteur y de <b>labels</b> (ce qu'on veut prédire). Règle d'or : le modèle apprend sur le <b>training set</b> (~70-80 %), se règle sur la <b>validation</b>, et n'est jugé qu'une seule fois sur le <b>test set</b> — des données qu'il n'a <i>jamais</i> vues. Évaluer sur les données d'entraînement, c'est corriger sa copie avec le corrigé : le score est gonflé, et le modèle déçoit en production.</p>
+ ${codeBlock(`from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)`)}`,
+ quiz:[{type:"qcm",q:`À quoi sert le test set ?`,o:[`À entraîner plus longtemps`,`À estimer la performance sur des données jamais vues`,`À stocker les features`],g:1,e:`C'est le simulacre d'examen final : données invisibles pendant l'apprentissage.`,w:[`On n'entraîne jamais sur le test.`,`Les features sont dans X.`]}],
+ sk:[`Découper un dataset avec train_test_split`,`Nommer X, y, train, test`],res:[`70/15/15 ou 80/20, jamais d'évaluation sur les données d'entraînement`],nx:[`reg-lin`,`Données prêtes : entraînons notre premier modèle.`]};
+
+L["reg-lin"]={t:`Régression linéaire : votre premier modèle`,l:4,p:"ml",d:`90 min`,full:1,
+ obj:[`Expliquer ce que fait une régression linéaire`,`Écrire la fonction de coût MSE`,`Entraîner à la main (descente de gradient) puis avec scikit-learn`,`Prédire et interpréter les coefficients`],
+ pre:[`ml-donnees`,`py-numpy`,`m-derivees`,`m-fonctions`],
+ th:`<p>La régression linéaire <b>prédit un nombre</b> (un loyer, une température, une note) en traçant la droite qui passe « au mieux » à travers les données.</p>
+ <h4>Le modèle</h4><p>Une droite : <code>ŷ = a·x + b</code>. ŷ (« y chapeau ») est la prédiction, x la feature, a la pente, b l'ordonnée à l'origine. <b>Entraîner</b> le modèle, c'est trouver les valeurs de a et b qui rendent les prédictions aussi justes que possible.</p>
+ <h4>Comment mesure-t-on « juste » ?</h4><p>Avec une <b>fonction de coût</b> : l'erreur quadratique moyenne (MSE) — la moyenne des erreurs au carré. Élever au carré a deux effets : punir fortement les grandes erreurs, et rendre la courbe bien lisse (donc dérivable).</p>
+ <h4>Comment apprend-on ?</h4><p>Par <b>descente de gradient</b> : on calcule la pente du coût par rapport à a et b, puis on fait un petit pas dans le sens qui réduit l'erreur. On répète jusqu'à convergence. Avantages : simple, rapide, interprétable. Inconvénients : ne capture que les relations en ligne droite, sensible aux valeurs extrêmes.</p>`,
+ int:`<p><b>Le loyer et la surface.</b> Vous avez visité 10 appartements. Votre cerveau a déjà remarqué : plus grand = plus cher, et à peu près proportionnel. Si un 45 m² n'existe pas dans vos visites, vous savez quand même estimer son loyer en prolongeant la tendance. La régression linéaire, c'est votre intuition, mais avec une droite calculée au millimètre.</p>`,
+ maths:`<div class="formula">ŷᵢ = a·xᵢ + b &nbsp;&nbsp;&nbsp; J(a,b) = (1/n) · Σ (ŷᵢ − y)²</div>
+ <p><b>Lecture :</b> pour chaque exemple i, l'erreur est (prédiction − réalité). On élève au carré, on moyenne sur les n exemples : c'est le coût J. Pour le minimiser :</p>
+ <div class="formula">a ← a − α · ∂J/a &nbsp;&nbsp;·&nbsp;&nbsp; b ← b − α · ∂J/∂b &nbsp;&nbsp;avec&nbsp; ∂J/a = (2/n)·Σ(ŷᵢ−y)·x</div>
+ <p>α (alpha) est le <b>learning rate</b> : la taille du pas. Trop petit → lent ; trop grand → on diverge. C'est LE réglage sensible de l'optimisation.</p>`,
+ py:{code:`import numpy as np
+
+# Données : surfaces (m2) et loyers (euros)
+X = np.array([20, 30, 40, 50, 60, 70], dtype=float)
+y = np.array([410, 560, 730, 890, 1050, 1190], dtype=float)
+
+a, b = 0.0, 0.0          # paramètres au hasard
+lr = 0.0005              # learning rate
+n = len(X)
+
+for epoque in range(300):
+    y_chapeau = a * X + b                 # 1. prédiction
+    erreur = y_chapeau - y                # 2. erreur
+    grad_a = (2/n) * np.sum(erreur * X)   # 3. pente du coût
+    grad_b = (2/n) * np.sum(erreur)       #    pour a et pour b
+    a = a - lr * grad_a                   # 4. un pas dans la descente
+    b = b - lr * grad_b
+
+print("Modèle appris : loyer = %.1f x surface + %.1f" % (a, b))
+print("Prédiction 45 m2 : %.0f euros" % (a*45 + b))`,
+ out:`Modèle appris : loyer = 19.0 x surface + 30.0
+Prédiction 45 m2 : 885 euros`,
+ expl:[[4,`Les features : une valeur par exemple.`],[5,`Les labels : ce qu'on cherche à prédire.`],[7,`On démarre d'une droite quelconque (horizontale à 0).`],[8,`Un petit pas : la descente de gradient est une marche patiente.`],[11,`Étape 1 : le modèle prédit avec ses paramètres actuels.`],[12,`Étape 2 : prédiction − réalité, pour chaque exemple.`],[13,`Étape 3 : la dérivée du MSE par rapport à a (formule du cours de maths).`],[14,`Idem pour b (sans le ×xᵢ).`],[15,`Étape 4 : on bouge a <i>contre</i> la pente — c'est ça, descendre.`],[16,`Pareil pour b. Après 300 époques, la droite est quasi parfaite.`]]},
+ py2:{titre:`La version professionnelle : scikit-learn`,code:`from sklearn.linear_model import LinearRegression
+import numpy as np
+
+X = np.array([[20],[30],[40],[50],[60],[70]])   # forme (n, 1)
+y = np.array([410, 560, 730, 890, 1050, 1190])
+
+modele = LinearRegression().fit(X, y)            # entraîne
+print("a =", round(modele.coef_[0], 1))
+print("b =", round(modele.intercept_, 1))
+print("Prédiction 45 m2 :", round(modele.predict([[45]])[0], 1), "euros")
+print("R2 :", round(modele.score(X, y), 3))`,
+ out:`a = 19.0
+b = 30.0
+Prédiction 45 m2 : 885.0 euros
+R2 : 0.999`,
+ expl:[[4,`scikit-learn veut X en 2D : n lignes, 1 colonne → doubles crochets.`],[6,`.fit() fait toute la descente (ici : calcul exact) en une ligne.`],[7,`coef_ : la pente apprise. intercept_ : l'ordonnée à l'origine.`],[9,`.predict() applique ŷ = ax + b.`],[10,`.score() renvoie le R² : 1 = parfait, 0 = nul.`]]},
+ viz:[`viz-reglin`],
+ ml:`<p><b>Interprétation des coefficients</b> : ici a = 19 signifie « chaque m² supplémentaire coûte environ 19 € de loyer ». C'est la grande force des modèles linéaires : on peut <i>expliquer</i> chaque prédiction. Cas d'usage : immobilier, prévision de demande, consommation énergétique, scoring. Erreurs fréquentes : entraîner sur des features à des échelles très différentes, oublier les valeurs extrêmes, évaluer sur le training set.</p>`,
+ ex:`<p>EDF prédit la consommation électrique à partir de la température ; les sites e-commerce estiment le panier moyen selon l'ancienneté du client. Même modèle, une droite, des millions de décisions.</p>`,
+ quiz:[
+  {type:"qcm",q:`Que cherche l'entraînement d'une régression linéaire ?`,o:[`La droite qui minimise l'erreur quadratique moyenne`,`Le point le plus haut du nuage`,`La moyenne des y`],g:0,e:`On ajuste a et b pour minimiser le MSE — le coût choisi.`,w:[`Le maximum n'a aucun sens ici.`,`La moyenne est un modèle constant, pas une droite.`]},
+  {type:"qcm",q:`Si le learning rate est trop grand…`,o:[`L'entraînement est plus précis`,`La descente peut diverger`,`Le MSE devient négatif`],g:1,e:`Des pas trop grands sautent par-dessus le minimum et peuvent exploser.`,w:[`Au contraire, on perd en stabilité.`,`Le MSE est une somme de carrés : toujours ≥ 0.`]},
+  {type:"qcm",q:`a = 19 dans notre modèle signifie :`,o:[`Le loyer moyen est 19 €`,`Chaque m² ajoute ≈ 19 € au loyer`,`La surface moyenne est 19 m²`],g:1,e:`La pente est l'effet d'une unité de x sur ŷ.`,w:[`19 est une pente, pas une moyenne.`,`Rien à voir avec la moyenne des x.`]}],
+ mp:{n:`Prédire une note selon les heures de révision`,
+ d:`Heures : [1, 2, 3, 4, 5, 6] — Notes : [6, 9, 11, 14, 16, 18]. 1) Tracez le nuage (matplotlib). 2) Entraînez une LinearRegression. 3) Prédisez la note pour 7 heures. 4) Affichez a, b et R².`,
+ etapes:[`Créer X (reshape) et y`,`train_test_split si vous voulez être rigoureux`,`fit puis predict`,`Interpréter : que vaut une heure de révision en points ?`],
+ ch:`Ajoutez une 2ᵉ feature « heures de sommeil » et passez à la régression multiple (X à 2 colonnes). Laquelle pèse le plus ?`},
+ res:[`ŷ = ax + b : une droite qui prédit un nombre`,`MSE : moyenne des erreurs au carré`,`Descente de gradient : pas à pas contre la pente`,`scikit-learn : fit / predict / score`],
+ sk:[`Écrire une fonction de coût`,`Entraîner un modèle à la main et avec sklearn`,`Interpréter des coefficients`],
+ liens:[[`gd`,`La descente en détail`],[`m-derivees`,`Les gradients`],[`eval-reg`,`MAE, MSE, R²`],[`py-pandas`,`Préparer X et y`]],
+ nx:[`gd`,`Notre modèle a appris grâce à la descente de gradient : ouvrons le capot.`]};
+
+L["gd"]={t:`La descente de gradient : le moteur de l'apprentissage`,l:4,p:"ml",d:`60 min`,full:1,
+ obj:[`Expliquer la descente de gradient avec une analogie`,`Régler un learning rate et observer ses effets`,`Implémenter la descente sur une fonction simple`],
+ pre:[`reg-lin`,`m-derivees`],
+ th:`<p>Tous les modèles du ML — de la régression au Transformer — apprennent par le même geste : <b>descendre la pente de l'erreur</b>. La descente de gradient est ce geste, formalisé.</p>
+ <p>À chaque itération : ① calculer le gradient (la pente) du coût au point actuel ; ② faire un pas dans la direction opposée, d'une taille α (learning rate) ; ③ recommencer. Trois variantes selon la quantité de données utilisée par pas : <b>batch</b> (tout), <b>mini-batch</b> (un lot, le standard en deep learning), <b>stochastique</b> (un seul exemple, rapide et bruité).</p>`,
+ int:`<p><b>Descendre une montagne dans le brouillard.</b> Vous ne voyez pas la vallée, seulement la pente sous vos pieds. Stratégie : tâter le terrain, faire un pas vers le bas, recommencer. La taille du pas = le learning rate. Trop timide : vous arrivez demain. Trop audacieux : vous sautez par-dessus la vallée et remontez de l'autre côté — parfois en explosant.</p>`,
+ maths:`<div class="formula">w ← w − α · ∇J(w)</div>
+ <p>Testons sur J(w) = (w−3)² + 1, dont le minimum est en w = 3 (J = 1). Gradient : J'(w) = 2(w−3). Départ w₀ = 0, α = 0,1 :</p>
+ <table><tr><th>itération</th><th>w</th><th>gradient</th><th>nouveau w</th></tr><tr><td>1</td><td>0</td><td>−6</td><td>0 − 0,1×(−6) = 0,6</td></tr><tr><td>2</td><td>0,6</td><td>−4,8</td><td>1,08</td></tr><tr><td>3</td><td>1,08</td><td>−3,84</td><td>1,46</td></tr></table>
+ <p>On se rapproche de 3, de plus en plus lentement : normal, la pente s'adoucit près du minimum.</p>`,
+ viz:[`viz-gd`],
+ py:{code:`w = 0.0          # départ au hasard
+alpha = 0.1      # learning rate
+
+def J(w):            # le coût : une vallée en w = 3
+    return (w - 3)**2 + 1
+
+def grad(w):         # la pente de la vallée
+    return 2 * (w - 3)
+
+for i in range(30):
+    pas = alpha * grad(w)
+    w = w - pas
+    if i % 5 == 0:
+        print("itération %2d | w = %.4f | coût = %.4f" % (i, w, J(w)))
+
+print("Minimum trouvé : w ≈", round(w, 4))`,
+ out:`itération  0 | w = 0.6000 | coût = 6.7600
+itération  5 | w = 2.2131 | coût = 6.7600->1.6327
+itération 10 | w = 2.8438 | coût = 1.0244
+itération 20 | w = 2.9939 | coût = 1.0000
+Minimum trouvé : w ≈ 2.9989`,
+ expl:[[1,`Point de départ arbitraire : la descente s'en moque (ici).`],[2,`α = 0,1 : essayez 0,01 (lent) et 1,2 (explosion) dans la visualisation !`],[4,`La vallée : minimum J = 1 atteint en w = 3.`],[7,`La dérivée : elle indique sens et raideur de la pente.`],[10,`Le pas = taille × pente.`],[11,`On recule le long de la pente.`]]},
+ ml:`<p>En pratique : <b>Adam</b> et ses cousins adaptent le pas automatiquement (vous les croiserez au niveau 8). Pièges classiques : features non normalisées (la vallée devient un canyon étroit), learning rate unique pour tout le monde, arrêt trop précoce. La convexité garantit un minimum global pour les modèles linéaires ; les réseaux de neurones ont des milliers de minima locaux — et s'en accommodent très bien.</p>`,
+ quiz:[
+  {type:"qcm",q:`Le gradient pointe toujours…`,o:[`vers le minimum`,`vers la plus forte montée du coût`,`vers zéro`],g:1,e:`C'est pourquoi on avance dans le sens <b>opposé</b> pour minimiser.`,w:[`C'est l'opposé du gradient qui descend.`,`Zéro est la valeur qu'on vise pour le gradient, pas sa direction.`]},
+  {type:"qcm",q:`Un learning rate trop petit provoque :`,o:[`une divergence`,`une convergence très lente`,`un meilleur minimum`],g:1,e:`Ça converge, mais en un temps déraisonnable.`,w:[`La divergence vient d'un α trop grand.`,`Le minimum atteint est le même, en plus lent.`]}],
+ mp:{n:`Trois learning rates`,d:`Lancez la descente sur J(w) avec α = 0,01 ; 0,1 ; 1,2. Tracez w en fonction des itérations pour chaque cas (matplotlib). Commentez : convergence lente, idéale, divergence.`,ch:`Remplacez J par (w−3)⁴ : la vallée est plate au fond. Que devient la descente ?`},
+ res:[`w ← w − α·∇J(w) : la formule universelle`,`Le learning rate contrôle taille et stabilité du pas`,`Batch / mini-batch / stochastique : trois saveurs`],
+ sk:[`Implémenter une descente de gradient`,`Diagnostiquer un learning rate`],
+ liens:[[`reg-lin`,`Appliquée au MSE`],[`m-derivees`,`Les gradients`],[`dl-backprop`,`Descente en réseau`]],
+ nx:[`reg-log`,`Même moteur, autre mission : prédire une classe au lieu d'un nombre.`]};
+
+L["reg-log"]={t:`Régression logistique : classer avec une probabilité`,l:4,p:"ml",d:`55 min`,
+ obj:[`Prédire une classe (0/1) avec un sigmoïde`,`Lire une probabilité de classe`,`Tracer une frontière de décision`],pre:[`reg-lin`,`m-probas`],
+ th:`<p>Malgré son nom, la régression logistique est une <b>classification</b>. On calcule un score linéaire z = w·x + b, puis on l'écrase entre 0 et 1 avec la <b>sigmoïde</b> σ(z) = 1/(1+e⁻ᶻ) : le résultat se lit comme une probabilité d'appartenir à la classe 1. Frontière de décision : là où σ = 0,5, c'est-à-dire z = 0 — une droite. Coût : l'entropie croisée (à base de logarithme, comme promis au niveau 0).</p>`,
+ quiz:[{type:"qcm",q:`La sortie d'une régression logistique est :`,o:[`Un nombre quelconque`,`Une probabilité entre 0 et 1`,`Une étiquette de classe directement`],g:1,e:`La sigmoïde borne le score entre 0 et 1.`,w:[`Ça, c'est le score z avant sigmoïde.`,`On choisit la classe ensuite, avec un seuil (0,5 en général).`]}],
+ sk:[`Interpréter σ(z)`,`Choisir un seuil de décision`],res:[`Score linéaire + sigmoïde = probabilité de classe ; frontière = droite z=0`],nx:[`knn`,`Une autre façon de classer : demander l'avis de ses voisins.`]};
+
+L["knn"]={t:`K-Nearest Neighbors : voter comme ses voisins`,l:4,p:"ml",d:`45 min`,
+ obj:[`Classer un point par vote de ses k voisins`,`Choisir k et mesurer des distances`,`Comprendre pourquoi normaliser est crucial`],pre:[`m-vecteurs`,`ml-donnees`],
+ th:`<p>KNN est l'algorithme le plus intuitif : pour classer un nouvel exemple, on regarde ses <b>k plus proches voisins</b> (distance euclidienne) et on fait voter la majorité. Pas de phase d'entraînement à proprement parler — le dataset <i>est</i> le modèle. Choix de k : trop petit = sensible au bruit ; trop grand = frontières floues. Attention : les features à grande échelle (revenus en milliers) écrasent les petites (âge) → il faut <b>normaliser</b>.</p>`,
+ quiz:[{type:"qcm",q:`Avec k très grand (ex. k = n), KNN prédit…`,o:[`Toujours la classe majoritaire globale`,`Des frontières très précises`,`Une erreur`],g:0,e:`Tous les points votent : c'est un vote national, plus local.`,w:[`Au contraire, les frontières deviennent ultra-floues.`,`Ça fonctionne, c'est juste idiot.`]}],
+ sk:[`Choisir k`,`Préparer les distances par normalisation`],res:[`Majorité des k voisins, distance euclidienne, normalisation indispensable`],nx:[`arbres`,`Autre style de classification : poser des questions en cascade.`]};
+
+L["arbres"]={t:`Arbres de décision : le jeu des 20 questions`,l:4,p:"ml",d:`50 min`,
+ obj:[`Lire un arbre : nœuds, conditions, feuilles`,`Comprendre les critères de découpe (Gini, entropie)`,`Repérer l'overfitting d'un arbre trop profond`],pre:[`knn`,`m-probas`],
+ th:`<p>Un arbre pose des questions binaires en cascade : « revenu > 30 k€ ? » puis « âge < 45 ? »… À chaque nœud, il choisit <b>la question qui sépare le mieux les classes</b> (critère de Gini ou entropie — deux mesures de désordre, à base de probabilités et de log). Arrivé dans une feuille, il prédit la classe majoritaire. Immense avantage : totalement interprétable. Immense défaut : trop profond, il apprend le bruit par cœur (overfitting).</p>`,
+ quiz:[{type:"qcm",q:`Un arbre de décision sans limite de profondeur risque surtout :`,o:[`l'underfitting`,`l'overfitting`,`la divergence`],g:1,e:`Il peut créer une feuille par exemple : il récite au lieu d'apprendre.`,w:[`Au contraire, il apprend trop par cœur.`,`La divergence concerne la descente de gradient.`]}],
+ sk:[`Lire un arbre entraîné`,`Limiter la profondeur (max_depth)`],res:[`Questions successives qui maximisent la pureté ; interprétable mais sujet à l'overfitting`],nx:[`kmeans`,`Jusqu'ici on avait des labels. Et s'il n'y en avait pas ?`]};
+
+L["kmeans"]={t:`K-Means : regrouper sans étiquettes`,l:4,p:"ml",d:`60 min`,full:1,
+ obj:[`Expliquer le clustering non supervisé`,`Dérouler l'algorithme pas à pas`,`Choisir k et lire l'inertie`],
+ pre:[`m-vecteurs`,`ml-donnees`],
+ th:`<p>Jusqu'ici, chaque exemple avait sa réponse (label). Le <b>non supervisé</b> travaille sans : on cherche la <b>structure</b> cachée. K-Means regroupe les points en k grappes autour de k <b>centroïdes</b> (points moyens).</p>
+ <h4>L'algorithme, en deux gestes répétés</h4>
+ <ol><li><b>Affectation</b> : chaque point rejoint le centroïde le plus proche.</li>
+ <li><b>Mise à jour</b> : chaque centroïde se déplace au centre de son groupe.</li></ol>
+ <p>On répète jusqu'à stabilisation. Résultat : chaque point a un numéro de groupe, sans qu'on ait jamais dit à la machine ce que signifient ces groupes. L'<b>inertie</b> (somme des distances aux centroïdes) mesure la compacité : elle baisse à chaque itération. Limites : il faut choisir k, et les formes doivent être à peu près « en grappes ».</p>`,
+ int:`<p><b>Ranger un entrepôt la nuit.</b> Des centaines de colis au sol, aucune étiquette. Vous posez 3 chariots au hasard, puis : chacun range chaque colis dans le chariot le plus proche ; vous déplacez ensuite chaque chariot au centre de son tas. Deux ou trois allers-retours et l'entpôt est organisé en 3 zones cohérentes — sans que personne n'ait défini ce qu'étaient ces zones.</p>`,
+ maths:`<div class="formula">objectif : minimiser Σₖ Σₓ∈groupe k ‖x − μₖ‖²</div>
+ <p>μₖ est le centroïde du groupe k : la moyenne des points du groupe. Chaque itération réduit cette somme — elle ne peut pas remonter, donc l'algorithme termine toujours (sur un minimum local). Pour choisir k, on trace l'inertie en fonction de k et on cherche le « coude ».</p>`,
+ viz:[`viz-kmeans`],
+ py:{code:`from sklearn.cluster import KMeans
+import numpy as np
+
+# 3 grappes de clients (revenu, fréquence d'achat)
+np.random.seed(7)
+g1 = np.random.randn(30, 2) * 4 + [20, 15]
+g2 = np.random.randn(30, 2) * 4 + [55, 70]
+g3 = np.random.randn(30, 2) * 4 + [80, 30]
+X = np.vstack([g1, g2, g3])
+
+km = KMeans(n_clusters=3, random_state=0, n_init=10)
+km.fit(X)
+
+print("Groupes des 6 premiers :", km.labels_[:6])
+print("Centroïdes arrondis :", km.cluster_centers_.round(1).tolist())
+print("Inertie :", round(km.inertia_, 1))`,
+ out:`Groupes des 6 premiers : [0 0 0 0 0 0]
+Centroïdes arrondis : [[19.8, 14.7], [55.1, 69.8], [80.2, 30.4]]
+Inertie : 1863.2`,
+ expl:[[5,`Trois nuages artificiels : dans la vraie vie, vous auriez juste X.`],[8,`On empile les 90 clients.`],[10,`n_init=10 : on tente 10 départs aléatoires et on garde le meilleur.`],[13,`labels_ : le groupe de chaque client.`],[14,`cluster_centers_ : le « client moyen » de chaque groupe.`],[15,`Inertie : plus elle est basse, plus les groupes sont compacts.`]]},
+ ml:`<p><b>Bien choisir k</b> : méthode du coude (courbe inertie/k) ou silhouette. <b>Piège</b> : des échelles différentes entre features faussent les distances → normalisez d'abord (StandardScaler). Cas d'usage : segmentation client, regroupement de documents, détection d'anomalies (points loin de tout centroïde).</p>`,
+ ex:`<p>Une banque segmente ses clients en 4 profils de dépense pour personnaliser ses offres ; un service client regroupe 50 000 tickets en familles de problèmes avant de les router.</p>`,
+ quiz:[
+  {type:"qcm",q:`K-Means est un apprentissage…`,o:[`supervisé`,`non supervisé`,`par renforcement`],g:1,e:`Aucun label : on découvre la structure des données.`,w:[`Il n'y a pas de labels à prédire.`,`Pas de récompenses ni d'agent ici.`]},
+  {type:"qcm",q:`Que fait l'étape « mise à jour » ?`,o:[`Chaque point change de groupe`,`Chaque centroïde devient la moyenne de son groupe`,`On supprime les points isolés`],g:1,e:`Le centroïde se recentre sur ses membres.`,w:[`Ça, c'est l'étape d'affectation.`,`On ne supprime jamais de données ici.`]},
+  {type:"vf",q:`L'inertie diminue (ou stagne) à chaque itération.`,o:[`Vrai`,`Faux`],g:0,e:`Chaque étape minimise une partie de l'objectif : elle ne peut pas augmenter.`,w:[`La démonstration vient de la structure même des deux étapes.`]}],
+ mp:{n:`Segmentation de clients`,
+ d:`Créez 200 clients fictifs (revenu, ancienneté) en 4 grappes. K-Means avec k = 2, 4, 8 : tracez chaque résultat et l'inertie. Où est le coude ?`,
+ etapes:[`Générer les données avec np.random.randn`,`Entraîner trois KMeans`,`scatter coloré par labels_ + centroïdes`,`Tracer inertie(k)`],
+ ch:`Un groupe de « fraudeurs » très petit rend K-Means aveugle. Testez, puis lisez la doc de DBSCAN.`},
+ res:[`Affectation + mise à jour, en boucle`,`Inertie = compacité ; méthode du coude pour k`,`Toujours normaliser avant de mesurer des distances`],
+ sk:[`Dérouler K-Means à la main`,`Choisir k avec le coude`,`Segmenter avec scikit-learn`],
+ liens:[[`m-vecteurs`,`Distances`],[`fe-encodage`,`Normalisation`],[`pca`,`Autre regard non supervisé`]],
+ nx:[`pca`,`Autre façon de découvrir la structure : réduire les dimensions.`]};
+
+L["pca"]={t:`PCA : voir en 2D ce qui vit en 20D`,l:4,p:"ml",d:`50 min`,
+ obj:[`Comprendre la réduction de dimensionnalité`,`Projeter sur les axes de plus grande variance`,`Utiliser PCA pour visualiser`],pre:[`m-matrices`,`m-vecteurs`],
+ th:`<p>L'<b>Analyse en Composantes Principales</b> cherche les directions où les données « s'étalent » le plus, puis projette les points dessus. Première composante = direction de variance maximale ; deuxième = perpendiculaire, etc. On garde les k premières : on perd un peu d'information, on gagne énormément en lisibilité et en vitesse. Mathématiquement, ce sont les <b>vecteurs propres</b> de la matrice de covariance — vous n'avez pas besoin de savoir les calculer pour savoir les utiliser.</p>`,
+ quiz:[{type:"qcm",q:`La première composante principale est la direction…`,o:[`de plus forte variance des données`,`la plus courte`,`choisie au hasard`],g:0,e:`On conserve d'abord ce qui différencie le plus les points.`,w:[`L'inverse : on perdrait tout.`,`Le calcul est déterministe.`]}],
+ sk:[`Visualiser un dataset multidimensionnel`,`Lire explained_variance_ratio_`],res:[`PCA = projection sur les directions de variance maximale ; visualisation et compression`],nx:[`eval-classif`,`Nos modèles prédisent : encore faut-il savoir s'ils ont raison.`]};
+
+L["eval-classif"]={t:`Évaluer une classification : au-delà de l'accuracy`,l:5,p:"ml",d:`70 min`,full:1,
+ obj:[`Lire une matrice de confusion (TP, FP, TN, FN)`,`Calculer accuracy, precision, recall, F1`,`Choisir la bonne métrique selon le contexte`],
+ pre:[`reg-log`,`m-stats`,`ml-donnees`],
+ th:`<p>« 95 % de bonnes réponses » peut cacher un modèle inutile. Tout part de la <b>matrice de confusion</b>, qui croise réalité et prédictions :</p>
+ <table><tr><th></th><th>Prédit MALADE</th><th>Prédit SAIN</th></tr><tr><td><b>Malade en réalité</b></td><td>TP — vrai positif ✅</td><td>FN — faux négatif ⚠️ (raté !)</td></tr><tr><td><b>Saine en réalité</b></td><td>FP — faux positif (fausse alerte)</td><td>TN — vrai négatif ✅</td></tr></table>
+ <p>De là naissent les métriques :</p>
+ <table><tr><th>Métrique</th><th>Formule</th><th>Question posée</th></tr>
+ <tr><td><b>Accuracy</b></td><td>(TP+TN)/total</td><td>« Globalement, combien de bonnes réponses ? »</td></tr>
+ <tr><td><b>Precision</b></td><td>TP/(TP+FP)</td><td>« Quand il crie au loup, a-t-il raison ? »</td></tr>
+ <tr><td><b>Recall</b></td><td>TP/(TP+FN)</td><td>« A-t-il trouvé tous les malades ? »</td></tr>
+ <tr><td><b>F1</b></td><td>2·P·R/(P+R)</td><td>« Le compromis entre les deux »</td></tr></table>
+ <p><b>L'erreur classique :</b> 99 % de sains, 1 % de malades. Un modèle qui répond toujours « sain » atteint 99 % d'accuracy… et rate 100 % des malades. Sur données déséquilibrées, l'accuracy ment : regardez recall, precision, F1, et la courbe ROC/AUC.</p>`,
+ int:`<p><b>Dépistage à l'aéroport.</b> Precision : « quand l'alarme sonne, quelle chance que ce soit vraiment dangereux ? » (trop de fausses alarmes = plus personne n'y croit). Recall : « a-t-on laissé passer quelque chose de dangereux ? » (un seul faux négatif peut être grave). Selon l'enjeu, on pousse l'un ou l'autre : détecteur de fraude bancaire ≠ filtre de spam.</p>`,
+ maths:`<p>Exemple numérique : TP = 40, FN = 10, FP = 5, TN = 45.</p>
+ <div class="formula">accuracy = 85/100 = 0,85 &nbsp;·&nbsp; precision = 40/45 ≈ 0,89 &nbsp;·&nbsp; recall = 40/50 = 0,80 &nbsp;·&nbsp; F1 ≈ 0,84</div>
+ <p>Le recall de 0,80 révèle ce que l'accuracy cachait : 10 malades sur 50 passent à la trappe.</p>`,
+ py:{code:`from sklearn.metrics import (confusion_matrix,
+    classification_report, accuracy_score)
+
+y_vrai  = [1,1,1,1,0,0,0,0,1,0]
+y_pred  = [1,1,0,1,0,0,1,0,1,0]
+
+print("Accuracy :", accuracy_score(y_vrai, y_pred))
+print(confusion_matrix(y_vrai, y_pred))
+print(classification_report(y_vrai, y_pred))`,
+ out:`Accuracy : 0.8
+[[4 1]
+ [1 4]]
+              precision    recall  f1-score   support
+           0       0.80      0.80      0.80         5
+           1       0.80      0.80      0.80         5
+    accuracy                           0.80        10`,
+ expl:[[4,`La vérité terrain : 5 positifs (1), 5 négatifs (0).`],[5,`Les prédictions du modèle : deux erreurs, une de chaque côté.`],[7,`80 % de bonnes réponses au total.`],[8,`Lignes = réalité, colonnes = prédictions.`],[9,`Le rapport complet : P, R, F1 par classe — à lire à chaque projet.`]]},
+ ml:`<p><b>Choisir selon le coût de l'erreur.</b> Cancer → recall d'abord (rater un malade est dramatique). Spam → precision d'abord (supprimer un vrai mail est inacceptable). La courbe <b>ROC</b> trace recall en fonction du taux de fausses alarmes pour tous les seuils ; l'<b>AUC</b> la résume en un score (1 = parfait, 0,5 = pile ou face). Pour la régression, ce sont MAE/MSE/R² (leçon suivante).</p>`,
+ ex:`<p>Un prêteur bancaire préfère rater quelques bons dossiers (FP) plutôt que d'accorder à des insolvables ; un tri de déchets industriels préfère ne rater aucun plastique recyclable (recall).</p>`,
+ quiz:[
+  {type:"qcm",q:`Dataset : 99 % classe A, 1 % classe B. Un modèle qui prédit toujours A a :`,o:[`une accuracy de 99 % mais aucun intérêt`,`une accuracy de 50 %`,`un recall de 100 % sur B`],g:0,e:`C'est LE piège : l'accuracy est haute, le recall sur B est… 0 %.`,w:[`Il a raison 99 fois sur 100, mathématiquement.`,`Sur la classe B, il ne trouve rien : recall = 0.`]},
+  {type:"qcm",q:`Pour un dépistage de maladie grave, on privilégie :`,o:[`la precision`,`le recall`,`l'accuracy`],g:1,e:`Il faut attraper un maximum de malades, quitte à vérifier ensuite les fausses alertes.`,w:[`La precision limiterait les fausses alertes, mais au prix de malades ratés.`,`L'accuracy masque le déséquilibre.`]},
+  {type:"qcm",q:`TP=40, FN=10. Le recall vaut :`,o:[`0,80`,`0,89`,`0,40`],g:0,e:`40/(40+10) = 0,80.`,w:[`0,89 serait la precision si FP=5.`,`40/100 est la part de TP dans le total.`]}],
+ mp:{n:`Duel de modèles`,
+ d:`Deux classifieurs sur les mêmes 200 prédictions : M1 (TP=60, FP=20, FN=10, TN=110), M2 (TP=55, FP=5, FN=15, TN=125). Calculez accuracy, precision, recall, F1 de chacun. Lequel choisissez-vous pour détecter une fraude ? Pour filtrer du spam ?`,
+ etapes:[`Poser les matrices de confusion`,`Appliquer les 4 formules`,`Argumenter selon le contexte`],
+ ch:`Tracez la courbe ROC des deux modèles avec sklearn.metrics.roc_curve à partir de probabilités simulées.`},
+ res:[`Accuracy globale, precision « qualité », recall « couverture », F1 compromis`,`Sur données déséquilibrées, l'accuracy ment`,`La bonne métrique dépend du coût de chaque type d'erreur`],
+ sk:[`Lire une matrice de confusion`,`Choisir une métrique selon l'enjeu`,`Utiliser classification_report`],
+ liens:[[`eval-reg`,`Métriques de régression`],[`cv`,`Fiabiliser ces scores`],[`fe-encodage`,`Déséquilibre de classes`]],
+ nx:[`eval-reg`,`Et quand on prédit un nombre au lieu d'une classe ?`]};
+
+L["eval-reg"]={t:`Évaluer une régression : MAE, MSE, RMSE, R²`,l:5,p:"ml",d:`45 min`,
+ obj:[`Choisir entre MAE et MSE`,`Interpréter un R²`,`Comprendre l'effet du carré`],pre:[`reg-lin`,`eval-classif`],
+ th:`<p><b>MAE</b> (erreur absolue moyenne) : l'erreur « en vrai », dans l'unité des données, robuste aux extrêmes. <b>MSE</b> : pareil mais au carré — les grandes erreurs sont écrasées de punition, et la formule est bien dérivable. <b>RMSE</b> = √MSE : retour dans l'unité des données. <b>R²</b> : la part de variance expliquée par le modèle ; 1 = parfait, 0 = aussi bien que prédire la moyenne, négatif = pire.</p>`,
+ quiz:[{type:"qcm",q:`R² = 0,95 signifie :`,o:[`Le modèle explique 95 % de la variance des y`,`Le modèle a 95 % de bonnes réponses`,`L'erreur moyenne est 0,95`],g:0,e:`C'est la proportion de variance capturée par le modèle.`,w:[`L'accuracy est une notion de classification.`,`0,95 est un ratio, pas une erreur.`]}],
+ sk:[`Choisir MAE vs MSE`,`Lire un R²`],res:[`MAE lisible, MSE punisseur, RMSE en unités réelles, R² en pourcentage de variance`],nx:[`cv`,`Un score sur un seul découpage peut être un coup de chance.`]};
+
+L["cv"]={t:`Cross-validation : des scores dignes de confiance`,l:5,p:"ml",d:`45 min`,
+ obj:[`Dérouler un k-fold à la main`,`Comparer des modèles avec cross_val_score`],pre:[`eval-classif`,`eval-reg`],
+ th:`<p>Avec un seul découpage train/test, le score dépend du tirage au sort. La <b>validation croisée k-fold</b> répète l'expérience : on découpe les données en k plis, on entraîne k fois en laissant chaque pli servir de validation à tour de rôle, et on moyenne les k scores. On obtient une estimation <b>stable</b> et un écart-type — la sincérité statistique du machine learning.</p>
+ ${codeBlock(`from sklearn.model_selection import cross_val_score
+scores = cross_val_score(modele, X, y, cv=5, scoring="accuracy")
+print(scores.round(3), "-> moyenne", scores.mean().round(3))`)}`,
+ quiz:[{type:"qcm",q:`En 5-fold, chaque exemple sert de données de validation…`,o:[`1 fois sur 5`,`5 fois`,`Jamais`],g:0,e:`Chaque pli est le pli de validation une seule fois, les 4 autres servent à entraîner.`,w:[`Chaque pli n'est validé qu'une fois.`,`Il sert aussi à entraîner dans les autres tours, mais validation = 1 fois.`]}],
+ sk:[`Utiliser cross_val_score`,`Comparer la moyenne ET l'écart-type`],res:[`k plis, k entraînements, un score moyen ± écart-type : la base de toute comparaison honnête`],nx:[`fe-nettoyage`,`Scores fiables en main : nettoyons maintenant les données elles-mêmes.`]};
+
+L["fe-nettoyage"]={t:`Nettoyage : valeurs manquantes et doublons`,l:6,p:"ml",d:`50 min`,
+ obj:[`Détecter et traiter les valeurs manquantes`,`Supprimer doublons et valeurs aberrantes`,`Décider : supprimer ou imputer`],pre:[`py-pandas`,`m-stats`],
+ th:`<p>Les vraies données sont sales. Valeurs manquantes : on supprime la ligne (si rares), on <b>impute</b> par la moyenne/médiane (si numériques), ou par la classe la plus fréquente. Valeurs aberrantes : on vérifie d'abord si ce n'est pas une erreur de saisie — parfois l'« anomalie » est justement ce qu'on cherche (fraude !). pandas : <code>df.isna().sum()</code>, <code>df.fillna()</code>, <code>df.drop_duplicates()</code>.</p>`,
+ quiz:[{type:"qcm",q:`Une colonne a 30 % de valeurs manquantes. La meilleure première idée :`,o:[`Supprimer toutes les lignes`,`Imputer par la médiane ou créer un indicateur de manquants`,`Remplacer par 0`],g:1,e:`Supprimer 30 % des données est violent ; 0 serait une fausse information.`,w:[`Perte massive d'information.`,`0 n'est pas une valeur « neutre », c'est une valeur fausse.`]}],
+ sk:[`Diagnostiquer avec isna()`,`Imputer proprement`],res:[`Diagnostiquer → décider (supprimer/imputer) → documenter ce qu'on a fait`],nx:[`fe-encodage`,`Données propres : mettons-les à la bonne échelle.`]};
+
+L["fe-encodage"]={t:`Normalisation, standardisation, encodage`,l:6,p:"ml",d:`55 min`,
+ obj:[`Mettre les features numériques à la même échelle`,`Encoder les catégories (one-hot, ordinal)`,`Savoir quel modèle exige quoi`],pre:[`fe-nettoyage`,`m-stats`,`knn`],
+ th:`<p><b>Standardisation</b> : on recentre sur 0 avec un écart-type de 1 → (x − moyenne)/écart-type. <b>Normalisation min-max</b> : on ramène tout dans [0, 1]. Indispensable pour KNN, K-Means, SVM, réseaux de neurones, PCA — tout ce qui mesure des distances ou descend un gradient. Les arbres, eux, s'en moquent. <b>Catégories</b> : un modèle ne lit pas « Paris » → one-hot encoding crée une colonne binaire par modalité ; l'encodage ordinal réserve un ordre (petit/moyen/grand).</p>`,
+ quiz:[{type:"qcm",q:`Pourquoi normaliser avant un KNN ?`,o:[`Pour accélérer Python`,`Sinon la feature à grande échelle domine la distance`,`C'est obligatoire pour tout modèle`],g:1,e:`La distance euclidienne est gouvernée par la plus grande échelle.`,w:[`L'effet est géométrique, pas matériel.`,`Les arbres n'en ont pas besoin.`]}],
+ sk:[`StandardScaler / OneHotEncoder`,`Choisir selon le modèle`],res:[`Distances et gradients exigent l'échelle ; les arbres s'en passent ; one-hot pour les catégories`],nx:[`fe-selection`,`Trop de features tue la feature : apprenons à choisir.`]};
+
+L["fe-selection"]={t:`Sélection de features : moins, mais mieux`,l:6,p:"ml",d:`45 min`,
+ obj:[`Éliminer les features inutiles ou redondantes`,`Utiliser corrélations et importances`,`Comprendre la malédiction de la dimension`],pre:[`fe-encodage`,`arbres`],
+ th:`<p>Chaque feature inutile ajoute du bruit et du risque d'overfitting. Outils : matrice de corrélation (deux features identiques ? on en garde une), importances d'un Random Forest, méthodes récursives. Plus il y a de dimensions, plus les données deviennent « clairsemées » et les distances peu informatives : c'est la <b>malédiction de la dimension</b>. 20 features pertinentes battent 2 000 features au hasard.</p>`,
+ quiz:[{type:"qcm",q:`Une feature totalement aléatoire dans le modèle risque :`,o:[`d'améliorer toujours les résultats`,`de créer de l'overfitting sans rien apporter`,`de faire diverger l'entraînement`],g:1,e:`Le modèle peut y trouver des motifs illusoires sur le training set.`,w:[`Au mieux elle n'apporte rien, au pire elle nuit.`,`La divergence n'a pas de rapport.`]}],
+ sk:[`Lire une matrice de corrélation`,`Utiliser feature_importances_`],res:[`Corrélation, importances, parcimonie : chaque feature doit mériter sa place`],nx:[`ml-forets`,`Et si on combinait des centaines d'arbres ?`]};
+
+L["ml-forets"]={t:`Random Forest : la sagesse des arbres en foule`,l:7,p:"ml",d:`50 min`,
+ obj:[`Expliquer le bagging et le vote d'arbres`,`Lire feature_importances_`,`Régler n_estimators et max_depth`],pre:[`arbres`,`cv`],
+ th:`<p>Un arbre apprend par cœur ; cent arbres qui votent, rarement. Le <b>Random Forest</b> entraîne des centaines d'arbres sur des échantillons tirés avec remise (bagging) et des sous-ensembles de features aléatoires, puis fait voter la majorité. Les erreurs individuelles se compensent : le vote collectif est bien plus robuste. Bonus : l'importance des features, gratuite et précieuse. C'est souvent LE premier modèle sérieux à dégainer sur des données tabulaires.</p>`,
+ quiz:[{type:"qcm",q:`Une Random Forest bat souvent un arbre seul parce que :`,o:[`elle est plus profonde`,`les erreurs des arbres individuels se compensent par le vote`,`elle utilise la descente de gradient`],g:1,e:`Diversité + vote = variance réduite.`,w:[`Chaque arbre est au contraire souvent limité.`,`Les arbres n'utilisent pas la descente de gradient.`]}],
+ sk:[`Entraîner une RandomForest`,`Interpréter les importances`],res:[`Bagging + features aléatoires + vote : robuste, interprétable, excellent par défaut`],nx:[`ml-boosting`,`L'autre grande famille d'ensembles : corriger ses erreurs en série.`]};
+
+L["ml-boosting"]={t:`Boosting & XGBoost : corriger ses erreurs en série`,l:7,p:"ml",d:`55 min`,
+ obj:[`Expliquer la différence bagging vs boosting`,`Comprendre le gradient boosting`,`Savoir quand sortir XGBoost`],pre:[`ml-forets`,`gd`],
+ th:`<p>Le <b>boosting</b> entraîne des arbres <b>en série</b> : chaque nouvel arbre se concentre sur les erreurs du précédent (le gradient boosting fait ça proprement en descendant le gradient de la loss). Là où le Random Forest vote entre modèles indépendants, le boosting affine, coup après coup. XGBoost et LightGBM dominent depuis des années la plupart des compétitions de données tabulaires. Attention : plus de réglages, plus de risque d'overfitting si on néglige la régularisation.</p>`,
+ quiz:[{type:"qcm",q:`En gradient boosting, les arbres sont entraînés :`,o:[`en parallèle et votent`,`séquentiellement, chacun corrigeant les erreurs résiduelles`,`sans labels`],g:1,e:`Chaque arbre modélise le résidu laissé par l'ensemble.`,w:[`Le parallélisme, c'est le bagging.`,`C'est supervisé.`]}],
+ sk:[`Installer et utiliser xgboost`,`Régler learning_rate et n_estimators`],res:[`Séquence d'arbres correcteurs : redoutable sur le tabulaire, exige du réglage`],nx:[`ml-tuning`,`Ces modèles ont des dizaines de réglages : automatisons leur recherche.`]};
+
+L["ml-tuning"]={t:`Hyperparamètres : GridSearch et RandomizedSearch`,l:7,p:"ml",d:`50 min`,
+ obj:[`Distinguer paramètre appris et hyperparamètre`,`Chercher la meilleure combinaison avec GridSearchCV`,`Éviter l'overfitting du réglage`],pre:[`cv`,`ml-forets`],
+ th:`<p>Les <b>paramètres</b> (pente d'une droite, poids d'un neurone) sont appris des données. Les <b>hyperparamètres</b> (profondeur d'un arbre, learning rate, k de KNN) sont choisis par l'humain — et se règlent par recherche : GridSearchCV explore une grille de combinaisons <i>avec validation croisée</i>, donc sans toucher au test set. On peut aussi chercher au hasard (RandomizedSearchCV), souvent plus efficace sur les grands espaces.</p>`,
+ quiz:[{type:"qcm",q:`Le learning rate est :`,o:[`un paramètre appris automatiquement`,`un hyperparamètre réglé avant l'entraînement`,`une métrique`],g:1,e:`C'est l'humain qui le fixe ; la machine, elle, apprend les poids.`,w:[`Il est fixé avant, pas appris.`,`C'est un réglage, pas une mesure.`]}],
+ sk:[`Construire une grille de recherche`,`Lire les résultats de GridSearchCV`],res:[`Paramètres appris ≠ hyperparamètres choisis ; recherche + CV, jamais sur le test set`],nx:[`ml-pipelines`,`Enchaînons nettoyage, encodage et modèle sans fuite.`]};
+
+L["ml-pipelines"]={t:`Pipelines scikit-learn : zéro fuite de données`,l:7,p:"ml",d:`50 min`,
+ obj:[`Assembler prétraitement + modèle dans un Pipeline`,`Comprendre le leakage et comment le pipeline l'évite`],pre:[`fe-encodage`,`ml-tuning`],
+ th:`<p>Le <b>leakage</b> : calculer la moyenne des données <i>avant</i> le découpage train/test, puis l'utiliser pour imputer — le test set a alors « contaminé » l'entraînement. Le <code>Pipeline</code> scikit-learn enchaîne les étapes (imputation → encodage → modèle) et garantit que chaque calcul ne voit que le fold d'entraînement. Code plus propre, résultats plus honnêtes, déploiement plus simple.</p>`,
+ quiz:[{type:"qcm",q:`Le plus grand avantage d'un Pipeline :`,o:[`il va plus vite`,`il empêche les fuites de données entre prétraitement et validation`,`il remplace le test set`],g:1,e:`Les statistiques du prétraitement sont calculées fold par fold, uniquement sur l'entraînement.`,w:[`La vitesse est secondaire.`,`Le test set reste indispensable.`]}],
+ sk:[`Construire ColumnTransformer + Pipeline`,`GridSearch sur un pipeline`],res:[`Pipeline = hygiène expérimentale : chaque étape n'apprend que du training fold`],nx:[`ml-shap`,`Le modèle décide : exigeons des explications.`]};
+
+L["ml-shap"]={t:`Interprétabilité : SHAP et le droit de comprendre`,l:7,p:"ml",d:`45 min`,
+ obj:[`Expliquer pourquoi un modèle a décidé`,`Lire un summary plot SHAP`],pre:[`ml-forets`,`ml-pipelines`],
+ th:`<p>Un refus de crédit doit pouvoir s'expliquer — la loi l'exige parfois. <b>SHAP</b> attribue à chaque feature de chaque prédiction une contribution signée : « +120 € parce que surface = 70 m², −40 € parce que étage = 0 ». Fondé sur la théorie des jeux (valeurs de Shapley), c'est l'outil standard d'audit de modèles. On distingue explications globales (qu'est-ce qui compte en général ?) et locales (pourquoi cette décision-ci ?).</p>`,
+ quiz:[{type:"qcm",q:`SHAP sert à :`,o:[`accélérer l'entraînement`,`attribuer à chaque feature une contribution à chaque prédiction`,`remplacer la validation croisée`],g:1,e:`C'est un outil d'explication, pas d'optimisation.`,w:[`Aucun effet sur la vitesse.`,`L'évaluation reste indispensable.`]}],
+ sk:[`Installer shap`,`Lire un beeswarm plot`],res:[`Chaque prédiction s'explique par des contributions signées : confiance, audit, conformité`],nx:[`dl-neurone`,`Les modèles classiques n'ont plus de secret. Construisons un neurone.`]};
+
+L["dl-neurone"]={t:`Le neurone artificiel : la brique du Deep Learning`,l:8,p:"dl",d:`65 min`,full:1,
+ obj:[`Décomposer un neurone : entrées pondérées, biais, activation`,`Calculer une sortie à la main puis avec NumPy`,`Comprendre que la régression logistique est un neurone`],
+ pre:[`m-vecteurs`,`reg-log`,`py-numpy`],
+ th:`<p>Un <b>neurone artificiel</b> fait trois choses, dans cet ordre :</p>
+ <ol><li><b>Somme pondérée</b> : chaque entrée xᵢ est multipliée par son poids wᵢ, on ajoute un biais b → z = w₁x₁ + w₂x₂ + w₃x₃ + b.</li>
+ <li><b>Activation</b> : une fonction non linéaire transforme z. La <b>sigmoïde</b> σ(z) = 1/(1+e⁻) écrase tout entre 0 et 1 : parfait pour une probabilité.</li>
+ <li><b>Sortie</b> : a = σ(z), l'activation du neurone.</li></ol>
+ <p>Les poids disent <b>l'importance</b> de chaque entrée (positif = encourage, négatif = freine) ; le biais est le <b>seuil de déclenchement</b>. Et la révélation du chapitre : <b>une régression logistique est exactement un neurone sigmoïde</b>. Le deep learning, c'est ce même neurone en très grand nombre, empilé en couches.</p>`,
+ int:`<p><b>Décider d'aller à un concert.</b> Trois critères : l'affiche vous plaît (x₁), vos amis y vont (x₂), le prix est raisonnable (x₃). Vous accordez une importance différente à chaque critère — ce sont les <b>poids</b>. Même sans ami, une affiche exceptionnelle peut suffire si votre enthousiasme de base (le <b>biais</b>) est élevé. Le neurone fait ce calcul : puis la sigmoïde transforme votre score d'envie en décision nette : « j'y vais / je n'y vais pas ».</p>`,
+ maths:`<div class="formula">z = Σ wᵢx + b &nbsp;&nbsp;→&nbsp;&nbsp; a = σ(z) = 1 / (1 + e⁻ᶻ)</div>
+ <p>Exemple : x = (1 ; 0,5 ; 1), w = (2 ; −1 ; 0,5), b = −1. z = 2×1 − 1×0,5 + 0,5×1 − 1 = 1,0. σ(1) ≈ <b>0,73</b> : le neurone « s'allume » à 73 %. Remarquez : le poids négatif de x₂ freine la décision, exactement comme un critère dissuasif.</p>`,
+ viz:[`viz-neurone`],
+ py:{code:`import numpy as np
+
+x = np.array([1.0, 0.5, 1.0])      # les entrées
+w = np.array([2.0, -1.0, 0.5])     # les poids
+b = -1.0                           # le biais
+
+z = np.dot(w, x) + b               # somme pondérée
+def sigmoide(z):
+    return 1 / (1 + np.exp(-z))
+
+print("z =", z)                    # 1.0
+print("activation =", round(sigmoide(z), 3))  # 0.731`,
+ out:`z = 1.0
+activation = 0.731`,
+ expl:[[3,`Les trois critères, chacun entre 0 et 1.`],[4,`Deux encouragent, un freine (poids négatif).`],[5,`Le biais : l'humeur de base du neurone.`],[7,`Le fameux produit scalaire w·x du niveau 3, plus le biais.`],[8,`La sigmoïde : la courbe en S qui borne entre 0 et 1.`],[11,`0,731 : le neurone est plutôt allumé.`]]},
+ ml:`<p><b>Et l'apprentissage ?</b> Exactement comme la régression linéaire : une loss mesure l'écart, la descente de gradient ajuste les poids. Un seul neurone = un classifieur linéaire. Pour dépasser les frontières droites, il faudra des couches (leçon suivante) et la magie de la backpropagation. Fonctions d'activation célèbres : sigmoïde, tanh, et surtout <b>ReLU</b> (max(0, z)) — la préférée des couches cachées.</p>`,
+ ex:`<p>Chaque neurone d'un grand modèle de langage (des centaines de milliards) applique cette formule. GPT ne « pense » pas : il multiplie, additionne, active — à une échelle vertigineuse.</p>`,
+ quiz:[
+  {type:"qcm",q:`Dans un neurone, les poids servent à :`,o:[`donner de l'importance relative à chaque entrée`,`accélérer le calcul`,`stocker les labels`],g:0,e:`Un grand poids = une entrée qui compte ; négatif = une entrée qui freine.`,w:[`La vitesse dépend du matériel.`,`Les labels sont les cibles d'entraînement.`]},
+  {type:"qcm",q:`σ(0) vaut :`,o:[`0`,`0,5`,`1`],g:1,e:`1/(1+e⁰) = 1/2 : le point milieu de la courbe en S.`,w:[`σ ne vaut jamais 0 exactement.`,`σ n'atteint jamais 1 exactement non plus.`]},
+  {type:"vf",q:`Une régression logistique est un neurone artificiel avec une activation sigmoïde.`,o:[`Vrai`,`Faux`],g:0,e:`Même formule, même apprentissage : z = w·x + b puis σ.`,w:[`Comparez les formules des deux leçons : identiques.`]}],
+ mp:{n:`Le neurone qui calcule ET / OU`,
+ d:`Trouvez à la main des poids et un biais pour qu'un neurone sigmoïde imite la porte logique OU (sortie > 0,5 si au moins une entrée sur deux vaut 1), puis la porte ET. Vérifiez avec NumPy sur les 4 combinaisons (0,0), (0,1), (1,0), (1,1).`,
+ etapes:[`Choisir w1, w2, b`,`Calculer σ pour les 4 entrées`,`Ajuster jusqu'à ce que les sorties séparent 0 et 1`],
+ ch:`Essayez avec la porte XOR. Ça bloque ? Normal : une droite ne sépare pas un XOR. Il faut deux neurones — leçon suivante.`},
+ res:[`z = w·x + b puis activation : la formule de chaque neurone`,`Poids = importance, biais = seuil`,`Sigmoïde → probabilité ; ReLU pour les couches cachées`],
+ sk:[`Calculer la sortie d'un neurone à la main`,`Relier neurone et régression logistique`],
+ liens:[[`reg-log`,`Le même modèle`],[`dl-mlp`,`Empiler les neurones`],[`dl-backprop`,`Les faire apprendre`]],
+ nx:[`dl-mlp`,`Un neurone sépare avec une droite. Empilons-les pour séparer n'importe quoi.`]};
+
+L["dl-activation"]={t:`Fonctions d'activation : sigmoïde, tanh, ReLU`,l:8,p:"dl",d:`40 min`,
+ obj:[`Comparer sigmoïde, tanh, ReLU, softmax`,`Savoir laquelle choisir et où`],pre:[`dl-neurone`],
+ th:`<p><b>Sigmoïde</b> : sortie entre 0 et 1 → probabilités binaires ; mais elle « sature » (gradients minuscules aux extrêmes). <b>Tanh</b> : entre −1 et 1, mieux centrée. <b>ReLU</b> : max(0, z) — simple, rapide, la référence des couches cachées (défaut : neurones « morts » si toujours négatifs). <b>Softmax</b> : transforme des scores en un vrai partage de probabilités entre plusieurs classes — la sortie standard des classifieurs multi-classes.</p>`,
+ quiz:[{type:"qcm",q:`La fonction la plus utilisée dans les couches cachées modernes :`,o:[`sigmoïde`,`ReLU`,`softmax`],g:1,e:`Rapide à calculer et à dériver, elle évite la saturation.`,w:[`Réservée aux sorties binaires, elle sature vite.`,`Softmax s'utilise en couche de sortie multi-classes.`]}],
+ sk:[`Choisir une activation selon la couche`],res:[`Cachées : ReLU ; sortie binaire : sigmoïde ; sortie multi-classes : softmax`],nx:[`dl-mlp`,`Empilons les neurones en couches.`]};
+
+L["dl-mlp"]={t:`Perceptron multicouche : la puissance de l'empilement`,l:8,p:"dl",d:`55 min`,
+ obj:[`Comprendre couches, couches cachées et sortie`,`Résoudre le XOR avec 2 neurones`,`Saisir la notion d'approximateur universel`],pre:[`dl-neurone`,`dl-activation`],
+ th:`<p>Un neurone = une droite de décision. Des neurones en <b>couche</b>, dont les sorties nourrissent une couche suivante, tracent des frontières courbes et brisées. La couche d'entrée reçoit les features, les <b>couches cachées</b> construisent des représentations intermédiaires de plus en plus abstraites, la couche de sortie répond. Sans fonction d'activation non linéaire, tout l'empilement s'effondre… en une simple régression linéaire. Théorème d'approximation universelle : un MLP assez large peut approcher n'importe quelle fonction continue.</p>`,
+ quiz:[{type:"qcm",q:`Un réseau sans aucune fonction d'activation calcule au final :`,o:[`une fonction linéaire`,`une convolution`,`un arbre de décision`],g:0,e:`Composer des fonctions linéaires reste linéaire : les couches s'annulent conceptuellement.`,w:[`Les convolutions sont des architectures spécifiques.`,`Rien à voir avec les arbres.`]}],
+ sk:[`Dessiner une architecture`,`Compter les paramètres`],res:[`Couches empilées + non-linéarités = frontières complexes ; chaque poids est appris`],nx:[`dl-backprop`,`Comment ces milliers de poids apprennent-ils ensemble ?`]};
+
+L["dl-backprop"]={t:`Backpropagation : la descente à reculons`,l:8,p:"dl",d:`60 min`,
+ obj:[`Expliquer pourquoi chaque poids reçoit sa part de responsabilité`,`Relier backprop et règle de la chaîne`],pre:[`dl-mlp`,`gd`,`m-derivees`],
+ th:`<p>Le réseau a prédit, s'est trompé : <b>qui est responsable ?</b> La backpropagation répond en propageant l'erreur de la sortie vers l'entrée, et attribue à chaque poids sa part de responsabilité via la <b>règle de la chaîne</b> : ∂loss/∂poids = produit des dérivées le long du chemin. Puis la descente de gradient fait son travail habituel. C'est tout. PyTorch le fait automatiquement (autograd) — vous n'écrirez jamais ces dérivées à la main, mais comprendre le principe vous rend capable de diagnostiquer un réseau qui n'apprend pas.</p>`,
+ quiz:[{type:"qcm",q:`La backpropagation utilise surtout :`,o:[`la règle de la chaîne (dérivées composées)`,`le théorème de Bayes`,`la méthode du coude`],g:0,e:`Elle compose les dérivées de chaque étape du calcul.`,w:[`Bayes est un théorème de probabilités.`,`Le coude sert à choisir k en clustering.`]}],
+ sk:[`Expliquer un gradient qui disparaît/explose`,`Lire le graphe de calcul`],res:[`Erreur propagée à reculons, responsabilité attribuée par dérivation en chaîne`],nx:[`py-pytorch`,`Assez de théorie : faisons-le faire par PyTorch.`]};
+
+L["py-pytorch"]={t:`PyTorch : tenseurs, autograd et premier réseau`,l:8,p:"py",d:`75 min`,
+ obj:[`Manipuler des tenseurs`,`Comprendre autograd (dérivées automatiques)`,`Écrire un nn.Module minimal`],pre:[`dl-neurone`,`py-numpy`],
+ th:`<p>PyTorch est la bibliothèque reine du deep learning moderne. Son objet central, le <b>tenseur</b>, est un tableau NumPy qui sait (a) vivre sur GPU et (b) calculer ses propres dérivées grâce à <b>autograd</b>. Un modèle s'écrit comme une classe héritant de <code>nn.Module</code> : on y déclare les couches, et <code>forward()</code> décrit le trajet des données.</p>
+ ${codeBlock(`import torch
+import torch.nn as nn
+
+x = torch.tensor([2.0, 3.0], requires_grad=True)
+y = (x ** 2).sum()     # y = x1² + x2²
+y.backward()           # dérivées automatiques !
+print(x.grad)          # tensor([4., 6.]) = [2x1, 2x2]
+
+class MiniReseau(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(4, 16)   # 4 features -> 16 neurones
+        self.fc2 = nn.Linear(16, 1)   # -> 1 sortie
+    def forward(self, x):
+        return self.fc2(torch.relu(self.fc1(x)))`)}`,
+ quiz:[{type:"qcm",q:`L'objet fondamental de PyTorch est :`,o:[`le DataFrame`,`le tenseur`,`l'arbre`],g:1,e:`Un tableau multidimensionnel, dérivable et compatible GPU.`,w:[`Ça, c'est pandas.`,`Ça, c'est scikit-learn.`]}],
+ sk:[`Créer des tenseurs`,`Utiliser backward()`,`Définir un nn.Module`],res:[`tenseur + autograd + nn.Module : le trio qui fait tourner tout le DL moderne`],nx:[`cv-images`,`Appliquons tout ça à des pixels.`]};
+
+L["cv-images"]={t:`Images = tenseurs : voir en nombres`,l:9,p:"dl",d:`45 min`,
+ obj:[`Lire une image comme un tableau H×L×3`,`Normaliser des pixels`,`Charger un dataset image`],pre:[`dl-mlp`,`py-pytorch`],
+ th:`<p>Une image couleur de 32×32 pixels est un tenseur 32×32×3 : 3 072 nombres entre 0 et 255. Avant d'entrer dans un réseau, on divise par 255 (normalisation) et souvent on recadre/rote légèrement les images d'entraînement (<b>data augmentation</b>) pour muscler la robustesse. Le dataset d'initiation universel : MNIST, 70 000 chiffres manuscrits.</p>`,
+ quiz:[{type:"qcm",q:`Une image RGB de 32×32 contient combien de valeurs ?`,o:[`1024`,`3072`,`32`],g:1,e:`32 × 32 × 3 canaux = 3 072.`,w:[`Ça, c'est sans les canaux.`,`Un seul pixel.`]}],
+ sk:[`Ouvrir une image en tenseur`,`Normaliser par 255`],res:[`Image = grille de nombres ; normaliser puis augmenter`],nx:[`cv-cnn`,`Un MLP sur des pixels oublie que l'image a une géométrie.`]};
+
+L["cv-cnn"]={t:`CNN : convolutions, filtres et pooling`,l:9,p:"dl",d:`60 min`,
+ obj:[`Expliquer convolution, filtres et cartes d'activation`,`Comprendre le rôle du pooling`],pre:[`cv-images`],
+ th:`<p>Un <b>CNN</b> (réseau convolutif) exploite la géométrie de l'image : de petits <b>filtres</b> (matrices 3×3 typiquement) glissent sur toute l'image et détectent des motifs locaux — bord, texture, puis contour, puis œil, puis visage au fil des couches. Chaque filtre produit une carte d'activation. Le <b>pooling</b> (max) résume chaque zone : plus compact, plus tolérant aux translations. Résultat : beaucoup moins de paramètres qu'un MLP, et une compréhension hiérarchique de l'image.</p>`,
+ quiz:[{type:"qcm",q:`Les filtres d'un CNN apprennent à détecter :`,o:[`des motifs locaux (bords, textures, formes)`,`des couleurs uniques`,`des étiquettes`],g:0,e:`Chaque filtre se spécialise sur un motif, des plus simples aux plus abstraits.`,w:[`La couleur n'est qu'une dimension parmi d'autres.`,`Les étiquettes sont les cibles, pas des motifs.`]}],
+ sk:[`Décrire une architecture CNN`,`Lire la forme des cartes`],res:[`Convolution = détection locale partagée ; pooling = synthèse ; hiérarchie de motifs`],nx:[`cv-transfer`,`Et si un modèle pré-entraîné faisait le gros du travail ?`]};
+
+L["cv-transfer"]={t:`Transfer learning : monter sur les épaules des géants`,l:9,p:"dl",d:`50 min`,
+ obj:[`Réutiliser un modèle pré-entraîné (ResNet, EfficientNet)`,`Fine-tuner les dernières couches`],pre:[`cv-cnn`],
+ th:`<p>Entraîner un CNN de zéro exige des millions d'images. Le <b>transfer learning</b> contourne le problème : on prend un modèle entraîné sur ImageNet (1,4 M d'images) — ses premières couches savent déjà détecter bords et textures — et on remplace sa tête de classification par la nôtre, qu'on entraîne sur <i>nos</i> données. Quelques centaines d'images suffisent alors là où il en fallait des millions. C'est la technique n°1 de la vision en entreprise — et le même principe nourrit le NLP moderne.</p>`,
+ quiz:[{type:"qcm",q:`Le transfer learning consiste à :`,o:[`réutiliser un modèle pré-entraîné et l'adapter à sa tâche`,`entraîner deux modèles en parallèle`,`transférer les données sur GPU`],g:0,e:`On capitalise sur des représentations déjà apprises.`,w:[`Aucun parallélisme là-dedans.`,`Le GPU est une question matérielle.`]}],
+ sk:[`Charger un modèle torchvision`,`Geler puis dégeler des couches`],res:[`Pré-entraîné + fine-tuning = performance pro avec peu de données`],nx:[`nlp-texte`,`Même logique pour le texte.`]};
+
+L["nlp-texte"]={t:`NLP : du texte aux nombres, la tokenisation`,l:10,p:"dl",d:`50 min`,
+ obj:[`Tokeniser un texte`,`Comprendre vocabulaire et sac-de-mots`,`Préparer un corpus`],pre:[`dl-mlp`,`py-pandas`],
+ th:`<p>Une machine ne lit pas : elle compte. La <b>tokenisation</b> découpe le texte en unités (mots ou sous-mots). Chaque token reçoit un identifiant ; le <b>vocabulaire</b> est la liste de tous les tokens connus. Premiers modèles : sac-de-mots (compter les mots, ignorer l'ordre) puis TF-IDF (pondérer les mots rares). Limites évidentes : « chien » et « chiot » n'ont rien en commun dans ce monde de comptage. Il faut des représentations qui capturent le <i>sens</i> — ce sont les embeddings.</p>`,
+ quiz:[{type:"qcm",q:`La tokenisation sert à :`,o:[`découper le texte en unités exploitables`,`traduire le texte`,`corriger les fautes`],g:0,e:`C'est la première étape de toute chaîne NLP.`,w:[`La traduction vient bien plus tard.`,`Le nettoyage est une étape distincte.`]}],
+ sk:[`Tokeniser avec split ou un tokenizer`,`Construire un vocabulaire`],res:[`Token → identifiant → représentation ; l'ordre et le sens arrivent après`],nx:[`nlp-embed`,`Donnons du sens aux mots.`]};
+
+L["nlp-embed"]={t:`Embeddings : la géométrie du sens`,l:10,p:"dl",d:`50 min`,
+ obj:[`Comprendre un embedding comme un vecteur de sens`,`Saisir les analogies vectoriennes (roi − homme + femme ≈ reine)`],pre:[`nlp-texte`,`m-vecteurs`],
+ th:`<p>Un <b>embedding</b> représente chaque mot (ou token) par un vecteur dense — et la magie : des mots proches en <i>sens</i> sont proches dans l'espace vectoriel. Word2Vec l'a montré en 2013 : ces vecteurs codent des relations (roi − homme + femme ≈ reine). D'où viennent-ils ? De l'entraînement sur d'énormes corpus : « dis-moi qui sont tes voisins de texte, je te dirai qui tu es ». Aujourd'hui, tous les LLM travaillent dans ces espaces — c'est aussi ce que stocke une base « vectorielle » pour la recherche sémantique.</p>`,
+ quiz:[{type:"qcm",q:`Un embedding représente un mot par :`,o:[`sa première lettre`,`un vecteur de nombres capturant son sens`,`sa fréquence exacte`],g:1,e:`Le vecteur encode la sémantique : proximité = similarité de sens.`,w:[`Réduction bien trop brutale.`,`La fréquence n'est qu'un indice parmi d'autres.`]}],
+ sk:[`Charger des embeddings pré-entraînés`,`Mesurer une similarité cosinus`],res:[`Mots = vecteurs ; similarité vectorielle = similarité de sens`],nx:[`nlp-transformers`,`L'architecture qui a tout changé.`]};
+
+L["nlp-transformers"]={t:`Transformers & attention : l'architecture qui a tout changé`,l:10,p:"dl",d:`60 min`,
+ obj:[`Expliquer l'attention en une phrase`,`Situer BERT, GPT et les LLM`],pre:[`nlp-embed`,`dl-mlp`],
+ th:`<p>Le mécanisme d'<b>attention</b> (2017, « Attention Is All You Need ») laisse chaque token regarder <b>tous les autres tokens</b> de la phrase et décider lesquels compter pour se comprendre lui-même. « La banque du fleuve » vs « la banque de France » : l'attention résout l'ambiguïté par le contexte. Empilez ces couches, entraînez sur des téraoctets de texte, et vous obtenez les <b>LLM</b> : BERT (comprendre, bidirectionnel), GPT (générer, mot après mot). Comprendre ce que fait l'attention — des produits scalaires entre requêtes, clés et valeurs — vous êtes en terrain conquis : encore le produit scalaire du niveau 3.</p>`,
+ quiz:[{type:"qcm",q:`Le mécanisme central des Transformers est :`,o:[`la convolution`,`l'attention`,`le pooling`],g:1,e:`Chaque token pondère l'importance de tous les autres.`,w:[`La convolution appartient aux CNN.`,`Le pooling résume, sans interactions.`]}],
+ sk:[`Expliquer l'attention simplement`,`Situer BERT vs GPT`],res:[`Attention = produit scalaire contextuel entre tokens ; les LLM en sont empilés`],nx:[`mlops-git`,`Vous savez construire. Apprenons à livrer.`]};
+
+L["mlops-git"]={t:`Git & GitHub pour le ML`,l:11,p:"env",d:`50 min`,
+ obj:[`Versionner code ET expérimentations`,`Écrire un README de projet ML`],pre:[`env-decouverte`],
+ th:`<p>Un projet ML, c'est du code + des données + des modèles + des réglages. Git versionne le code (<code>init, add, commit, push</code>), les branches isolent les essais, la pull request ouvre la discussion. Règles ML : jamais de données brutes ni de gros modèles dans le dépôt (<code>.gitignore</code>) ; notez les hyperparamètres et les scores dans le commit ou un fichier d'expérience ; le README explique données, entraînement et reproduction. GitHub héberge et rend tout cela collaboratif.</p>
+ ${codeBlock(`git init && git add . && git commit -m "RF baseline : F1 0.83"
+git checkout -b essai-xgboost
+git push origin essai-xgboost`,"bash")}`,
+ quiz:[{type:"qcm",q:`git commit sert à :`,o:[`envoyer le code sur GitHub`,`enregistrer un instantané versionné des modifications`,`supprimer l'historique`],g:1,e:`Le commit est une photographie locale ; push l'envoie ensuite.`,w:[`Ça, c'est push.`,`Git conserve au contraire l'historique.`]}],
+ sk:[`add/commit/push`,`Créer une branche d'expérimentation`],res:[`Versionner le code, tracer les expériences, ignorer les données brutes`],nx:[`mlops-api`,`Le modèle vit sur votre machine : exposez-le au monde.`]};
+
+L["mlops-api"]={t:`FastAPI : transformer un modèle en service web`,l:11,p:"env",d:`55 min`,
+ obj:[`Servir un modèle via une route /predict`,`Échanger des données en JSON`],pre:[`mlops-git`,`ml-pipelines`],
+ th:`<p>Un modèle dans un notebook ne sert à personne. Une <b>API</b> le met à disposition de n'importe quelle application : le client envoie du JSON, le serveur charge le modèle, prédit, répond en JSON. FastAPI le fait en dix lignes, avec documentation automatique.</p>
+ ${codeBlock(`from fastapi import FastAPI
+import joblib
+
+app = FastAPI()
+modele = joblib.load("modele.pkl")     # modèle sauvegardé
+
+@app.post("/predict")
+def predire(donnees: dict):
+    X = [[donnees["surface"], donnees["pieces"]]]
+    return {"loyer_pred": float(modele.predict(X)[0])}`)}
+ <p>On lance avec <code>uvicorn main:app</code>, et l'application web, mobile ou métier consomme votre modèle sans rien savoir de Python.</p>`,
+ quiz:[{type:"qcm",q:`Le rôle d'une API de prédiction :`,o:[`réentraîner le modèle chaque nuit`,`recevoir des données et renvoyer une prédiction`,`stocker le dataset`],g:1,e:`Requête JSON entrante → prédiction JSON sortante.`,w:[`Le réentraînement est un autre processus.`,`Le stockage est le rôle d'une base.`]}],
+ sk:[`Écrire une route FastAPI`,`Sérialiser un modèle avec joblib`],res:[`API = le pont entre votre modèle et le monde réel`],nx:[`mlops-docker`,`Et pour que ça tourne partout, pareil, à chaque fois…`]};
+
+L["mlops-docker"]={t:`Docker : « ça marche sur ma machine » → « partout »`,l:11,p:"env",d:`55 min`,
+ obj:[`Comprendre image vs conteneur`,`Écrire un Dockerfile pour une API ML`],pre:[`mlops-api`],
+ th:`<p>Une <b>image</b> Docker est un moule : système minimal + Python + bibliothèques + votre code. Un <b>conteneur</b> est une instance qui tourne, identique sur votre portable, celui du collègue et le serveur de production. Le <code>Dockerfile</code> décrit la recette :</p>
+ ${codeBlock(`FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]`,"dockerfile")}
+ ${codeBlock(`docker build -t mon-api-ml .
+docker run -p 8000:8000 mon-api-ml`,"bash")}
+ <p>Reproductibilité totale : c'est la brique de base du MLOps moderne, avant l'orchestration (CI/CD, Kubernetes) que vous découvrirez en poste.</p>`,
+ quiz:[{type:"qcm",q:`Un conteneur Docker est :`,o:[`une machine virtuelle complète`,`une instance légère et isolée d'une image`,`un fichier de logs`],g:1,e:`Il partage le noyau de l'hôte : léger, isolé, identique partout.`,w:[`Une VM émule du matériel ; pas un conteneur.`,`Les logs vivent dedans, mais ne le définissent pas.`]}],
+ sk:[`Écrire un Dockerfile`,`build & run`],res:[`Image = recette, conteneur = plat servi : reproductibilité garantie`],nx:[`mlops-suivi`,`Le modèle est en production. Le travail commence.`]};
+
+L["mlops-suivi"]={t:`Monitoring : un modèle en production est vivant`,l:11,p:"ml",d:`45 min`,
+ obj:[`Détecter la dérive des données (drift)`,`Mettre en place un suivi de performance`],pre:[`mlops-api`,`eval-classif`],
+ th:`<p>Le jour du déploiement, le modèle commence à vieillir : les données changent (<b>data drift</b> — les clients de 2027 ne ressemblent pas à ceux de 2024), les performances baissent parfois silencieusement. Le MLOps met en place : métriques de prédiction en continu, comparaison des distributions entrantes avec l'entraînement, alertes, et un <b>registre de modèles</b> pour savoir quelle version tourne et pouvoir revenir en arrière. Réentraîner n'est pas un accident, c'est un processus planifié.</p>`,
+ quiz:[{type:"qcm",q:`La dérive des données (data drift), c'est :`,o:[`la distribution des données d'entrée qui évolue dans le temps`,`un bug de GPU`,`la perte du dataset`],g:0,e:`Le monde change, les données aussi : le modèle entraîné hier devient moins pertinent.`,w:[`Rien de matériel.`,`Le dataset est toujours là ; c'est sa représentativité qui s'érode.`]}],
+ sk:[`Choisir des indicateurs de suivi`,`Planifier un réentraînement`],res:[`Déployer n'est pas finir : surveiller, alerter, réentraîner`],nx:[`proj-final`,`Il est temps de tout assembler.`]};
+
+L["proj-final"]={t:`Projet final : votre application ML de bout en bout`,l:12,p:"ml",d:`20 h+`,
+ obj:[`Conduire un projet ML complet, du problème au déploiement`,`Assembler les 3 piliers dans un livrable professionnel`],pre:[`mlops-docker`],
+ th:`<p>Le niveau final n'est pas une leçon : c'est une mission. Construisez une application réelle — par exemple <b>PrédiSanté</b> : un modèle qui estime un risque à partir de données de santé, servi par une API, dockerisé, documenté sur GitHub. Checklist : problème posé → données trouvées et nettoyées → exploration → baseline simple → modèle amélioré + tuning → évaluation honnête (test set intact) → API FastAPI → Dockerfile → README qui explique tout. Ensuite : publiez, essuyez des retours, itérez. C'est exactement le travail d'un ML engineer.</p>`,
+ quiz:[{type:"qcm",q:`Le bon ordre d'un projet ML professionnel :`,o:[`Modèle → données → problème`,`Problème → données → baseline → modèle → évaluation → déploiement`,`Déploiement → modèle → données`],g:1,e:`On part du besoin, on finit par le service rendu.`,w:[`Construire sans données ni problème mène nulle part.`,`L'inverse du cycle de vie.`]}],
+ sk:[`Piloter un projet de bout en bout`,`Documenter et livrer`],res:[`Votre portfolio commence ici : un dépôt GitHub propre vaut mille certificats`],nx:[`proj-final`,`Et maintenant : pratiquez. Les projets 1 à 10 vous attendent.`]};
+
+/* ================= NIVEAUX ================= */
+const LEVELS=[
+ {n:0,t:`Prérequis`,d:`L'ordinateur, le terminal, les premiers nombres et le premier code. Tout le monde part d'ici.`,ls:[`env-decouverte`,`py-decouverte`,`m-nombres`]},
+ {n:1,t:`Introduction à l'IA`,d:`Comprendre la famille IA / ML / Deep Learning, et les objets de base : fonctions, listes, données.`,ls:[`ia-ml-dl`,`m-fonctions`,`py-listes`]},
+ {n:2,t:`Python pour le ML`,d:`Le socle programmation : boucles, fonctions, fichiers, puis la trilogie NumPy · Pandas · Matplotlib.`,ls:[`py-boucles`,`py-fonctions`,`py-fichiers`,`py-numpy`,`py-pandas`,`py-matplotlib`,`m-stats`]},
+ {n:3,t:`Mathématiques pour le ML`,d:`Vecteurs, matrices, probabilités, dérivées — chaque notion enseignée pour son usage réel.`,ls:[`m-vecteurs`,`m-matrices`,`m-probas`,`m-derivees`]},
+ {n:4,t:`Machine Learning fondamental`,d:`Les algorithmes fondateurs, implémentés à la main puis avec scikit-learn.`,ls:[`ml-donnees`,`reg-lin`,`gd`,`reg-log`,`knn`,`arbres`,`kmeans`,`pca`]},
+ {n:5,t:`Évaluation des modèles`,d:`Mesurer honnêtement la performance : métriques, matrice de confusion, validation croisée.`,ls:[`eval-classif`,`eval-reg`,`cv`]},
+ {n:6,t:`Feature Engineering`,d:`Nettoyer, encoder, normaliser, sélectionner : là où se gagnent les vrais points.`,ls:[`fe-nettoyage`,`fe-encodage`,`fe-selection`]},
+ {n:7,t:`Machine Learning avancé`,d:`Forêts aléatoires, boosting, tuning, pipelines, interprétabilité.`,ls:[`ml-forets`,`ml-boosting`,`ml-tuning`,`ml-pipelines`,`ml-shap`]},
+ {n:8,t:`Deep Learning`,d:`Du neurone à la backpropagation, avec PyTorch en main.`,ls:[`dl-neurone`,`dl-activation`,`dl-mlp`,`dl-backprop`,`py-pytorch`]},
+ {n:9,t:`Computer Vision`,d:`Images, CNN et transfer learning.`,ls:[`cv-images`,`cv-cnn`,`cv-transfer`]},
+ {n:10,t:`NLP`,d:`Du token à l'attention : embeddings, Transformers et modèles de langage.`,ls:[`nlp-texte`,`nlp-embed`,`nlp-transformers`]},
+ {n:11,t:`MLOps`,d:`Git, API, Docker, monitoring : du notebook à la production.`,ls:[`mlops-git`,`mlops-api`,`mlops-docker`,`mlops-suivi`]},
+ {n:12,t:`Projet final`,d:`Une application ML complète, de bout en bout. Votre porte d'entrée vers l'expertise.`,ls:[`proj-final`]}
+];
+const ORDER=LEVELS.flatMap(l=>l.ls);
+const LESSONS=ORDER.length;
+
+/* ================= GLOSSAIRE ================= */
+const GLOSS=[
+ [`IA`,`Fondamentaux`,`Intelligence artificielle : tout programme accomplissant une tâche considérée comme intelligente.`],
+ [`Machine Learning`,`Fondamentaux`,`Sous-domaine de l'IA où la machine apprend des données au lieu de suivre des règles écrites.`],
+ [`Deep Learning`,`Fondamentaux`,`ML fondé sur des réseaux de neurones à plusieurs couches ; excelle sur images, texte, voix.`],
+ [`Dataset`,`Données`,`Ensemble d'exemples utilisés pour entraîner, valider ou tester un modèle.`],
+ [`Feature`,`Données`,`Variable d'entrée, une colonne du dataset (surface, âge, pixel…).`],
+ [`Label`,`Données`,`Réponse attendue, ce que le modèle doit apprendre à prédire.`],
+ [`Modèle`,`Fondamentaux`,`Fonction apprise des données, capable de prédire sur de nouveaux exemples.`],
+ [`Entraînement`,`Entraînement`,`Phase où les paramètres du modèle sont ajustés pour minimiser l'erreur.`],
+ [`Inférence`,`Entraînement`,`Utilisation d'un modèle entraîné pour produire des prédictions.`],
+ [`Epoch`,`Entraînement`,`Un passage complet du jeu d'entraînement dans l'algorithme.`],
+ [`Batch`,`Entraînement`,`Lot d'exemples traité en une fois pendant l'entraînement.`],
+ [`Loss`,`Entraînement`,`Fonction de coût : mesure l'écart entre prédictions et réalité.`],
+ [`Gradient`,`Entraînement`,`Vecteur des dérivées du coût ; indique la direction de plus forte montée.`],
+ [`Optimizer`,`Entraînement`,`Algorithme qui ajuste les paramètres (SGD, Adam…) en suivant le gradient.`],
+ [`Learning rate`,`Entraînement`,`Taille du pas de la descente de gradient ; l'hyperparamètre le plus sensible.`],
+ [`Overfitting`,`Entraînement`,`Sur-apprentissage : le modèle récite l'entraînement et rate l'inconnu.`],
+ [`Underfitting`,`Entraînement`,`Sous-apprentissage : modèle trop simple pour capter le phénomène.`],
+ [`Régularisation`,`Entraînement`,`Pénalité (L1, L2, dropout…) qui freine la complexité et combat l'overfitting.`],
+ [`Accuracy`,`Évaluation`,`Proportion globale de bonnes prédictions ; trompeuse sur données déséquilibrées.`],
+ [`Precision`,`Évaluation`,`Parmi les positifs prédits, part de vrais positifs : fiabilité des alertes.`],
+ [`Recall`,`Évaluation`,`Parmi les positifs réels, part détectée : couverture du modèle.`],
+ [`F1-score`,`Évaluation`,`Moyenne harmonique de precision et recall ; le compromis standard.`],
+ [`Matrice de confusion`,`Évaluation`,`Tableau croisant prédictions et réalité : TP, FP, TN, FN.`],
+ [`ROC / AUC`,`Évaluation`,`Courbe et score résumant le compromis détection/fausses alertes sur tous les seuils.`],
+ [`Cross-validation`,`Évaluation`,`Évaluation répétée sur des plis différents pour un score stable.`],
+ [`Hyperparamètre`,`Entraînement`,`Réglage choisi par l'humain avant l'entraînement (profondeur, k, α…).`],
+ [`Pipeline`,`Données`,`Chaîne prétraitement → modèle garantissant l'absence de fuite de données.`],
+ [`Clustering`,`Fondamentaux`,`Regroupement non supervisé d'exemples similaires (K-Means, DBSCAN).`],
+ [`PCA`,`Fondamentaux`,`Réduction de dimension par projection sur les axes de plus forte variance.`],
+ [`Neurone`,`Deep Learning`,`Unité de calcul : somme pondérée des entrées + biais, passée dans une activation.`],
+ [`Backpropagation`,`Deep Learning`,`Propagation de l'erreur vers l'arrière pour attribuer les gradients à chaque poids.`],
+ [`Embedding`,`Deep Learning`,`Représentation vectorielle dense et apprise d'un mot, d'un token ou d'un objet.`],
+ [`Token`,`Données`,`Unité de texte (mot ou sous-mot) produite par la tokenisation.`],
+ [`Attention`,`Deep Learning`,`Mécanisme laissant chaque token pondérer l'importance de tous les autres.`],
+ [`Transformer`,`Deep Learning`,`Architecture fondée sur l'attention ; socle des grands modèles de langage.`],
+ [`CNN`,`Deep Learning`,`Réseau convolutif : filtres glissants spécialisés dans les images.`],
+ [`Transfer learning`,`Deep Learning`,`Réutilisation d'un modèle pré-entraîné, adapté à une nouvelle tâche avec peu de données.`],
+ [`Déploiement`,`MLOps`,`Mise en production d'un modèle, souvent via une API conteneurisée.`],
+ [`Drift`,`MLOps`,`Évolution des données dans le temps qui dégrade un modèle en production.`],
+ [`MLOps`,`MLOps`,`Ensemble des pratiques pour exploiter des modèles de façon fiable et reproductible.`]
+];
+
+/* ================= PROJETS ================= */
+const PROJ=[
+ {t:`Prédire une note d'examen`,niv:`Niveau 4`,diff:`★`,obj:`Prédire la note obtenue selon les heures de révision.`,
+  comp:[`Régression linéaire`,`NumPy`,`Matplotlib`],tech:[`Python`,`NumPy`,`scikit-learn`,`Matplotlib`],math:[`MSE`,`dérivées`,`moyenne`],algo:[`LinearRegression`],
+  etapes:[`Créer le dataset (heures, notes)`,`Tracer le nuage de points`,`Entraîner une régression linéaire`,`Évaluer avec R² et tracer la droite`,`Prédire pour 7 h et 12 h`],
+  code:`from sklearn.linear_model import LinearRegression
+import numpy as np
+heures = np.array([[1],[2],[3],[4],[5],[6]])
+notes  = np.array([6, 9, 11, 14, 16, 18])
+m = LinearRegression().fit(heures, notes)
+print("Pour 7 h :", round(m.predict([[7]])[0], 1))   # environ 19.1`,
+  res:`Un modèle qui estime la note à ±1 point et une droite tracée sur les données.`,
+  exos:[`Ajouter une feature « sommeil »`,`Comparer avec une régression polynomiale`],ch:`À partir de combien d'heures le modèle prédit-il plus de 20 ? Pourquoi faut-il s'en méfier ?`},
+ {t:`Classifier les iris`,niv:`Niveau 5`,diff:`★★`,obj:`Reconnaître l'espèce d'une fleur à partir de 4 mesures.`,
+  comp:[`Classification`,`train/test`,`évaluation`],tech:[`scikit-learn`,`Pandas`],math:[`distances`,`probabilités`],algo:[`KNN`,`LogisticRegression`,`DecisionTree`],
+  etapes:[`Charger load_iris`,`Explorer avec pandas + scatter matrix`,`Découper train/test`,`Comparer 3 algorithmes`,`Départager avec la matrice de confusion`],
+  code:`from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report
+X, y = load_iris(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=.25, random_state=0)
+print(classification_report(yte, KNeighborsClassifier(5).fit(Xtr, ytr).predict(Xte)))`,
+  res:`Trois modèles comparés honnêtement, un gagnant justifié par les métriques.`,
+  exos:[`Tester k = 1, 3, 5, 15`,`Standardiser avant KNN et mesurer le gain`],ch:`Quelle espèce est la plus souvent confondue ? Regardez les données pour comprendre pourquoi.`},
+ {t:`Exploration du Titanic`,niv:`Niveau 6`,diff:`★★`,obj:`Analyser qui a survécu, et pourquoi.`,
+  comp:[`Pandas`,`visualisation`,`feature engineering`],tech:[`Pandas`,`Matplotlib`,`Seaborn`],math:[`statistiques descriptives`,`probabilités conditionnelles`],algo:[`— (analyse)`],
+  etapes:[`Charger et nettoyer (âge manquant, cabines)`,`Taux de survie global`,`Croiser survie × sexe × classe × âge`,`Créer des features (taille famille, tranche d'âge)`,`Rédiger 5 constats chiffrés`],
+  res:`Un carnet d'analyse avec graphiques légendés : « les femmes de 1ʳᵉ classe survivent 5× plus que les hommes de 3ᵉ ».`,
+  exos:[`Imputer l'âge par médiane vs par classe`,`Visualiser les tarifs avec des boxplots`],ch:`Trouvez la feature inventée qui améliore le plus un classifieur simple.`},
+ {t:`Système de recommandation`,niv:`Niveau 7`,diff:`★★★`,obj:`« Les utilisateurs qui ont aimé ceci ont aussi aimé… »`,
+  comp:[`Matrices`,`similarité`,`clustering`],tech:[`NumPy`,`scikit-learn`],math:[`produit scalaire`,`similarité cosinus`],algo:[`KNN sur matrice`,`filtrage simple`],
+  etapes:[`Construire la matrice utilisateurs × films (notes)`,`Mesurer la similarité cosinus entre films`,`Recommander les 5 plus proches d'un film aimé`,`Évaluer sur des notes masquées`],
+  code:`from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+notes = np.array([[5,4,0,1],[4,0,0,1],[0,0,5,4]])  # utilisateurs x films
+sim = cosine_similarity(notes.T)                    # films x films
+top = sim[0].argsort()[::-1][1:4]                   # voisins du film 0
+print("A recommander :", top)`,
+  res:`Un moteur de recommandation par similarité fonctionnel sur un mini-catalogue.`,
+  exos:[`Passer aux recommandations par utilisateur`,`Pondérer par la note donnée`],ch:`Comment recommander à un nouvel utilisateur qui n'a rien noté ? (cold start)`},
+ {t:`Reconnaître les chiffres MNIST`,niv:`Niveau 9`,diff:`★★★`,obj:`Lire des chiffres manuscrits avec un réseau de neurones.`,
+  comp:[`PyTorch`,`CNN`,`data pipeline`],tech:[`PyTorch`,`torchvision`],math:[`softmax`,`entropie croisée`],algo:[`MLP puis CNN`],
+  etapes:[`Charger MNIST via torchvision`,`MLP simple : dépasser 96 %`,`Ajouter des couches convolutives : viser 99 %`,`Analyser les erreurs restantes`],
+  res:`Deux architectures comparées, une courbe d'apprentissage, un taux > 98 %.`,
+  exos:[`Afficher les cartes d'activation d'un filtre`,`Ajouter du dropout`],ch:`Testez sur vos propres chiffres écrits à la main.`},
+ {t:`Analyse de sentiment`,niv:`Niveau 10`,diff:`★★★`,obj:`Positif ou négatif ? Classer des avis clients.`,
+  comp:[`NLP`,`embeddings`,`fine-tuning léger`],tech:[`scikit-learn`,`Hugging Face`],math:[`TF-IDF`,`probabilités`],algo:[`LogReg + TF-IDF`,`puis pipeline Transformers`],
+  etapes:[`Nettoyer et tokeniser un corpus d'avis`,`Baseline TF-IDF + régression logistique`,`Améliorer avec des embeddings pré-entraînés`,`Mesurer precision/recall sur les avis négatifs`],
+  res:`Un classifieur d'avis à > 85 % de F1, avec analyse des faux négatifs.`,
+  exos:[`Repérer les mots les plus prédictifs`,`Tester sur des avis sarcastiques`],ch:`Le modèle se trompe-t-il sur « pas mal du tout » ? Pourquoi ?`},
+ {t:`Deep Learning sur données tabulaires`,niv:`Niveau 8`,diff:`★★★`,obj:`Battre (ou égaler) un Random Forest avec PyTorch.`,
+  comp:[`nn.Module`,`loss, optimizers`,`régularisation`],tech:[`PyTorch`,`scikit-learn`],math:[`gradient`,`entropie`],algo:[`MLP vs RandomForest`],
+  etapes:[`Préparer un dataset tabulaire standardisé`,`Écrire un MLP 2 couches en nn.Module`,`Entraîner avec suivi de loss train/val`,`Comparer à une RandomForest`],
+  res:`Courbes d'apprentissage honnêtes montrant quand le réseau gagne… et quand il perd.`,
+  exos:[`Ajouter dropout et early stopping`,`Faire varier la largeur des couches`],ch:`Expliquez en 5 lignes pourquoi le Random Forest résiste si bien.`},
+ {t:`API de prédiction avec FastAPI`,niv:`Niveau 11`,diff:`★★`,obj:`Servir un modèle via une requête HTTP.`,
+  comp:[`FastAPI`,`sérialisation`,`JSON`],tech:[`FastAPI`,`uvicorn`,`joblib`],math:[`—`],algo:[`modèle de votre choix`],
+  etapes:[`Entraîner et sauvegarder un modèle (joblib)`,`Écrire la route /predict`,`Tester avec curl ou Swagger`,`Ajouter la validation des entrées`],
+  code:`@app.post("/predict")
+def predict(d: dict):
+    return {"prix": float(modele.predict([[d["surface"]]])[0])}`,
+  res:`Une API documentée automatiquement, testable depuis Swagger UI.`,
+  exos:[`Ajouter une route /health`,`Gérer les entrées aberrantes`],ch:`Mesurez le temps de réponse sur 100 requêtes consécutives.`},
+ {t:`Déploiement Docker`,niv:`Niveau 11`,diff:`★★★`,obj:`Rendre l'API du projet 8 exécutable partout.`,
+  comp:[`Dockerfile`,`images`,`ports`],tech:[`Docker`],math:[`—`],algo:[`—`],
+  etapes:[`Écrire le Dockerfile (voir leçon MLOps)`,`Builder l'image`,`Lancer le conteneur et tester l'API`,`Réduire la taille de l'image`],
+  res:`<code>docker run</code> → l'API répond. Sur n'importe quelle machine.`,
+  exos:[`Publier l'image sur un registre`,`Ajouter un healthcheck`],ch:`Passez sous 200 Mo d'image finale.`},
+ {t:`PROJET FINAL — Application ML complète`,niv:`Niveau 12`,diff:`★★★★`,obj:`Votre application de bout en bout : données → modèle → API → Docker → GitHub.`,
+  comp:[`Tout le parcours`,`gestion de projet`,`documentation`],tech:[`Python, scikit-learn/PyTorch, FastAPI, Docker, Git`],math:[`selon le modèle choisi`],algo:[`au choix, justifié`],
+  etapes:[`Choisir un problème réel qui vous tient à cœur`,`Pipeline de données propre`,`Baseline puis modèle amélioré + tuning`,`Évaluation honnête (test set intact)`,`API + Dockerfile + README complet`,`Publier sur GitHub et demander des retours`],
+  res:`Un dépôt GitHub professionnel : c'est lui qui vous ouvrira des portes.`,
+  exos:[`Ajouter un tableau de bord des prédictions`,`Mettre en place un mini-monitoring`],ch:`Présentez votre projet en 5 minutes à quelqu'un qui n'y connaît rien. S'il comprend, c'est gagné.`}
+];
+
+/* ================= ENVIRONNEMENTS ================= */
+const ENV=[
+ {id:`python`,t:`Python`,ic:`🐍`,h:`<p>Python est gratuit et s'installe en 5 minutes. Sur Windows, <b>cochez absolument « Add Python to PATH »</b> pendant l'installation.</p>
+ ${codeBlock(`# Télécharger depuis python.org puis vérifier dans le terminal :
+python --version        # Windows
+python3 --version       # Mac / Linux
+
+# pip : le gestionnaire de bibliothèques
+pip --version
+pip install numpy pandas scikit-learn matplotlib jupyter`,"bash")}
+ <h4>Environnements virtuels (venv)</h4>
+ <p>Un environnement virtuel isole les bibliothèques d'un projet : indispensable pour ne pas tout casser.</p>
+ ${codeBlock(`python -m venv .venv             # créer
+source .venv/bin/activate        # activer (Mac/Linux)
+pip freeze > requirements.txt    # figer les dépendances
+pip install -r requirements.txt  # les réinstaller ailleurs`,"bash")}`},
+ {id:`vscode`,t:`VS Code`,ic:`🧰`,h:`<p>L'éditeur recommandé : gratuit, léger, parfait pour Python.</p>
+ <ul><li>Installez <b>VS Code</b> puis l'extension officielle <b>Python</b> (Microsoft) — Pylance s'ajoute tout seul.</li>
+ <li>Ouvrez le <b>dossier du projet</b> (Fichier → Ouvrir le dossier), pas un fichier seul.</li>
+ <li>Le terminal intégré (Ctrl + ù) utilise automatiquement le venv détecté.</li>
+ <li><b>F5</b> lance le débogueur : points d'arrêt, pas à pas, inspection des variables — indispensable pour comprendre un bug.</li>
+ <li>Les notebooks <code>.ipynb</code> s'ouvrent directement dans l'éditeur.</li></ul>`},
+ {id:`jupyter`,t:`Jupyter`,ic:`📓`,h:`<p>Le carnet interactif : idéal pour explorer des données, mêler code, résultats et texte.</p>
+ ${codeBlock(`pip install jupyterlab
+jupyter lab            # ouvre l'interface dans le navigateur`,"bash")}
+ <ul><li>Une <b>cellule de code</b> s'exécute avec <code>Maj + Entrée</code> ; le résultat s'affiche juste dessous.</li>
+ <li>Une <b>cellule Markdown</b> contient du texte formaté : titres, listes, formules — votre cahier d'expériences.</li>
+ <li>Règle d'or : exécutez les cellules <b>dans l'ordre</b> (« Restart & Run All » pour vérifier que tout marche d'un bloc).</li></ul>`},
+ {id:`colab`,t:`Google Colab`,ic:`☁️`,h:`<p>Jupyter dans le cloud, gratuit, avec <b>GPU</b> : parfait pour le deep learning sans machine puissante.</p>
+ <ul><li>Allez sur <code>colab.research.google.com</code> : un notebook vierge s'ouvre, Python est déjà installé.</li>
+ <li>Menu Exécution → « Modifier le type d'exécution » → choisissez <b>GPU</b> pour entraîner des réseaux.</li>
+ <li>Montez votre Drive pour accéder à vos datasets.</li>
+ <li>Limites : session limitée dans le temps, GPU partagé. Pour un usage intensif : machine locale ou cloud payant.</li></ul>`},
+ {id:`git`,t:`Git & GitHub`,ic:`🌿`,h:`<p>Git versionne votre travail ; GitHub l'héberge et le rend collaboratif.</p>
+ ${codeBlock(`git init                       # démarrer un dépôt
+git add .                      # préparer les modifications
+git commit -m "nettoyage données"   # enregistrer
+git clone <url>                # récupérer un dépôt existant
+git checkout -b feature-x      # créer une branche
+git push origin feature-x      # publier`,"bash")}
+ <ul><li>La <b>pull request</b> propose une branche à la relecture avant fusion.</li>
+ <li>Le <b>README</b> présente le projet : données, installation, résultats.</li>
+ <li>En ML : <code>.gitignore</code> exclut données brutes et gros modèles ; on versionne le code et les réglages.</li></ul>`},
+ {id:`docker`,t:`Docker`,ic:`🐳`,h:`<p>Docker empaquette votre application avec tout son environnement : elle tournera pareil partout.</p>
+ ${codeBlock(`# Dockerfile minimal pour une API ML
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]`,"dockerfile")}
+ ${codeBlock(`docker build -t mon-modele .     # construire l'image
+docker run -p 8000:8000 mon-modele   # lancer le conteneur`,"bash")}
+ <p>Image = recette ; conteneur = plat servi. C'est la brique « reproductibilité » du MLOps (leçon complète au niveau 11).</p>`}
+];
+
+/* ================= MOTEUR ================= */
+const pct=()=>Math.round(ORDER.filter(isDone).length/ORDER.length*100);
+const lvlPct=n=>{const ls=LEVELS[n].ls;return Math.round(ls.filter(isDone).length/ls.length*100)};
+function pilLessons(p){return ORDER.filter(id=>{const x=L[id];if(p==="dl")return x.l>=8&&x.l<=10;return x.p===p&&!(x.l>=8&&x.l<=10)})}
+const pilPct=p=>{const ls=pilLessons(p);return Math.round(ls.filter(isDone).length/ls.length*100)};
+function rank(){const p=pct();return p<12?"Débutant·e":p<35?"Apprenti·e":p<60?"Intermédiaire":p<85?"Avancé·e":"Expert·e"}
+function nextLesson(){return ORDER.find(x=>!isDone(x))||null}
+const IC={obj:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>',
+th:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z"/></svg>',
+math:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 5H7l5.5 7L7 19h11"/></svg>',
+code:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 8-4 4 4 4M16 8l4 4-4 4"/></svg>',
+quiz:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 9a3 3 0 1 1 4.6 2.5c-1 .7-1.6 1.3-1.6 2.5m0 3.5h.01"/><circle cx="12" cy="12" r="9"/></svg>',
+proj:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V4h12l-2 3.5L16 11H4"/></svg>',
+check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m4 12.5 5 5L20 6.5"/></svg>'};
+
+const QINDEX={};
+ORDER.forEach(id=>(L[id].quiz||[]).forEach((q,i)=>QINDEX[id+"-"+i]=q));
+function quizHTML(q,uid){
+  const letters="ABCD";
+  return `<div class="quiz" data-uid="${uid}">
+   <div class="qq"><span class="qtag">${q.type==="vf"?"Vrai / Faux":"QCM"}</span><span>${q.q}</span></div>
+   <div class="opts">${q.o.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${letters[i]}</span><span>${o}</span></button>`).join("")}</div>
+   <div class="qfb" hidden></div></div>`;
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".opt"); if(!b||b.disabled)return;
+  const qz=b.closest(".quiz"), i=+b.dataset.i, q=QINDEX[qz.dataset.uid]; if(!q)return;
+  const good=i===q.g;
+  qz.querySelectorAll(".opt").forEach((o,j)=>{o.disabled=true; if(j===q.g)o.classList.add("good")});
+  if(!good)b.classList.add("bad");
+  const fb=qz.querySelector(".qfb");
+  let why="";
+  if(q.w&&q.w.length){why=`<div class="why"><b>Pourquoi pas les autres ?</b><ul>${q.o.map((o,j)=>j===q.g?"":`<li><b>${"ABCD"[j]}.</b> ${q.w[j-(j>q.g?1:0)]||""}</li>`).join("")}</ul></div>`}
+  fb.innerHTML=`<span class="v ${good?"ok":"ko"}">${good?"✓ Bonne réponse":"✗ Pas tout à fait"}</span> — la bonne réponse était <b>${"ABCD"[q.g]}</b>.<p>${q.e}</p>${why}`;
+  fb.hidden=false;
+  S.quiz[qz.dataset.uid]=good; save(); refreshHdr();
+});
+
+function renderLesson(id){
+  const le=L[id],pil=PIL[le.p]||PIL.ml;
+  const idx=ORDER.indexOf(id), prev=ORDER[idx-1];
+  let n=0;
+  const sec=(ic,title,inner,pc)=>{n++;return `<div class="lsec"${pc?` style="--pc:${pc}"`:""}><div class="stt"><span class="ic">${ic}</span><h2>${n} · ${title}</h2></div>${inner}</div>`};
+  let h=`<div style="--pc:${pil.c}">
+  <div style="font-size:12px;color:var(--mut)"><a href="#" class="go" data-v="parcours">Parcours</a> › Niveau ${le.l} — ${LEVELS[le.l].t}</div>
+  <div class="lhero"><div>
+    <div class="kicker" style="color:${pil.c}">${pil.n}${le.full?" · LEÇON COMPLÈTE":" · FICHE SYNTHÈSE"}</div>
+    <h1>${le.t}</h1>
+    <div class="meta"><span class="tag dur">⏱ ${le.d}</span>
+      <span class="tag ${le.full?"full":"syn"}">${le.full?"Théorie + pratique + exercices":"Synthèse — détails à venir"}</span>
+      <span class="tag dur">Niveau ${le.l}</span></div>
+  </div>
+  <button class="btn" id="doneBtn">${isDone(id)?"✓ Leçon terminée":"Marquer comme terminée"}</button></div>`;
+  h+=sec(IC.obj,`Objectifs & prérequis`,`<div class="bd"><div class="objgrid">
+    <div><h4>À la fin de cette leçon, vous saurez :</h4><ul>${le.obj.map(o=>`<li>${o}</li>`).join("")}</ul></div>
+    <div><h4>Prérequis :</h4>${le.pre&&le.pre.length?`<ul>${le.pre.map(p=>`<li><a href="#" class="go" data-v="lesson" data-id="${p}" style="color:${pil.c}">${L[p].t}</a></li>`).join("")}</ul>`:`<p>Aucun — c'est un point de départ. 🚀</p>`}</div>
+  </div></div>`);
+  if(!le.full){
+    h+=sec(IC.th,`L'essentiel`,`<div class="bd">${le.th}</div>`);
+    h+=`<div class="lsec"><div class="bd" style="border-style:dashed;text-align:center;color:var(--mut);padding:26px">
+      <b>📦 Sections « Intuition », « Mathématiques détaillées », « Python pas à pas », « Mini-projet » prévues pour cette leçon.</b><br>
+      Elles seront développées dans le fichier de contenu suivant — la structure est déjà en place : chaque section s'affichera ici automatiquement.</div></div>`;
+    h+=sec(IC.quiz,`Exercice — vérifiez tout de suite`,le.quiz.map((q,i)=>quizHTML(q,id+"-"+i)).join(""));
+  }else{
+    h+=sec(IC.th,`Théorie & intuition`,`<div class="bd">${le.th}${le.int?`<h4 style="margin-top:20px">💡 Intuition</h4>${le.int}`:""}</div>`);
+    if(le.maths)h+=sec(IC.math,`Mathématiques`,`<div class="bd">${le.maths}</div>`,"var(--c-math)");
+    if(le.py)h+=sec(IC.code,`Python — le code pas à pas`,`<div class="bd">
+      ${codeBlock(le.py.code)}${le.py.out?`<div class="out">${esc(le.py.out)}</div>`:""}
+      ${le.py.expl?`<button class="expl-toggle" data-t="ex1">▸ Afficher l'explication ligne par ligne</button><div class="expl-list" id="ex1" hidden>${le.py.expl.map(e=>`<div class="er"><b>L${e[0]}</b><div>${e[1]}</div></div>`).join("")}</div>`:""}
+      ${le.py2?`<h4 style="margin-top:22px">${le.py2.titre}</h4>${codeBlock(le.py2.code)}${le.py2.out?`<div class="out">${esc(le.py2.out)}</div>`:""}${le.py2.expl?`<button class="expl-toggle" data-t="ex2">▸ Afficher l'explication ligne par ligne</button><div class="expl-list" id="ex2" hidden>${le.py2.expl.map(e=>`<div class="er"><b>L${e[0]}</b><div>${e[1]}</div></div>`).join("")}</div>`:""}`:""}
+    </div>`,"var(--c-py)");
+    if(le.viz)h+=sec(IC.obj,`Visualisation interactive`,le.viz.map(v=>VIZHTML[v]).join(""));
+    if(le.ml)h+=sec(IC.th,`Côté Machine Learning`,`<div class="bd">${le.ml}${le.ex?`<h4 style="margin-top:18px">🌍 Exemple réel</h4>${le.ex}`:""}</div>`);
+    h+=sec(IC.quiz,`Exercices`,le.quiz.map((q,i)=>quizHTML(q,id+"-"+i)).join(""));
+    if(le.mp)h+=sec(IC.proj,`Mini-projet — ${le.mp.n}`,`<div class="bd"><p>${le.mp.d}</p>
+      ${le.mp.etapes?`<h4>Étapes conseillées</h4><ol>${le.mp.etapes.map(e=>`<li>${e}</li>`).join("")}</ol>`:""}
+      <div class="callout warn"><b class="t">⚡ Challenge</b>${le.mp.ch}</div></div>`,"var(--c-py)");
+  }
+  h+=sec(IC.check,`Résumé & compétences`,`<div class="bd"><div class="objgrid">
+    <div><h4>À retenir</h4><ul>${le.res.map(r=>`<li>${r}</li>`).join("")}</ul></div>
+    <div><h4>Compétences acquises</h4><ul>${le.sk.map(s=>`<li>${s}</li>`).join("")}</ul></div></div>
+    ${le.liens?`<h4>🔗 Liens entre les piliers</h4><div class="linkrow">${le.liens.map(([lid,lbl])=>`<button class="pchip go" data-v="lesson" data-id="${lid}" style="--pc:${PIL[L[lid].p].c}">${PIL[L[lid].p].n.split(" ")[0]} · ${lbl}</button>`).join("")}</div>`:""}
+  </div>`);
+  h+=`<div class="lsec" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+    ${prev?`<a href="#" class="btn ghost sm go" data-v="lesson" data-id="${prev}">← ${L[prev].t}</a>`:""}
+    ${le.nx&&L[le.nx[0]]&&le.nx[0]!==id?`<div style="flex:1;min-width:240px;font-size:13.5px;color:var(--mut)"><b style="color:${pil.c}">Étape suivante :</b> ${le.nx[1]}</div>
+    <a href="#" class="btn sm go" data-v="lesson" data-id="${le.nx[0]}">${L[le.nx[0]].t} →</a>`:""}
+  </div></div>`;
+  $("#v-lesson").innerHTML=h;
+  const db=$("#doneBtn");
+  const paint=()=>{const d=isDone(id);db.textContent=d?"✓ Leçon terminée":"Marquer comme terminée";db.className="btn "+(d?"":"ghost");db.style.cssText=d?"background:var(--c-ml);border-color:var(--c-ml);color:#fff":""};
+  paint();
+  db.onclick=()=>{if(S.done[id])delete S.done[id];else S.done[id]=true;save();paint();refreshHdr();refreshCards()};
+  $$("#v-lesson .expl-toggle").forEach(b=>b.onclick=()=>{const t=document.getElementById(b.dataset.t);t.hidden=!t.hidden;b.textContent=t.hidden?"▸ Afficher l'explication ligne par ligne":"▾ Masquer l'explication"});
+  initViz(); reveal();
+}
+
+function laneCard(id){
+  const le=L[id],c=(PIL[le.p]||PIL.ml).c;
+  return `<button class="lcard go ${isDone(id)?"isdone":""}" data-v="lesson" data-id="${id}" style="--pc:${c}">
+   <span class="tt"><span class="chk">${isDone(id)?"✓":""}</span><span>${le.t}</span></span>
+   <span class="mt"><span class="tag ${le.full?"full":"syn"}">${le.full?"Complète":"Synthèse"}</span><span class="tag dur">${le.d}</span></span></button>`;
+}
+function refreshCards(){$$(".lcard").forEach(c=>{const id=c.dataset.id;c.classList.toggle("isdone",isDone(id));c.querySelector(".chk").textContent=isDone(id)?"✓":""})}
+function renderParcours(){
+  let h=`<div class="kicker">Le parcours</div><h1 class="h1">13 niveaux, 3 piliers, ${LESSONS} leçons</h1>
+  <p class="sub" style="margin:10px 0 8px">Chaque niveau fait avancer <b>ensemble</b> le Machine Learning, Python et les mathématiques. Les leçons <span class="tag full">Complètes</span> contiennent théorie détaillée, code expliqué ligne par ligne, visualisations et mini-projet.</p>
+  <div class="lane-hd" style="margin-top:26px">${[["ml","🧠 Machine Learning","concepts & algorithmes"],["py","🐍 Python","le code qui implémente"],["math","📐 Mathématiques","le pourquoi des formules"]].map(x=>`<div class="lh" style="--pc:${PIL[x[0]].c}">${x[1]} <small>${x[2]}</small></div>`).join("")}</div>`;
+  LEVELS.forEach(lv=>{
+    const lanes={ml:[],py:[],math:[]};
+    lv.ls.forEach(id=>{const p=L[id].p==="env"?"py":L[id].p;(lanes[p]||(lanes[p]=[])).push(id)});
+    h+=`<div class="level-block rv"><div class="lvnum"><div><small>NIVEAU</small><span>${lv.n}</span></div></div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><div class="lt">${lv.t}</div>
+      <div style="flex:1;min-width:140px;max-width:260px"><div class="bar"><i style="width:${lvlPct(lv.n)}%"></i></div></div>
+      <span style="font-size:12.5px;color:var(--mut)">${lv.ls.filter(isDone).length}/${lv.ls.length} leçons · ${lvlPct(lv.n)} %</span></div>
+      <div class="ld">${lv.d}</div>
+      <div class="lanes">${["ml","py","math"].map(p=>lanes[p].length?`<div class="lane" style="--pc:${PIL[p].c}">${lanes[p].map(laneCard).join("")}</div>`:`<div class="lane"><div class="lane-empty">—</div></div>`).join("")}</div></div>`;
+  });
+  $("#v-parcours").innerHTML=h; reveal();
+}
+function renderPillar(key){
+  const cfg={ml:{t:"Machine Learning",d:"Concepts, algorithmes, évaluation, feature engineering et ML avancé — le cœur du parcours."},
+   py:{t:"Python & Programmation",d:"Le langage enseigné en parallèle du ML : des variables jusqu'à PyTorch, toujours au service d'un concept."},
+   math:{t:"Mathématiques",d:"Uniquement ce qui sert, au moment où ça sert : fonctions, vecteurs, probabilités, dérivées, gradients."},
+   dl:{t:"Deep Learning",d:"Niveaux 8 à 10 : neurones, CNN, NLP et Transformers."}}[key];
+  const c=key==="dl"?"var(--c-dl)":PIL[key].c;
+  let h=`<div class="kicker" style="color:${c}">Pilier</div><h1 class="h1">${cfg.t}</h1><p class="sub" style="margin:10px 0 22px">${cfg.d}</p>
+  <div style="display:flex;gap:14px;align-items:center;margin-bottom:26px"><div class="bar lg" style="flex:1;max-width:340px;--pc:${c}"><i style="width:${pilPct(key)}%"></i></div><b style="font-family:'Space Grotesk'">${pilPct(key)} %</b></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">`;
+  pilLessons(key).forEach(id=>h+=laneCard(id));
+  h+="</div>";
+  $("#v-pillar").innerHTML=h; reveal();
+}
+function renderProjets(){
+  let h=`<div class="kicker">Apprendre en construisant</div><h1 class="h1">10 projets, du premier modèle à l'application complète</h1>
+  <p class="sub" style="margin:10px 0 26px">Chaque projet indique ses prérequis, ses maths, son code de démarrage et son challenge. Cliquez pour dérouler.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:16px">`;
+  PROJ.forEach((p,i)=>{
+    h+=`<div class="proj rv" data-i="${i}"><div class="ph"><span class="pn">${String(i+1).padStart(2,"0")}</span>
+      <div style="flex:1"><div class="ptt">${p.t}</div><div class="pd">${p.obj}</div>
+      <div class="pm"><span class="tag full">${p.niv}</span><span class="tag syn">${p.diff}</span>${p.comp.slice(0,2).map(c=>`<span class="tag dur">${c}</span>`).join("")}</div></div>
+      <span class="chev">▾</span></div>
+      <div class="pbody" hidden>
+      <h4>Compétences & technologies</h4><p style="font-size:13.5px"><b>Compétences :</b> ${p.comp.join(", ")}<br><b>Technos :</b> ${p.tech.join(", ")}<br><b>Maths :</b> ${p.math.join(", ")}<br><b>Algorithmes :</b> ${p.algo.join(", ")}</p>
+      <h4>Étapes</h4><ol>${p.etapes.map(e=>`<li>${e}</li>`).join("")}</ol>
+      ${p.code?`<h4>Code de démarrage</h4>${codeBlock(p.code)}`:""}
+      <h4>Résultat attendu</h4><p style="font-size:14px">${p.res}</p>
+      <h4>Exercices supplémentaires</h4><ul>${p.exos.map(x=>`<li>${x}</li>`).join("")}</ul>
+      <div class="callout warn"><b class="t">⚡ Challenge</b>${p.ch}</div></div></div>`;
+  });
+  h+="</div>";
+  $("#v-projets").innerHTML=h;
+  $$("#v-projets .ph").forEach(ph=>ph.onclick=()=>{const p=ph.parentElement,b=p.querySelector(".pbody");p.classList.toggle("open");b.hidden=!b.hidden});
+  reveal();
+}
+function renderExercices(){
+  const items=ORDER.flatMap(id=>(L[id].quiz||[]).map((q,i)=>({idq:id+"-"+i,q,le:L[id]})));
+  let h=`<div class="kicker">Entraînement</div><h1 class="h1">Exercices interactifs</h1>
+  <p class="sub" style="margin:10px 0 6px">Répondez : la correction détaillée s'affiche immédiatement, avec l'explication des autres réponses.</p>
+  <p style="font-size:13.5px;color:var(--mut);margin-bottom:22px">Bonnes réponses enregistrées : <b style="color:var(--c-ml)">${Object.values(S.quiz).filter(v=>v).length}</b></p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:14px;align-items:start">`;
+  items.forEach(it=>{h+=`<div><div style="font-size:11px;color:var(--mut);margin:0 0 6px 4px">${it.le.t} · niveau ${it.le.l}</div>${quizHTML(it.q,it.idq)}</div>`});
+  h+="</div>";
+  $("#v-exercices").innerHTML=h; reveal();
+}
+function renderEnv(){
+  let h=`<div class="kicker">Les outils</div><h1 class="h1">Votre environnement de travail</h1>
+  <p class="sub" style="margin:10px 0 26px">Tout ce qu'il faut installer et maîtriser, expliqué sans jargon.</p><div class="envgrid">
+  <div class="envtabs">${ENV.map((e,i)=>`<button data-i="${i}" class="${i===0?"on":""}">${e.ic} ${e.t}</button>`).join("")}</div>
+  <div id="envBody" class="card pad"></div></div>`;
+  $("#v-env").innerHTML=h;
+  const show=i=>{$("#envBody").innerHTML=`<h2 class="h2" style="margin-bottom:12px">${ENV[i].ic} ${ENV[i].t}</h2>${ENV[i].h}`;$$("#v-env .envtabs button").forEach((b,j)=>b.classList.toggle("on",j===i))};
+  $$("#v-env .envtabs button").forEach(b=>b.onclick=()=>show(+b.dataset.i)); show(0);
+}
+function renderGlossairePage(){
+  $("#v-glossaire").innerHTML=`<div class="kicker">Vocabulaire</div><h1 class="h1">Glossaire du Machine Learning</h1>
+  <p class="sub" style="margin:10px 0 20px">${GLOSS.length} termes, expliqués simplement. Recherchez ou filtrez.</p>
+  <div class="glosearch"><input id="gIn" placeholder="Rechercher un terme…">
+  <div style="display:flex;gap:6px;flex-wrap:wrap">${["Tous","Fondamentaux","Données","Entraînement","Évaluation","Deep Learning","MLOps"].map((c,i)=>`<button class="chip gcat" data-c="${c}" style="${i===0?"border-color:var(--c-ml);color:var(--c-ml)":""}">${c}</button>`).join("")}</div></div>
+  <div class="ggrid" id="gGrid"></div>`;
+  let cat="Tous";
+  const apply=()=>{const f=$("#gIn").value.toLowerCase();
+    const terms=GLOSS.filter(g=>(cat==="Tous"||g[1]===cat)&&(!f||g[0].toLowerCase().includes(f)||g[2].toLowerCase().includes(f)));
+    $("#gGrid").innerHTML=terms.length?terms.map(g=>`<div class="card gterm"><span class="c">${g[1]}</span><div class="t">${g[0]}</div><div class="d">${g[2]}</div></div>`).join(""):`<p style="color:var(--mut)">Aucun terme trouvé.</p>`};
+  $("#gIn").oninput=apply;
+  $$(".gcat").forEach(b=>b.onclick=()=>{cat=b.dataset.c;$$(".gcat").forEach(x=>{x.style.borderColor="";x.style.color=""});b.style.borderColor="var(--c-ml)";b.style.color="var(--c-ml)";apply()});
+  apply();
+}
+function renderProgression(){
+  const p=pct(),rk=rank();
+  const ranks=["Débutant·e","Apprenti·e","Intermédiaire","Avancé·e","Expert·e"];
+  const ri=ranks.indexOf(rk);
+  let h=`<div class="kicker">Votre avancement</div><h1 class="h1">Progression</h1>
+  <div class="rankbar">${ranks.map((r,i)=>`<div class="rank ${i<=ri?"on":""}"><div class="r">${r}</div><div class="s">${i<=ri?"✓ acquis":i===ri+1?"prochain palier":""}</div></div>`).join("")}</div>
+  <div class="card pad" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>Progression globale</b><span class="num" style="font-size:28px;color:var(--c-ml)">${p} %</span></div>
+   <div class="bar lg" style="margin-top:10px"><i style="width:${p}%"></i></div></div>
+  <div class="objgrid" style="align-items:start">
+  <div class="card pad"><h3 class="h2" style="font-size:17px">Par niveau</h3>${LEVELS.map(lv=>`<div class="prog-row"><span class="pc-t">Niveau ${lv.n} — ${lv.t}</span><div class="bar"><i style="width:${lvlPct(lv.n)}%"></i></div><span class="pc-n">${lvlPct(lv.n)}%</span></div>`).join("")}</div>
+  <div>
+   <div class="card pad" style="margin-bottom:16px"><h3 class="h2" style="font-size:17px">Par pilier</h3>
+    ${[["ml","Machine Learning"],["py","Python"],["math","Mathématiques"]].map(([k,nm])=>`<div class="prog-row"><span class="pc-t">${nm}</span><div class="bar" style="--pc:${PIL[k].c}"><i style="width:${pilPct(k)}%"></i></div><span class="pc-n">${pilPct(k)}%</span></div>`).join("")}
+    <div class="prog-row"><span class="pc-t">Deep Learning</span><div class="bar" style="--pc:var(--c-dl)"><i style="width:${pilPct("dl")}%"></i></div><span class="pc-n">${pilPct("dl")}%</span></div></div>
+   <div class="card pad"><h3 class="h2" style="font-size:17px">Statistiques</h3>
+    <p style="font-size:14px">Leçons terminées : <b>${ORDER.filter(isDone).length} / ${LESSONS}</b><br>
+    Exercices réussis : <b>${Object.values(S.quiz).filter(v=>v).length}</b> (${Object.values(S.quiz).length} tentés)<br>
+    Leçons complètes disponibles : <b>${ORDER.filter(id=>L[id].full).length}</b></p>
+    <button class="btn ghost sm" id="resetBtn" style="margin-top:10px;color:var(--c-dl);border-color:var(--c-dl)">Réinitialiser ma progression</button></div>
+  </div></div>`;
+  $("#v-progression").innerHTML=h;
+  $("#resetBtn").onclick=()=>{if(confirm("Effacer toute votre progression ?")){S.done={};S.quiz={};save();refreshHdr();go("progression")}};
+}
+function renderDash(){
+  const p=pct(),rk=rank(),nx=nextLesson();
+  const hero=`<div class="hero rv in">
+   <div>
+    <div class="kicker">Plateforme d'auto-formation · 2026</div>
+    <h1 class="h1" style="margin-top:10px">Apprenez le Machine Learning<br>en le construisant.</h1>
+    <p class="sub" style="margin-top:14px">Un parcours unique où <b>Machine Learning, Python et mathématiques avancent ensemble</b> — de votre premier <code>print()</code> jusqu'au déploiement d'un modèle dockerisé.</p>
+    <div class="chips">
+     <span class="chip" style="--pc:var(--c-ml)"><span class="dot"></span>🧠 ${pilLessons("ml").length} leçons ML</span>
+     <span class="chip" style="--pc:var(--c-py)"><span class="dot"></span>🐍 ${pilLessons("py").length} leçons Python</span>
+     <span class="chip" style="--pc:var(--c-math)"><span class="dot"></span>📐 ${pilLessons("math").length} leçons de maths</span>
+    </div>
+    <div class="cta">
+     <a class="btn go" data-v="lesson" data-id="${nx||ORDER[0]}">${nx?"▶ Reprendre : "+L[nx].t:"Commencer : "+L[ORDER[0]].t}</a>
+     <a class="btn ghost go" data-v="parcours">Voir le parcours complet</a>
+    </div>
+   </div>
+   <div class="console"><div class="chd"><i style="background:#f4738f"></i><i style="background:#f0b23e"></i><i style="background:#3dd68f"></i>&nbsp; entrainement.py — régression linéaire en direct</div>
+    <canvas id="heroViz" height="230"></canvas>
+    <div class="cft"><span id="heroStat">époque 0 · MSE —</span><span>descente de gradient <span class="blink">▊</span></span></div></div>
+  </div>
+  <div class="statband">
+   <div class="card stat rv" style="--pc:var(--c-ml)"><div class="num">${p}%</div><div class="lb">du parcours</div></div>
+   <div class="card stat rv" style="--pc:var(--c-py)"><div class="num" style="font-size:22px;padding-top:8px">${rk}</div><div class="lb">Niveau actuel</div></div>
+   <div class="card stat rv" style="--pc:var(--c-math)"><div class="num">${ORDER.filter(isDone).length}</div><div class="lb">Leçons terminées</div></div>
+   <div class="card stat rv" style="--pc:var(--c-dl)"><div class="num">${Object.values(S.quiz).filter(v=>v).length}</div><div class="lb">Exercices réussis</div></div>
+  </div>`;
+  const pillars=`<div class="sec"><div class="sec-head"><h2 class="h2">Les 3 piliers</h2><a class="lnk go" data-v="parcours" href="#">Tout le parcours →</a></div>
+  <div class="pillars">
+   <div class="card pcard rv" style="--pc:var(--c-ml)"><div class="pt"><span class="pic">🧠</span>Machine Learning</div>
+    <div class="pct">${pilPct("ml")} %</div><div class="bar"><i style="width:${pilPct("ml")}%"></i></div>
+    <ul><li>Régression, classification, clustering</li><li>Évaluation & feature engineering</li><li>Ensembles, XGBoost, SHAP</li></ul></div>
+   <div class="card pcard rv" style="--pc:var(--c-py)"><div class="pt"><span class="pic">🐍</span>Python</div>
+    <div class="pct">${pilPct("py")} %</div><div class="bar"><i style="width:${pilPct("py")}%"></i></div>
+    <ul><li>Du <code>print()</code> à la POO</li><li>NumPy · Pandas · Matplotlib</li><li>PyTorch & FastAPI</li></ul></div>
+   <div class="card pcard rv" style="--pc:var(--c-math)"><div class="pt"><span class="pic">📐</span>Mathématiques</div>
+    <div class="pct">${pilPct("math")} %</div><div class="bar"><i style="width:${pilPct("math")}%"></i></div>
+    <ul><li>Fonctions & statistiques</li><li>Vecteurs, matrices, probabilités</li><li>Dérivées & gradient</li></ul></div>
+  </div></div>`;
+  const strip=`<div class="sec"><div class="sec-head"><h2 class="h2">Le parcours, niveau par niveau</h2><a class="lnk go" data-v="parcours" href="#">Détails →</a></div>
+  <div class="lvlstrip">${LEVELS.map(lv=>`<div class="lvlchip go ${lvlPct(lv.n)===100?"done":""}" data-v="parcours"><div class="n">${String(lv.n).padStart(2,"0")}</div><div class="t">${lv.t}</div><div class="bar"><i style="width:${lvlPct(lv.n)}%"></i></div></div>`).join("")}</div></div>`;
+  const flow=`<div class="sec"><div class="sec-head"><h2 class="h2">La méthode Praxis</h2></div><div class="card pad rv"><div class="flow">
+   ${["Concept simple","Intuition réelle","Mathématiques","Python","Machine Learning","Exercice corrigé","Projet"].map((s,i,a)=>`<span class="st">${s}</span>${i<a.length-1?`<span class="ar">→</span>`:""}`).join("")}
+  </div><p style="margin-top:14px;color:var(--mut);font-size:14px">Règle absolue : aucune notion n'est utilisée avant d'avoir été enseignée. Chaque leçon complète suit les 14 étapes de la structure pédagogique.</p></div></div>`;
+  $("#v-dash").innerHTML=hero+pillars+strip+flow;
+  heroDemo(); reveal();
+}
+
+const TITLES={dash:"Tableau de bord",parcours:"Parcours complet",projets:"Projets",exercices:"Exercices",env:"Environnement",glossaire:"Glossaire",progression:"Progression"};
+function go(v,arg){
+  document.body.classList.remove("nav-open");
+  $$(".view").forEach(x=>x.hidden=true);
+  $$("#nav a").forEach(a=>a.classList.toggle("on",a.dataset.v===v));
+  if(v==="lesson"){renderLesson(arg);$("#v-lesson").hidden=false;$("#tbTitle").textContent="Leçon · "+L[arg].t;
+    $$("#nav a").forEach(a=>a.classList.toggle("on",a.dataset.v==="parcours"));}
+  else if(v.startsWith("p-")){renderPillar(v.slice(2));$("#v-pillar").hidden=false;
+    $("#tbTitle").textContent={"p-ml":"Machine Learning","p-py":"Python","p-math":"Mathématiques","p-dl":"Deep Learning"}[v];}
+  else{({dash:renderDash,parcours:renderParcours,projets:renderProjets,exercices:renderExercices,env:renderEnv,glossaire:renderGlossairePage,progression:renderProgression})[v]();
+    $("#v-"+v).hidden=false;$("#tbTitle").textContent=TITLES[v];}
+  window.scrollTo({top:0});
+}
+document.addEventListener("click",e=>{
+  const g=e.target.closest(".go"); if(!g)return; e.preventDefault();
+  go(g.dataset.v,g.dataset.id);
+});
+$("#nav").innerHTML=NAV.map(n=>`<a href="#" data-v="${n.v}" class="go">${n.ic}${n.t}${n.v==="parcours"?`<span class="cnt">${LESSONS}</span>`:n.v==="projets"?`<span class="cnt">${PROJ.length}</span>`:n.v==="glossaire"?`<span class="cnt">${GLOSS.length}</span>`:""}</a>`).join("");
+
+const SEARCH=[
+ ...ORDER.map(id=>({t:"Leçon · "+L[id].t,k:(L[id].t+" niveau "+L[id].l).toLowerCase(),v:"lesson",id})),
+ ...GLOSS.map(g=>({t:"Glossaire · "+g[0],k:g[0].toLowerCase(),v:"glossaire"})),
+ ...PROJ.map(p=>({t:"Projet · "+p.t,k:p.t.toLowerCase(),v:"projets"}))
+];
+$("#searchIn").addEventListener("input",e=>{
+  const f=e.target.value.trim().toLowerCase(),d=$("#searchDrop");
+  if(!f){d.hidden=true;return}
+  const r=SEARCH.filter(s=>s.k.includes(f)).slice(0,9);
+  d.innerHTML=r.length?r.map(s=>`<div class="si go" data-v="${s.v}" data-id="${s.id||""}">🔎 ${s.t}</div>`).join(""):`<div class="si" style="color:var(--mut)">Aucun résultat</div>`;
+  d.hidden=false;
+});
+$("#searchIn").addEventListener("keydown",e=>{if(e.key==="Enter"){const s=$("#searchDrop .si");if(s)s.click()}});
+document.addEventListener("click",e=>{if(!e.target.closest(".search"))$("#searchDrop").hidden=true});
+document.addEventListener("keydown",e=>{
+  if(e.key==="/"&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$("#searchIn").focus()}
+  if(e.key==="Escape"){$("#searchDrop").hidden=true;document.body.classList.remove("nav-open")}
+});
+function applyTheme(){document.documentElement.dataset.theme=S.theme;$("#themeLbl").textContent=S.theme==="light"?"Thème sombre":"Thème clair"}
+$("#themeBtn").onclick=()=>{S.theme=S.theme==="light"?"dark":"light";save();applyTheme()};
+applyTheme();
+function refreshHdr(){$("#hdrPct").textContent=pct()+"%"}
+function reveal(){const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target)}}),{threshold:.06});$$(".rv:not(.in)").forEach(el=>io.observe(el))}
+
+(function(){const cv=$("#bgfx");let W,H,nodes=[];
+ function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;nodes=Array.from({length:Math.min(46,innerWidth/28)},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22}))}
+ rs();addEventListener("resize",rs);
+ const col=()=>getComputedStyle(document.documentElement).getPropertyValue("--c-ml").trim();
+ (function tick(){const c=cv.getContext("2d");c.clearRect(0,0,W,H);const cl=col();
+  nodes.forEach(nd=>{nd.x+=nd.vx;nd.y+=nd.vy;if(nd.x<0||nd.x>W)nd.vx*=-1;if(nd.y<0||nd.y>H)nd.vy*=-1});
+  for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const a=nodes[i],b=nodes[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+   if(d<150){c.strokeStyle=cl;c.globalAlpha=(1-d/150)*.16;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}}
+  c.globalAlpha=.35;c.fillStyle=cl;nodes.forEach(nd=>{c.beginPath();c.arc(nd.x,nd.y,1.6,0,7);c.fill()});
+  c.globalAlpha=1;requestAnimationFrame(tick)})();
+})();
+
+/* ================= VISUALISATIONS ================= */
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function cvx(cv){const d=devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*d;cv.height=r.height*d;const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return[c,r.width,r.height]}
+const VIZHTML={
+ "viz-reglin":`<div class="viz"><div class="vhd"><i></i> simu · régression linéaire — ajustez la droite à la main, ou laissez la descente de gradient travailler</div><canvas id="cvReg" height="300"></canvas><div class="vct"><label>pente a <input type="range" id="vr-a" min="-1" max="5" step="0.05" value="0.6"></label><label>ordonnée b <input type="range" id="vr-b" min="0" max="120" step="1" value="20"></label><button class="btn" id="vr-fit">⚡ Entraîner le modèle</button><span class="ro">MSE = <b id="vr-mse">—</b></span></div></div>`,
+ "viz-gd":`<div class="viz"><div class="vhd"><i></i> simu · descente de gradient — la bille descend la vallée du coût</div><canvas id="cvGd" height="280"></canvas><div class="vct"><label>learning rate α <input type="range" id="vg-lr" min="0.02" max="1.15" step="0.01" value="0.25"></label><button class="btn" id="vg-step">Un pas</button><button class="btn ghost" id="vg-auto">Lecture auto</button><button class="btn ghost" id="vg-reset">Reset</button><span class="ro" id="vg-ro">w = — · J(w) = —</span></div></div>`,
+ "viz-kmeans":`<div class="viz"><div class="vhd"><i></i> simu · K-Means — regardez les centroïdes trouver leurs groupes</div><canvas id="cvKm" height="300"></canvas><div class="vct"><button class="btn" id="km-new">🎲 Nouvelles données</button><button class="btn ghost" id="km-step">Une étape</button><button class="btn ghost" id="km-run">Tout lancer</button><span class="ro">itération <b id="km-it">0</b> · inertie <b id="km-in">—</b></span></div></div>`,
+ "viz-neurone":`<div class="viz"><div class="vhd"><i></i> simu · un neurone en direct — bougez les poids, regardez la sortie s'allumer</div><div class="neuro"><div class="nmain"><canvas id="cvNeu" height="250"></canvas></div><div class="nctl">
+   <label>w₁ (affiche) <input type="range" id="nw1" min="-3" max="3" step="0.1" value="2"></label>
+   <label>w₂ (amis) <input type="range" id="nw2" min="-3" max="3" step="0.1" value="-1"></label>
+   <label>w₃ (prix ok) <input type="range" id="nw3" min="-3" max="3" step="0.1" value="0.5"></label>
+   <label>biais b <input type="range" id="nb" min="-3" max="3" step="0.1" value="-1"></label>
+   <div style="text-align:center"><div class="bulb" id="nbulb"></div><b id="nout" style="font-family:'Space Grotesk';font-size:22px">—</b><div style="font-size:11px;color:var(--mut)">activation σ(z)</div></div></div></div></div>`
+};
+function initViz(){if($("#cvReg"))vizReg();if($("#cvGd"))vizGd();if($("#cvKm"))vizKm();if($("#cvNeu"))vizNeu()}
+function vizReg(){
+ const cv=$("#cvReg");const P=[[12,53],[18,61],[25,79],[31,88],[38,102],[45,118],[52,131],[60,149],[68,168],[75,181],[82,199],[90,214]];
+ let a=+$("#vr-a").value,b=+$("#vr-b").value,anim=null;
+ const W0=()=>cv.getBoundingClientRect().width;
+ const sx=x=>30+x/100*(W0()-50), sy=y=>280-y/240*250;
+ const mse=()=>P.reduce((s,p)=>s+((a*p[0]+b)-p[1])**2,0)/P.length;
+ function draw(){const [c,W,H]=cvx(cv);c.clearRect(0,0,W,H);
+  c.strokeStyle=css("--line");c.beginPath();c.moveTo(sx(0),sy(0));c.lineTo(sx(100),sy(0));c.moveTo(sx(0),sy(0));c.lineTo(sx(0),sy(240));c.stroke();
+  const ml=css("--c-ml");
+  P.forEach(([x,y])=>{const py=a*x+b;c.strokeStyle=css("--c-dl");c.globalAlpha=.45;c.beginPath();c.moveTo(sx(x),sy(y));c.lineTo(sx(x),sy(py));c.stroke();c.globalAlpha=1});
+  c.strokeStyle=ml;c.lineWidth=2.5;c.beginPath();c.moveTo(sx(0),sy(b));c.lineTo(sx(100),sy(a*100+b));c.stroke();c.lineWidth=1;
+  c.fillStyle=css("--c-math");P.forEach(([x,y])=>{c.beginPath();c.arc(sx(x),sy(y),4.5,0,7);c.fill()});
+  c.fillStyle=css("--mut");c.font="11px IBM Plex Mono";c.fillText("x (feature)",sx(70),sy(0)+16);
+  $("#vr-mse").textContent=mse().toFixed(1)}
+ $("#vr-a").oninput=e=>{a=+e.target.value;cancelAnimationFrame(anim);draw()};
+ $("#vr-b").oninput=e=>{b=+e.target.value;cancelAnimationFrame(anim);draw()};
+ $("#vr-fit").onclick=()=>{a=0;b=10;cancelAnimationFrame(anim);
+   (function step(){let ga=0,gb=0;P.forEach(([x,y])=>{const e=a*x+b-y;ga+=2*e*x/P.length;gb+=2*e/P.length});
+    a-=0.02*ga;b-=0.02*gb;$("#vr-a").value=a;$("#vr-b").value=b;draw();
+    if(Math.abs(ga)+Math.abs(gb)>0.02)anim=requestAnimationFrame(step)})()};
+ draw();
+}
+function vizGd(){
+ const cv=$("#cvGd");const f=w=>0.55*(w-3)**2+0.5,df=w=>1.1*(w-3);
+ let w=0.2,lr=0.25,hist=[0.2],auto=null;
+ function draw(){const [c,W,H]=cvx(cv);c.clearRect(0,0,W,H);
+  const sx=x=>30+x/6*(W-50), sy=y=>H-26-y/8*(H-50);
+  c.strokeStyle=css("--line");c.beginPath();c.moveTo(sx(0),sy(0));c.lineTo(sx(6),sy(0));c.stroke();
+  c.strokeStyle=css("--c-math");c.lineWidth=2;c.beginPath();for(let x=0;x<=6;x+=.05){const X=sx(x),Y=sy(f(x));x===0?c.moveTo(X,Y):c.lineTo(X,Y)}c.stroke();c.lineWidth=1;
+  c.fillStyle=css("--mut");c.font="11px IBM Plex Mono";c.fillText("J(w) — le coût",sx(4.4),sy(f(6))+4);c.fillText("w",sx(5.8),sy(0)+16);
+  c.globalAlpha=.35;c.strokeStyle=css("--c-dl");c.beginPath();hist.forEach(x=>{c.moveTo(sx(x),sy(f(x)));c.lineTo(sx(x),sy(0))});c.stroke();c.globalAlpha=1;
+  hist.forEach(x=>{c.fillStyle=css("--c-dl");c.beginPath();c.arc(sx(x),sy(f(x)),3,0,7);c.fill()});
+  c.fillStyle=css("--c-ml");c.beginPath();c.arc(sx(w),sy(f(w)),8,0,7);c.fill();
+  $("#vg-ro").innerHTML=`w = <b>${w.toFixed(3)}</b> · J(w) = <b>${f(w).toFixed(3)}</b> · gradient = <b>${df(w).toFixed(2)}</b>`}
+ const step=()=>{w=Math.max(-3,Math.min(9,w-lr*df(w)));hist.push(w);if(hist.length>60)hist.shift();draw()};
+ $("#vg-step").onclick=step;
+ $("#vg-lr").oninput=e=>lr=+e.target.value;
+ $("#vg-reset").onclick=()=>{w=0.2;hist=[0.2];clearInterval(auto);auto=null;$("#vg-auto").textContent="Lecture auto";draw()};
+ $("#vg-auto").onclick=function(){if(auto){clearInterval(auto);auto=null;this.textContent="Lecture auto"}else{auto=setInterval(step,420);this.textContent="⏸ Pause"}};
+ draw();
+}
+function vizKm(){
+ const cv=$("#cvKm");let pts=[],cents=[],assign=[],it=0,run=null;
+ const CL=[css("--c-ml"),css("--c-py"),css("--c-math")];
+ function gen(){const W=cv.getBoundingClientRect().width;pts=[];const cs=[[.2,.3],[.75,.25],[.5,.78]];
+  cs.forEach(([cx,cy])=>{for(let i=0;i<26;i++)pts.push([cx*W+(Math.random()+Math.random()+Math.random()-1.5)*38,cy*300+(Math.random()+Math.random()+Math.random()-1.5)*38])});
+  cents=[pts[3].slice(),pts[35].slice(),pts[62].slice()];assign=pts.map(()=>0);it=0;draw()}
+ function inertia(){return pts.reduce((s,p,i)=>s+(p[0]-cents[assign[i]][0])**2+(p[1]-cents[assign[i]][1])**2,0)/pts.length}
+ function stepK(){pts.forEach((p,i)=>{let bi=0,bd=1e9;cents.forEach((c,k)=>{const d=(p[0]-c[0])**2+(p[1]-c[1])**2;if(d<bd){bd=d;bi=k}});assign[i]=bi});
+  cents=cents.map((c,k)=>{const m=pts.filter((p,i)=>assign[i]===k);return m.length?[m.reduce((s,p)=>s+p[0],0)/m.length,m.reduce((s,p)=>s+p[1],0)/m.length]:c});
+  it++;draw()}
+ function draw(){const [c,W,H]=cvx(cv);c.clearRect(0,0,W,H);
+  pts.forEach((p,i)=>{c.fillStyle=CL[assign[i]];c.globalAlpha=.75;c.beginPath();c.arc(p[0],p[1],4,0,7);c.fill()});c.globalAlpha=1;
+  cents.forEach((ct,k)=>{c.fillStyle=CL[k];c.strokeStyle=css("--ink");c.lineWidth=2;c.beginPath();c.arc(ct[0],ct[1],9,0,7);c.fill();c.stroke();
+   c.beginPath();c.moveTo(ct[0]-4,ct[1]);c.lineTo(ct[0]+4,ct[1]);c.moveTo(ct[0],ct[1]-4);c.lineTo(ct[0],ct[1]+4);c.strokeStyle="#fff";c.stroke()});c.lineWidth=1;
+  $("#km-it").textContent=it;$("#km-in").textContent=inertia().toFixed(0)}
+ $("#km-new").onclick=()=>{clearInterval(run);run=null;gen()};
+ $("#km-step").onclick=stepK;
+ $("#km-run").onclick=()=>{if(run){clearInterval(run);run=null;return}run=setInterval(()=>{const b=inertia();stepK();if(Math.abs(b-inertia())<0.5){clearInterval(run);run=null}},450)};
+ gen();
+}
+function vizNeu(){
+ const cv=$("#cvNeu");const xs=[1.0,.5,1.0],labs=["x₁ = 1,0 · l'affiche plaît","x₂ = 0,5 · un ami y va","x₃ = 1,0 · prix raisonnable"];
+ function draw(){const [c,W,H]=cvx(cv);c.clearRect(0,0,W,H);
+  const w=[+$("#nw1").value,+$("#nw2").value,+$("#nw3").value],b=+$("#nb").value;
+  const z=w[0]*xs[0]+w[1]*xs[1]+w[2]*xs[2]+b, out=1/(1+Math.exp(-z));
+  const nx=W*.56,ny=H/2;
+  xs.forEach((x,i)=>{const y=45+i*80,cx=W*.12;
+   c.strokeStyle=w[i]>=0?css("--c-ml"):css("--c-dl");c.lineWidth=Math.min(5,Math.abs(w[i])*1.6+.5);
+   c.beginPath();c.moveTo(cx+14,y);c.lineTo(nx-34,ny);c.stroke();c.lineWidth=1;
+   c.fillStyle=css("--bg2");c.strokeStyle=css("--line");c.beginPath();c.arc(cx,y,15,0,7);c.fill();c.stroke();
+   c.fillStyle=css("--ink");c.font="600 11px IBM Plex Mono";c.fillText("x"+(i+1),cx-6,y+4);
+   c.fillStyle=css("--mut");c.font="11px IBM Plex Sans";c.fillText(labs[i],cx-14,y+32);
+   c.fillStyle=w[i]>=0?css("--c-ml"):css("--c-dl");c.font="600 11px IBM Plex Mono";c.fillText("w="+w[i].toFixed(1),(cx+nx*.4)/1.9,y-8+(i-1)*14)});
+  c.fillStyle=css("--bg2");c.strokeStyle=css("--c-dl");c.lineWidth=2;c.beginPath();c.arc(nx,ny,30,0,7);c.fill();c.stroke();c.lineWidth=1;
+  c.fillStyle=css("--ink");c.font="600 12px Space Grotesk";c.fillText("Σ + b",nx-17,ny+4);
+  c.strokeStyle=css("--mut");c.beginPath();c.moveTo(nx+30,ny);c.lineTo(W*.8,ny);c.stroke();
+  c.fillStyle=css("--c-py");c.globalAlpha=.25+out*.75;c.beginPath();c.arc(W*.86,ny,26,0,7);c.fill();c.globalAlpha=1;
+  c.strokeStyle=css("--c-py");c.beginPath();c.arc(W*.86,ny,26,0,7);c.stroke();
+  c.fillStyle=css("--ink");c.font="700 14px Space Grotesk";c.fillText(out.toFixed(2),W*.86-13,ny+5);
+  c.fillStyle=css("--mut");c.font="11px IBM Plex Mono";c.fillText("z = "+z.toFixed(2),nx-16,ny+52);c.fillText("σ(z)",W*.86-12,ny+44);
+  $("#nbulb").style.opacity=.2+out*.8;$("#nout").textContent=out.toFixed(3)}
+ ["nw1","nw2","nw3","nb"].forEach(id=>document.getElementById(id).oninput=draw);draw();
+}
+function heroDemo(){
+ const cv=$("#heroViz");if(!cv)return;
+ const P=Array.from({length:16},(_,i)=>[6+i*5.6,40+i*10.5+(Math.random()-.5)*36]);
+ let a=0.4,b=150,ep=0;
+ const sx=x=>26+x/96*(cv.getBoundingClientRect().width-46), sy=y=>212-y/230*190;
+ function draw(){const [c,W,H]=cvx(cv);c.clearRect(0,0,W,H);
+  c.strokeStyle=css("--line");c.beginPath();c.moveTo(sx(0),sy(0));c.lineTo(sx(96),sy(0));c.stroke();
+  c.strokeStyle=css("--c-ml");c.lineWidth=2;c.beginPath();c.moveTo(sx(0),sy(b));c.lineTo(sx(96),sy(a*96+b));c.stroke();c.lineWidth=1;
+  c.fillStyle=css("--c-math");P.forEach(([x,y])=>{c.beginPath();c.arc(sx(x),sy(y),3.6,0,7);c.fill()});
+  const mse=P.reduce((s,p)=>s+((a*p[0]+b)-p[1])**2,0)/P.length;
+  const st=$("#heroStat");if(st)st.textContent=`époque ${ep} · a=${a.toFixed(2)} · b=${b.toFixed(0)} · MSE=${mse.toFixed(1)}`}
+ function tick(){let ga=0,gb=0;P.forEach(([x,y])=>{const e=a*x+b-y;ga+=2*e*x/P.length;gb+=2*e/P.length});
+  a-=0.018*ga;b-=0.018*gb;ep++;draw();
+  if(Math.abs(ga)+Math.abs(gb)>0.05){setTimeout(tick,40)}
+  else setTimeout(()=>{a=0.4;b=150;ep=0;tick()},3500)}
+ draw();setTimeout(tick,700);
+}
+refreshHdr(); go("dash");
+</script>
+</body>
+</html>
