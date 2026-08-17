@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoT &amp; Cybersecurity Academy — Ateliers pratiques (TP)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="t1">Academy</div>
+        <div class="t2">IoT &amp; Cybersecurity</div>
+      </div>
+      <span class="brand-badge">TP</span>
+    </div>
+    <div class="nav-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="nav-search" placeholder="Rechercher un atelier…"/>
+    </div>
+    <nav class="tree" id="nav-tree"></nav>
+    <div style="padding:14px 8px 0">
+      <a href="#/dashboard" class="nav-item" style="margin-bottom:4px">🏠 Dashboard</a>
+      <a href="#/glossary" class="nav-item">📚 Glossaire</a>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script src="content.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

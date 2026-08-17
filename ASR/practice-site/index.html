@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Lab — Administration Système &amp; Réseaux (Pratique)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
+
+<div class="sidebar-scrim" id="scrim"></div>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">PL</div>
+      <div class="brand-text">
+        <div class="brand-name">PRACTICE LAB</div>
+        <div class="brand-sub">De la théorie à l'infrastructure réelle</div>
+      </div>
+    </div>
+
+    <div class="sidebar-search">
+      <div class="sidebar-search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="globalSearch" placeholder="Rechercher un TP...">
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="sidebar-progress-top"><span>Progression globale</span><span id="sidebarPct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="sidebarProgressFill" style="width:0%"></div></div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+
+    <div class="sidebar-footer">
+      <span>v1.0 · Hors-ligne</span>
+      <button class="theme-toggle" id="themeToggle">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <span id="themeLabel">Sombre</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="icon-btn mobile-menu-btn" id="menuBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="breadcrumb" id="breadcrumb"><b>Dashboard</b></div>
+      </div>
+    </div>
+
+    <!-- ===== VIEW: DASHBOARD ===== -->
+    <section class="view" id="view-dashboard" hidden>
+      <div class="hero">
+        <div class="hero-eyebrow">Practice Lab · Complément 100% pratique</div>
+        <h1>Tu connais la théorie. Ici, tu apprends à faire.</h1>
+        <p>Chaque notion théorique devient un TP guidé, un laboratoire, un scénario d'entreprise. Objectif final : administrer seul une infrastructure d'entreprise complète en environnement de laboratoire.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="val" id="statPct">0%</div><div class="lbl">Progression</div></div>
+          <div class="hero-stat teal"><div class="val" id="statLabs">0 / 0</div><div class="lbl">TP terminés</div></div>
+          <div class="hero-stat amber"><div class="val" id="statChallenges">0 / 0</div><div class="lbl">Challenges relevés</div></div>
+        </div>
+      </div>
+
+      <div class="level-banner">
+        <div class="level-badge" id="levelLabel">Débutant</div>
+        <div class="level-next" id="levelNext"></div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <h2>Progression <span class="n">// par domaine</span></h2>
+          <div id="dashDomains"></div>
+        </div>
+        <div class="card">
+          <h2>Derniers TP consultés</h2>
+          <div id="recentList"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <h2>Parcours de formation</h2>
+        <div class="career-path">
+          <div class="career-step">Théorie</div><span class="diagram-arrow">→</span>
+          <div class="career-step">Pratique guidée</div><span class="diagram-arrow">→</span>
+          <div class="career-step">Laboratoire</div><span class="diagram-arrow">→</span>
+          <div class="career-step">Scénario d'entreprise</div><span class="diagram-arrow">→</span>
+          <div class="career-step">Projet</div><span class="diagram-arrow">→</span>
+          <div class="career-step accent">Autonomie</div>
+        </div>
+      </div>
+
+      <div class="quick-links">
+        <a class="quick-link" onclick="nav('final-project')"><span class="ql-icon">🏢</span><span class="ql-title">Projet Final</span><span class="ql-sub">Infrastructure PME complète</span></a>
+        <a class="quick-link" onclick="nav('troubleshoot-hub')"><span class="ql-icon">🔥</span><span class="ql-title">Mode Panne</span><span class="ql-sub">Diagnostic d'incident</span></a>
+        <a class="quick-link" onclick="nav('interview-hub')"><span class="ql-icon">🎯</span><span class="ql-title">Entretien</span><span class="ql-sub">Simulation d'embauche</span></a>
+        <a class="quick-link" onclick="nav('environments')"><span class="ql-icon">🖥️</span><span class="ql-title">Environnements</span><span class="ql-sub">VirtualBox/VMware/Hyper-V/Proxmox</span></a>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: ENVIRONMENTS ===== -->
+    <section class="view" id="view-environments" hidden>
+      <div class="module-header">
+        <div class="eyebrow">Avant de commencer</div>
+        <h1>Choisir son environnement de laboratoire</h1>
+        <p>Tous les TP peuvent être réalisés avec n'importe lequel de ces hyperviseurs. Choisis celui qui correspond à ton contexte et garde-le pour tout le parcours.</p>
+      </div>
+      <div class="env-grid" id="envGrid"></div>
+    </section>
+
+    <!-- ===== VIEW: CATEGORY (liste des TP) ===== -->
+    <section class="view" id="view-category" hidden>
+      <div class="module-header">
+        <div class="eyebrow" id="categoryEyebrow">DOMAINE</div>
+        <h1 id="categoryTitle"></h1>
+        <p id="categoryDesc"></p>
+      </div>
+      <div class="lesson-list" id="categoryLabList"></div>
+    </section>
+
+    <!-- ===== VIEW: LAB DETAIL ===== -->
+    <section class="view lab-view" id="view-lab" hidden>
+      <div class="lab-numero" id="labNumero"></div>
+      <h1 id="labTitle"></h1>
+      <div class="lab-actions">
+        <button class="pill-btn done-toggle" id="doneLabBtn">○ Marquer comme terminé</button>
+        <button class="pill-btn done-toggle" id="challengeLabBtn">◆ Marquer le challenge comme relevé</button>
+      </div>
+      <div id="labBody"></div>
+    </section>
+
+    <!-- ===== VIEW: TROUBLESHOOT HUB ===== -->
+    <section class="view" id="view-troubleshoot-hub" hidden>
+      <div class="module-header">
+        <div class="eyebrow">🔥 Diagnostic d'incident</div>
+        <h1>Mode Panne</h1>
+        <p>Une infrastructure volontairement cassée. Trouve la cause avec la même méthode qu'un administrateur : observation, hypothèses, test, correction. Les indices se révèlent progressivement — pas de solution donnée d'un coup.</p>
+        <p id="incidentStat" style="font-family:var(--mono); color:var(--amber); font-size:12.5px;"></p>
+      </div>
+      <div id="incidentList"></div>
+    </section>
+
+    <!-- ===== VIEW: INCIDENT DETAIL ===== -->
+    <section class="view" id="view-incident" hidden>
+      <div class="lab-numero">🔥 INCIDENT</div>
+      <h1 id="incidentTitle" style="font-size:22px;margin:0 0 14px;"></h1>
+      <div class="card" style="margin-bottom:18px;">
+        <h2>Symptôme observé</h2>
+        <p id="incidentSymptome" style="font-size:13.5px; color:var(--text-muted);"></p>
+      </div>
+      <div id="incidentHints"></div>
+      <button class="reveal-btn" id="revealHintBtn"></button>
+      <div style="margin-top:20px;">
+        <button class="pill-btn done-toggle" id="solveIncidentBtn"></button>
+      </div>
+      <div class="solution-box" id="incidentSolution" style="display:none;"></div>
+    </section>
+
+    <!-- ===== VIEW: INTERVIEW HUB ===== -->
+    <section class="view" id="view-interview-hub" hidden>
+      <div class="module-header">
+        <div class="eyebrow">🎯 Simulation d'entretien</div>
+        <h1>Administrateur Système &amp; Réseau</h1>
+        <p>Des situations réelles posées en entretien. Réfléchis à ta méthodologie avant de révéler la réponse professionnelle attendue.</p>
+      </div>
+      <div id="interviewList"></div>
+    </section>
+
+    <!-- ===== VIEW: INTERVIEW DETAIL ===== -->
+    <section class="view" id="view-interview" hidden>
+      <div class="lab-numero">🎯 ENTRETIEN</div>
+      <h1 id="interviewQuestion" style="font-size:20px;margin:0 0 16px;"></h1>
+      <button class="reveal-btn" id="revealMethodoBtn">Voir la méthodologie professionnelle</button>
+      <div id="interviewMethodo" hidden></div>
+    </section>
+
+    <!-- ===== VIEW: PROJECTS ===== -->
+    <section class="view" id="view-projects" hidden>
+      <div class="module-header">
+        <div class="eyebrow">Mise en pratique progressive</div>
+        <h1>Projets</h1>
+        <p>Du réseau domestique à l'infrastructure d'entreprise segmentée — chaque projet combine plusieurs domaines de TP déjà vus.</p>
+      </div>
+      <div id="projectsList"></div>
+    </section>
+
+    <!-- ===== VIEW: FINAL PROJECT ===== -->
+    <section class="view" id="view-final-project" hidden>
+      <div class="module-header">
+        <div class="eyebrow">🏢 Projet final</div>
+        <h1 id="finalTitle"></h1>
+        <p id="finalEntreprise"></p>
+      </div>
+      <div class="card" style="margin-bottom:20px;">
+        <h2>Architecture cible</h2>
+        <div id="finalArchitecture"></div>
+      </div>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="sidebar-progress-top" style="margin-bottom:8px;"><span>Avancement du projet final</span><span id="finalGlobalPct">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" id="finalGlobalFill" style="width:0%"></div></div>
+      </div>
+      <h2 style="font-size:14px; margin-bottom:12px;">20 missions</h2>
+      <div id="finalMissions"></div>
+    </section>
+
+    <!-- ===== VIEW: CHALLENGES ===== -->
+    <section class="view" id="view-challenges" hidden>
+      <div class="module-header">
+        <div class="eyebrow">Aller plus loin</div>
+        <h1>Challenges</h1>
+        <p id="challengesStat" style="font-family:var(--mono); color:var(--amber);"></p>
+      </div>
+      <div class="lesson-list" id="challengesList"></div>
+    </section>
+
+    <!-- ===== VIEW: PROGRESSION DÉTAILLÉE ===== -->
+    <section class="view" id="view-progression" hidden>
+      <div class="module-header">
+        <div class="eyebrow">Suivi complet</div>
+        <h1>Progression détaillée</h1>
+        <p>Détail de ta progression domaine par domaine, et badges débloqués.</p>
+      </div>
+      <div id="progressDomains" style="margin-bottom:26px;"></div>
+      <h2 style="font-size:15px; margin-bottom:10px;">Badges</h2>
+      <div class="badges-row" id="badgesRow"></div>
+    </section>
+
+  </main>
+</div>
+
+<script src="data-meta.js"></script>
+<script src="data-labs-1.js"></script>
+<script src="data-labs-2.js"></script>
+<script src="data-labs-3.js"></script>
+<script src="data-labs-4.js"></script>
+<script src="data-extra.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

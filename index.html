@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>~/cours — index</title>
+<title>Techno-Info — Portail de Cours</title>
 <style>
   /* ── Variables de thème ─────────────────────────────────────── */
   :root {
-    /* Mode sombre (par défaut) */
     --bg: #0D1117;
     --surface: #151B23;
     --surface-2: #1C2530;
@@ -58,267 +57,184 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: .001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: .001ms !important;
-    }
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
   }
 
-  /* ── Layout ─────────────────────────────────────────────────── */
-  .wrap { max-width: 980px; margin: 0 auto; padding: 56px 24px 80px; }
+  /* ── Layout compact ─────────────────────────────────────────── */
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
 
-  header.top { margin-bottom: 34px; position: relative; }
+  header.top { margin-bottom: 20px; position: relative; }
 
   .theme-toggle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: var(--muted);
+    position: absolute; top: 0; right: 0;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s ease; color: var(--muted); z-index: 10;
   }
+  .theme-toggle:hover { background: var(--surface-2); color: var(--text); border-color: var(--muted); }
+  .theme-toggle svg { width: 19px; height: 19px; }
 
-  .theme-toggle:hover {
-    background: var(--surface-2);
-    color: var(--text);
-    border-color: var(--muted);
-  }
-
-  .theme-toggle svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: var(--muted);
-    letter-spacing: .06em;
-  }
-
+  .eyebrow { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .06em; }
   .eyebrow .path { color: var(--teal); }
 
   h1 {
-    font-family: var(--mono);
-    font-weight: 600;
-    font-size: clamp(26px, 4vw, 38px);
-    margin: 10px 0 8px;
-    letter-spacing: -0.01em;
+    font-family: var(--mono); font-weight: 600;
+    font-size: clamp(22px, 3.4vw, 32px);
+    margin: 8px 0 6px; letter-spacing: -0.01em;
   }
-
   h1 .caret {
-    display: inline-block;
-    width: .55em;
-    background: var(--gold);
-    animation: blink 1.1s step-end infinite;
-    margin-left: 2px;
-    height: 0.85em;
-    vertical-align: -0.1em;
+    display: inline-block; width: .55em; background: var(--gold);
+    animation: blink 1.1s step-end infinite; margin-left: 2px;
+    height: 0.85em; vertical-align: -0.1em;
   }
-
   @keyframes blink { 50% { opacity: 0; } }
 
-  p.sub {
-    color: var(--muted);
-    font-size: 15px;
-    max-width: 560px;
-    line-height: 1.55;
-    margin: 0;
-  }
+  p.sub { color: var(--muted); font-size: 14px; max-width: 720px; line-height: 1.55; margin: 0; }
 
-  /* ── Terminal ───────────────────────────────────────────────── */
-  .term {
-    margin-top: 28px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px -20px rgba(0,0,0,.6);
-    transition: background 0.3s ease, border-color 0.3s ease;
-  }
+  /* ── Stats Bar ──────────────────────────────────────────────── */
+  .stats-bar { display: flex; gap: 12px; margin: 18px 0 8px; flex-wrap: wrap; }
 
-  [data-theme="light"] .term {
-    box-shadow: 0 20px 50px -20px rgba(0,0,0,.1);
+  .stat-item {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 12px;
   }
+  .stat-icon {
+    width: 30px; height: 30px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .stat-icon.gold   { background: color-mix(in srgb, var(--gold) 20%, transparent);   color: var(--gold); }
+  .stat-icon.violet { background: color-mix(in srgb, var(--violet) 20%, transparent); color: var(--violet); }
+  .stat-icon.teal   { background: color-mix(in srgb, var(--teal) 20%, transparent);   color: var(--teal); }
+  .stat-value { font-weight: 600; font-size: 16px; color: var(--text); }
+  .stat-label { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-  .term-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: var(--surface-2);
+  /* ── Sections par module ────────────────────────────────────── */
+  .section { margin: 26px 0 10px; }
+
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px; padding-bottom: 10px;
     border-bottom: 1px solid var(--line);
   }
+  .section-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .section-icon.gold   { background: color-mix(in srgb, var(--gold) 15%, transparent);   color: var(--gold); }
+  .section-icon.violet { background: color-mix(in srgb, var(--violet) 15%, transparent); color: var(--violet); }
+  .section-icon.teal   { background: color-mix(in srgb, var(--teal) 15%, transparent);   color: var(--teal); }
 
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot.r { background: #F17F7F; }
-  .dot.y { background: #E3B341; }
-  .dot.g { background: #4FD08A; }
-
-  .term-title {
-    margin-left: 8px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
+  .section-title { font-family: var(--mono); font-size: 17px; font-weight: 600; margin: 0; }
+  .section-subtitle { font-size: 12px; color: var(--muted); margin: 2px 0 0 0; }
+  .section-count {
+    margin-left: auto; font-family: var(--mono); font-size: 11.5px;
+    color: var(--muted); background: var(--surface-2); padding: 4px 10px; border-radius: 12px;
+    white-space: nowrap;
   }
 
-  .term-body {
-    padding: 16px 18px 20px;
-    font-family: var(--mono);
-    font-size: 13.5px;
-    color: var(--muted);
-    line-height: 1.75;
-  }
-
-  .term-body .cmd { color: var(--text); }
-  .term-body .ok { color: var(--teal); }
-  #scan-status { white-space: pre-wrap; }
-
-  /* ── Grid ───────────────────────────────────────────────────── */
-  #status-line {
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: var(--muted);
-    margin: 34px 0 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  #status-line::before { content: "›"; color: var(--gold); }
-
+  /* ── Grid & cartes ──────────────────────────────────────────── */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 14px;
   }
 
   .card {
     position: relative;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 20px 20px 18px;
-    text-decoration: none;
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: all 0.2s ease;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px; text-decoration: none; color: var(--text);
+    display: flex; flex-direction: column; gap: 10px;
+    transition: all 0.25s ease;
     border-top: 3px solid var(--accent, var(--rose));
   }
-
-  .card:hover,
-  .card:focus-visible {
-    transform: translateY(-3px);
+  .card:hover, .card:focus-visible {
+    transform: translateY(-4px);
     border-color: var(--accent, var(--rose));
     background: var(--surface-2);
     outline: none;
-    box-shadow: 0 8px 20px -8px rgba(0,0,0,.3);
+    box-shadow: 0 12px 28px -12px rgba(0,0,0,.35);
   }
+  [data-theme="light"] .card:hover, [data-theme="light"] .card:focus-visible {
+    box-shadow: 0 12px 28px -12px rgba(0,0,0,.12);
+  }
+  .card:focus-visible { box-shadow: 0 0 0 2px var(--accent, var(--rose)); }
 
-  [data-theme="light"] .card:hover,
-  [data-theme="light"] .card:focus-visible {
-    box-shadow: 0 8px 20px -8px rgba(0,0,0,.1);
-  }
-
-  .card:focus-visible {
-    box-shadow: 0 0 0 2px var(--accent, var(--rose));
-  }
-
-  .card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-  }
+  .card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 
   .badge {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: .06em;
-    color: var(--accent, var(--rose));
-    border: 1px solid var(--accent, var(--rose));
-    border-radius: 999px;
-    padding: 2px 8px;
-    text-transform: uppercase;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
+    color: var(--accent, var(--rose)); border: 1px solid var(--accent, var(--rose));
+    border-radius: 999px; padding: 3px 9px; text-transform: uppercase;
     background: color-mix(in srgb, var(--accent, var(--rose)) 12%, transparent);
   }
+  .ext { font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
 
-  .ext {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
+  .card h2 { margin: 0; font-size: 15.5px; font-weight: 600; line-height: 1.35; }
+  .card p  { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; flex-grow: 1; }
 
-  .card h2 {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 600;
-    line-height: 1.35;
-  }
-
-  .card p {
-    margin: 0;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-    flex-grow: 1;
+  .card .path {
+    font-family: var(--mono); font-size: 10.5px; color: var(--muted); opacity: .75;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
 
   .card .go {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--accent, var(--rose));
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 4px;
+    font-family: var(--mono); font-size: 11.5px; color: var(--accent, var(--rose));
+    display: flex; align-items: center; gap: 6px; margin-top: 2px;
   }
-
-  .card .go svg {
-    width: 12px;
-    height: 12px;
-    transition: transform 0.2s ease;
-  }
-
-  .card:hover .go svg { transform: translateX(3px); }
+  .card .go svg { width: 12px; height: 12px; transition: transform 0.2s ease; }
+  .card:hover .go svg { transform: translateX(4px); }
 
   .empty, .hint {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--muted);
-    border: 1px dashed var(--line);
-    border-radius: 10px;
-    padding: 18px;
-    line-height: 1.7;
+    font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+    border: 1px dashed var(--line); border-radius: 10px; padding: 16px; line-height: 1.7;
+  }
+  .hint code {
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: 1px 6px; border-radius: 4px; color: var(--gold);
   }
 
-  .hint code {
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    padding: 1px 6px;
-    border-radius: 4px;
-    color: var(--gold);
+  /* ── Terminal repliable en bas ──────────────────────────────── */
+  .term-details { margin-top: 34px; }
+  .term-details summary {
+    font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+    cursor: pointer; padding: 10px 0; user-select: none;
+    display: flex; align-items: center; gap: 8px;
   }
+  .term-details summary:hover { color: var(--text); }
+  .term-details summary::before { content: "▸"; color: var(--gold); transition: transform .2s; }
+  .term-details[open] summary::before { transform: rotate(90deg); }
+
+  .term {
+    margin-top: 10px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,.6);
+  }
+  [data-theme="light"] .term { box-shadow: 0 20px 50px -20px rgba(0,0,0,.1); }
+
+  .term-bar {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+    background: var(--surface-2); border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #F17F7F; } .dot.y { background: #E3B341; } .dot.g { background: #4FD08A; }
+  .term-title { margin-left: 8px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+  .term-body {
+    padding: 14px 18px 18px; font-family: var(--mono); font-size: 13px;
+    color: var(--muted); line-height: 1.75;
+  }
+  .term-body .cmd { color: var(--text); }
+  .term-body .ok { color: var(--teal); }
+  #scan-status { white-space: pre-wrap; }
 
   footer {
-    margin-top: 48px;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--muted);
-    border-top: 1px solid var(--line);
-    padding-top: 16px;
+    margin-top: 40px; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+    border-top: 1px solid var(--line); padding-top: 16px; text-align: center;
   }
+  footer strong { color: var(--text); }
 </style>
 </head>
 <body>
@@ -327,92 +243,152 @@
     <button class="theme-toggle" id="themeToggle" aria-label="Basculer le thème">
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line>
-        <line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
       </svg>
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </svg>
     </button>
 
-    <div class="eyebrow">Mirajo <span class="path">/ cours / index.html</span></div>
-    <h1>Bibliothèque de cours<span class="caret">&nbsp;</span></h1>
-    <p class="sub">Portail qui recense automatiquement les fichiers <code>.html</code> présents dans ce dossier — dépose un nouveau cours ici, il apparaît tout seul.</p>
+    <div class="eyebrow">Techno-Info <span class="path">/ index.html</span></div>
+    <h1>Portail de Cours<span class="caret">&nbsp;</span></h1>
+    <p class="sub">Tous les cours et ressources classés par module — visibles immédiatement.</p>
   </header>
 
-  <div class="term">
-    <div class="term-bar">
-      <span class="dot r"></span>
-      <span class="dot y"></span>
-      <span class="dot g"></span>
-      <span class="term-title">bash — scan du dossier courant</span>
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-icon gold">📚</div>
+      <div><div class="stat-value" id="total-count">7</div><div class="stat-label">Ressources</div></div>
     </div>
-    <div class="term-body">
-      <div><span class="cmd">$</span> ls -1 *.html | grep -v index.html</div>
-      <div id="scan-status">…</div>
+    <div class="stat-item">
+      <div class="stat-icon violet">📂</div>
+      <div><div class="stat-value">3</div><div class="stat-label">Modules</div></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon teal">✓</div>
+      <div><div class="stat-value">Prêt</div><div class="stat-label">Statut</div></div>
     </div>
   </div>
 
-  <div id="status-line">chargement des cours</div>
-  <div class="grid" id="grid"></div>
-
-  <div class="hint" id="server-hint" style="display:none; margin-top:22px;">
-    Détection automatique indisponible ici (ouverture directe du fichier, sans serveur). Lance un petit serveur local dans ce dossier pour l'activer :
-    <br><br>
-    <code>python3 -m http.server 8000</code> puis ouvre <code>http://localhost:8000/</code>
-    <br><br>
-    En attendant, la liste de secours ci-dessus est utilisée — pour l'éditer à la main, modifie le tableau <code>FALLBACK_COURSES</code> tout en bas du fichier <code>index.html</code>.
+  <!-- ══ MODULE 1 : COURS LOCAUX (affichés en premier) ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon gold">📄</div>
+      <div>
+        <h2 class="section-title">Cours Locaux</h2>
+        <p class="section-subtitle">Fichiers HTML à la racine de Techno-Info</p>
+      </div>
+      <span class="section-count" id="course-count">…</span>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="hint" id="server-hint" style="display:none; margin-top:14px;">
+      Détection automatique indisponible (ouverture directe sans serveur). Liste de secours utilisée.
+      Pour activer le scan : <code>python3 -m http.server 8000</code> puis <code>http://localhost:8000/</code>
+    </div>
   </div>
 
-  <footer>index.html — ajoute un fichier .html dans ce dossier, recharge la page, il apparaît automatiquement.</footer>
+  <!-- ══ MODULE 2 : OCC ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon teal">🔒</div>
+      <div>
+        <h2 class="section-title">OCC — IoT Cyber Academy</h2>
+        <p class="section-subtitle">Cybersécurité appliquée à l'Internet des Objets</p>
+      </div>
+      <span class="section-count">2 ressources</span>
+    </div>
+    <div class="grid">
+      <a href="OCC/iot-cyber-academy-pratique/index.html" class="card" style="--accent: var(--teal);">
+        <div class="card-top"><span class="badge">OCC · Pratique</span><span class="ext">/index.html</span></div>
+        <h2>IoT Cyber Academy — Pratique</h2>
+        <p>Exercices pratiques, laboratoires et projets hands-on en cybersécurité IoT</p>
+        <span class="path">OCC/iot-cyber-academy-pratique/</span>
+        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+      <a href="OCC/iot-cyber-academy-th%C3%A9orique/index.html" class="card" style="--accent: var(--violet);">
+        <div class="card-top"><span class="badge">OCC · Théorie</span><span class="ext">/index.html</span></div>
+        <h2>IoT Cyber Academy — Théorique</h2>
+        <p>Cours théoriques, concepts fondamentaux et documentation de référence</p>
+        <span class="path">OCC/iot-cyber-academy-théorique/</span>
+        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ MODULE 3 : ASR ══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon violet">🌐</div>
+      <div>
+        <h2 class="section-title">ASR — Administration Systèmes & Réseaux</h2>
+        <p class="section-subtitle">Administration systèmes et infrastructure réseau</p>
+      </div>
+      <span class="section-count">2 ressources</span>
+    </div>
+    <div class="grid">
+      <a href="ASR/practice-site/index.html" class="card" style="--accent: var(--teal);">
+        <div class="card-top"><span class="badge">ASR · Pratique</span><span class="ext">/index.html</span></div>
+        <h2>ASR — Practice Site</h2>
+        <p>Laboratoires pratiques, exercices d'administration systèmes et réseaux</p>
+        <span class="path">ASR/practice-site/</span>
+        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+      <a href="ASR/theory-site/index.html" class="card" style="--accent: var(--violet);">
+        <div class="card-top"><span class="badge">ASR · Théorie</span><span class="ext">/index.html</span></div>
+        <h2>ASR — Theory Site</h2>
+        <p>Documentation théorique, concepts et ressources d'apprentissage ASR</p>
+        <span class="path">ASR/theory-site/</span>
+        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Terminal repliable en bas -->
+  <details class="term-details">
+    <summary>bash — scan du dossier courant (détails techniques)</summary>
+    <div class="term">
+      <div class="term-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="term-title">bash — scan du dossier courant</span>
+      </div>
+      <div class="term-body">
+        <div><span class="cmd">$</span> ls -1 *.html | grep -v index.html</div>
+        <div id="scan-status">…</div>
+      </div>
+    </div>
+  </details>
+
+  <footer>
+    <strong>Techno-Info</strong> — Portail centralisé de cours · Ajoutez un .html à la racine, il apparaît automatiquement
+  </footer>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════
-// Gestion du thème (clair/sombre)
-// ══════════════════════════════════════════════════════════════════
+// ══ Thème ══
 const themeManager = {
   init() {
     const saved = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = saved || (prefersDark ? 'dark' : 'light');
-    this.setTheme(theme);
+    this.setTheme(saved || (prefersDark ? 'dark' : 'light'));
     document.getElementById('themeToggle').addEventListener('click', () => this.toggle());
   },
-
   toggle() {
     const current = document.documentElement.getAttribute('data-theme') || 'dark';
     this.setTheme(current === 'dark' ? 'light' : 'dark');
   },
-
   setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-    this.updateIcon(theme);
-  },
-
-  updateIcon(theme) {
-    const sunIcon = document.querySelector('.icon-sun');
-    const moonIcon = document.querySelector('.icon-moon');
-    if (theme === 'light') {
-      sunIcon.style.display = 'none';
-      moonIcon.style.display = 'block';
-    } else {
-      sunIcon.style.display = 'block';
-      moonIcon.style.display = 'none';
-    }
+    document.querySelector('.icon-sun').style.display  = theme === 'light' ? 'none'  : 'block';
+    document.querySelector('.icon-moon').style.display = theme === 'light' ? 'block' : 'none';
   }
 };
 
-// ══════════════════════════════════════════════════════════════════
-// Configuration des cours
-// ══════════════════════════════════════════════════════════════════
+// ══ Configuration des cours locaux ══
 const FALLBACK_COURSES = [
   { file: "cours-sage100c.html", fallbackTitle: "Cours Sage 100c" },
   { file: "csharp-complet-theorie-pratique.html", fallbackTitle: "C# — Théorie & pratique" },
@@ -420,99 +396,72 @@ const FALLBACK_COURSES = [
 ];
 
 const ACCENT_MAP = {
-  gold: { keywords: ['sage', 'gestion'], label: 'gestion' },
+  gold:   { keywords: ['sage', 'gestion'], label: 'gestion' },
   violet: { keywords: ['csharp', 'c#', '.net', 'dev'], label: 'dev' },
-  teal: { keywords: ['machine', 'ml', 'ia', 'data', 'ai'], label: 'data' }
+  teal:   { keywords: ['machine', 'ml', 'ia', 'data', 'ai'], label: 'data' }
 };
-
 const ACCENT_COLORS = ['gold', 'violet', 'teal', 'rose'];
 
-// ══════════════════════════════════════════════════════════════════
-// Utilitaires
-// ══════════════════════════════════════════════════════════════════
+// ══ Utilitaires ══
 function selectAccent(filename) {
   const normalized = filename.toLowerCase();
   for (const [color, config] of Object.entries(ACCENT_MAP)) {
     if (config.keywords.some(kw => normalized.includes(kw))) return color;
   }
-  // Hash stable pour nouveaux fichiers
   let hash = 0;
   for (const char of normalized) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   return ACCENT_COLORS[hash % ACCENT_COLORS.length];
 }
 
 function formatTitle(filename) {
-  return filename
-    .replace(/\.html?$/i, '')
-    .replace(/[-_]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return filename.replace(/\.html?$/i, '').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ')
+    .trim().replace(/\b\w/g, c => c.toUpperCase());
 }
 
 async function fetchMetadata(url) {
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error('HTTP error');
-    const html = await response.text();
-    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
     return {
       title: doc.querySelector('title')?.textContent?.trim() || null,
       description: doc.querySelector('meta[name="description"]')?.content?.trim() || null
     };
-  } catch {
-    return { title: null, description: null };
-  }
+  } catch { return { title: null, description: null }; }
 }
 
-// ══════════════════════════════════════════════════════════════════
-// Rendu des cartes
-// ══════════════════════════════════════════════════════════════════
+// ══ Rendu des cartes de cours locaux ══
 function renderCourseCards(courses) {
   const grid = document.getElementById('grid');
-  const statusLine = document.getElementById('status-line');
+  const courseCount = document.getElementById('course-count');
+  const totalCount = document.getElementById('total-count');
   grid.innerHTML = '';
 
+  courseCount.textContent = `${courses.length} cours`;
+  totalCount.textContent = courses.length + 4; // + 4 ressources des modules
+
   if (courses.length === 0) {
-    statusLine.textContent = 'aucun cours trouvé';
-    grid.innerHTML = `
-      <div class="empty">
-        Aucun fichier .html trouvé à côté de index.html.<br>
-        Dépose un cours ici et recharge la page.
-      </div>
-    `;
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">Aucun fichier .html à la racine.<br>Déposez un cours ici et rechargez la page.</div>`;
     return;
   }
 
-  const plural = courses.length > 1 ? 's' : '';
-  statusLine.textContent = `${courses.length} cours trouvé${plural}`;
-
   courses.forEach(course => {
     const accent = selectAccent(course.file);
-    const accentConfig = Object.entries(ACCENT_MAP).find(([color]) => color === accent)?.[1];
-    const badgeLabel = accentConfig?.label || 'cours';
+    const label = Object.entries(ACCENT_MAP).find(([c]) => c === accent)?.[1]?.label || 'local';
 
     const card = document.createElement('a');
     card.className = 'card';
     card.href = encodeURI(course.file);
     card.style.setProperty('--accent', `var(--${accent})`);
     card.innerHTML = `
-      <div class="card-top">
-        <span class="badge">${badgeLabel}</span>
-        <span class="ext">.html</span>
-      </div>
+      <div class="card-top"><span class="badge">${label}</span><span class="ext">.html</span></div>
       <h2>${course.fallbackTitle || formatTitle(course.file)}</h2>
       <p class="desc">Ouvrir le cours…</p>
-      <span class="go">
-        Ouvrir
-        <svg viewBox="0 0 12 12" fill="none">
-          <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
+      <span class="path">./${course.file}</span>
+      <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     `;
     grid.appendChild(card);
 
-    // Enrichir avec les métadonnées du fichier
     fetchMetadata(course.file).then(meta => {
       if (meta.title) card.querySelector('h2').textContent = meta.title;
       if (meta.description) card.querySelector('.desc').textContent = meta.description;
@@ -520,40 +469,30 @@ function renderCourseCards(courses) {
   });
 }
 
-// ══════════════════════════════════════════════════════════════════
-// Détection automatique via listing de répertoire
-// ══════════════════════════════════════════════════════════════════
+// ══ Détection automatique ══
 async function detectViaDirectoryListing() {
   const response = await fetch('./', { cache: 'no-store' });
   if (!response.ok) throw new Error('listing indisponible');
-
-  const html = await response.text();
-  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
   const links = Array.from(doc.querySelectorAll('a'))
     .map(a => decodeURIComponent(a.getAttribute('href') || ''))
     .filter(href => /\.html?$/i.test(href) && !/index\.html?$/i.test(href));
-
   if (links.length === 0) throw new Error('listing vide');
   return links.map(file => ({ file, fallbackTitle: null }));
 }
 
-// ══════════════════════════════════════════════════════════════════
-// Initialisation
-// ══════════════════════════════════════════════════════════════════
+// ══ Initialisation ══
 async function initialize() {
   themeManager.init();
-
   const scanStatus = document.getElementById('scan-status');
-
   try {
     const files = await detectViaDirectoryListing();
     scanStatus.innerHTML = files.map(f => `<span class="ok">✓</span> ${f.file}`).join('\n') || 'aucun fichier';
     renderCourseCards(files);
-  } catch (error) {
+  } catch {
     document.getElementById('server-hint').style.display = 'block';
     scanStatus.innerHTML = FALLBACK_COURSES.map(f =>
-      `<span class="ok">✓</span> ${f.file} <span style="color:var(--muted)">(liste de secours)</span>`
-    ).join('\n');
+      `<span class="ok">✓</span> ${f.file} <span style="color:var(--muted)">(liste de secours)</span>`).join('\n');
     renderCourseCards(FALLBACK_COURSES);
   }
 }
