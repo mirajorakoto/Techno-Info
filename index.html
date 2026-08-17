@@ -4,297 +4,290 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Techno-Info — Portail de Cours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
 <style>
-  /* ── Variables de thème ─────────────────────────────────────── */
+  /* ── Tokens ──────────────────────────────────────────────────
+     Palette pensée comme une fiche de catalogue de bibliothèque :
+     papier sauge + encre marine, trois encres de tampon (moutarde,
+     forêt, brique) pour distinguer les modules. */
   :root {
-    --bg: #0D1117;
-    --surface: #151B23;
-    --surface-2: #1C2530;
-    --line: #2A323D;
-    --text: #E6EDF3;
-    --muted: #8B949E;
-    --gold: #E3B341;
-    --violet: #A371F7;
-    --teal: #39D2C0;
-    --rose: #F17FA5;
+    --ink: #1E2A38;
+    --ink-soft: #3D4B58;
+    --muted: #6B7680;
+    --paper: #EFEDE6;
+    --card: #FFFFFF;
+    --line: #DAD5C8;
+    --mustard: #B8811F;
+    --forest: #2C6B54;
+    --clay: #AB4F35;
+    --display: 'Fraunces', Georgia, serif;
+    --body: 'Inter', system-ui, -apple-system, sans-serif;
     --mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
-    --sans: 'IBM Plex Sans', system-ui, sans-serif;
   }
 
-  [data-theme="light"] {
-    --bg: #F6F8FA;
-    --surface: #FFFFFF;
-    --surface-2: #F0F2F5;
-    --line: #D0D7DE;
-    --text: #1F2328;
-    --muted: #656D76;
-    --gold: #B8860B;
-    --violet: #8250DF;
-    --teal: #1A7F6D;
-    --rose: #C9557F;
+  [data-theme="dark"] {
+    --ink: #EAE6DC;
+    --ink-soft: #C9C2B4;
+    --muted: #93A0AA;
+    --paper: #141B23;
+    --card: #1B2530;
+    --line: #2B3844;
+    --mustard: #D9A64C;
+    --forest: #55A488;
+    --clay: #D9755A;
   }
 
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
 
   body {
     margin: 0;
-    background:
-      radial-gradient(1200px 600px at 15% -10%, rgba(163,113,247,.08), transparent),
-      radial-gradient(1000px 500px at 100% 0%, rgba(57,210,192,.06), transparent),
-      var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    transition: background 0.3s ease, color 0.3s ease;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    transition: background .25s ease, color .25s ease;
   }
 
-  [data-theme="light"] body {
-    background:
-      radial-gradient(1200px 600px at 15% -10%, rgba(130,80,223,.05), transparent),
-      radial-gradient(1000px 500px at 100% 0%, rgba(26,127,109,.04), transparent),
-      var(--bg);
-  }
+  a { color: inherit; }
 
-  @media (prefers-reduced-motion: reduce) {
-    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
-  }
-
-  /* ── Layout compact ─────────────────────────────────────────── */
-  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
-
-  header.top { margin-bottom: 20px; position: relative; }
-
-  .theme-toggle {
-    position: absolute; top: 0; right: 0;
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: 8px; width: 38px; height: 38px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s ease; color: var(--muted); z-index: 10;
-  }
-  .theme-toggle:hover { background: var(--surface-2); color: var(--text); border-color: var(--muted); }
-  .theme-toggle svg { width: 19px; height: 19px; }
-
-  .eyebrow { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .06em; }
-  .eyebrow .path { color: var(--teal); }
-
-  h1 {
-    font-family: var(--mono); font-weight: 600;
-    font-size: clamp(22px, 3.4vw, 32px);
-    margin: 8px 0 6px; letter-spacing: -0.01em;
-  }
-  h1 .caret {
-    display: inline-block; width: .55em; background: var(--gold);
-    animation: blink 1.1s step-end infinite; margin-left: 2px;
-    height: 0.85em; vertical-align: -0.1em;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  p.sub { color: var(--muted); font-size: 14px; max-width: 720px; line-height: 1.55; margin: 0; }
-
-  /* ── Stats Bar ──────────────────────────────────────────────── */
-  .stats-bar { display: flex; gap: 12px; margin: 18px 0 8px; flex-wrap: wrap; }
-
-  .stat-item {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
-    padding: 10px 16px; display: flex; align-items: center; gap: 10px;
-    font-family: var(--mono); font-size: 12px;
-  }
-  .stat-icon {
-    width: 30px; height: 30px; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center; font-size: 15px;
-  }
-  .stat-icon.gold   { background: color-mix(in srgb, var(--gold) 20%, transparent);   color: var(--gold); }
-  .stat-icon.violet { background: color-mix(in srgb, var(--violet) 20%, transparent); color: var(--violet); }
-  .stat-icon.teal   { background: color-mix(in srgb, var(--teal) 20%, transparent);   color: var(--teal); }
-  .stat-value { font-weight: 600; font-size: 16px; color: var(--text); }
-  .stat-label { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-
-  /* ── Sections par module ────────────────────────────────────── */
-  .section { margin: 26px 0 10px; }
-
-  .section-header {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 14px; padding-bottom: 10px;
+  /* ── Navbar ─────────────────────────────────────────────────── */
+  .navbar {
+    position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px) saturate(1.1);
     border-bottom: 1px solid var(--line);
   }
-  .section-icon {
-    width: 36px; height: 36px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; flex-shrink: 0;
+  .nav-inner {
+    max-width: 1080px; margin: 0 auto; padding: 12px 24px;
+    display: flex; align-items: center; gap: 22px;
   }
-  .section-icon.gold   { background: color-mix(in srgb, var(--gold) 15%, transparent);   color: var(--gold); }
-  .section-icon.violet { background: color-mix(in srgb, var(--violet) 15%, transparent); color: var(--violet); }
-  .section-icon.teal   { background: color-mix(in srgb, var(--teal) 15%, transparent);   color: var(--teal); }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 7px; background: var(--ink); color: var(--paper);
+    font-family: var(--display); font-weight: 700; font-size: 15px;
+    display: flex; align-items: center; justify-content: center; flex: none;
+  }
+  .brand-text { font-family: var(--display); font-weight: 600; font-size: 17px; letter-spacing: -.01em; }
 
-  .section-title { font-family: var(--mono); font-size: 17px; font-weight: 600; margin: 0; }
-  .section-subtitle { font-size: 12px; color: var(--muted); margin: 2px 0 0 0; }
-  .section-count {
-    margin-left: auto; font-family: var(--mono); font-size: 11.5px;
-    color: var(--muted); background: var(--surface-2); padding: 4px 10px; border-radius: 12px;
+  .nav-links { display: flex; gap: 20px; margin-right: auto; flex-wrap: wrap; }
+  .nav-links a {
+    font-size: 13.5px; text-decoration: none; color: var(--ink-soft);
+    padding: 6px 2px; border-bottom: 2px solid transparent; transition: border-color .18s, color .18s;
+  }
+  .nav-links a:hover { color: var(--ink); border-color: var(--mustard); }
+
+  .nav-actions { display: flex; align-items: center; gap: 10px; }
+  .nav-contact {
+    font-family: var(--body); font-weight: 600; font-size: 13px;
+    background: var(--ink); color: var(--paper); text-decoration: none;
+    padding: 8px 16px; border-radius: 7px; transition: opacity .18s, transform .18s;
     white-space: nowrap;
   }
+  .nav-contact:hover { opacity: .85; transform: translateY(-1px); }
 
-  /* ── Grid & cartes ──────────────────────────────────────────── */
+  .theme-toggle {
+    background: transparent; border: 1px solid var(--line); border-radius: 7px;
+    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--muted); transition: all .18s; flex: none;
+  }
+  .theme-toggle:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+
+  @media (max-width: 640px) { .nav-links { display: none; } }
+
+  /* ── Layout ─────────────────────────────────────────────────── */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 56px; }
+
+  /* ── Hero ───────────────────────────────────────────────────── */
+  .hero { padding: 40px 0 28px; border-bottom: 1px solid var(--line); margin-bottom: 30px; }
+  .hero-kicker {
+    font-family: var(--mono); font-size: 11.5px; color: var(--forest);
+    text-transform: uppercase; letter-spacing: .09em; margin-bottom: 10px;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 600; font-size: clamp(28px, 4.4vw, 42px);
+    margin: 0 0 10px; letter-spacing: -0.015em; line-height: 1.08;
+  }
+  p.sub { color: var(--muted); font-size: 15px; max-width: 620px; line-height: 1.6; margin: 0 0 6px; }
+  .hero-meta { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .hero-meta strong { color: var(--ink-soft); font-weight: 500; }
+
+  /* ── Sections ───────────────────────────────────────────────── */
+  .section { margin: 0 0 44px; scroll-margin-top: 76px; }
+
+  .section-header {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 16px; padding-left: 14px; border-left: 4px solid var(--accent, var(--ink));
+  }
+  .section-title { font-family: var(--display); font-size: 21px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  .section-subtitle { font-size: 12.5px; color: var(--muted); margin: 2px 0 0; }
+  .section-count {
+    margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--muted);
+    white-space: nowrap; align-self: center;
+  }
+
+  /* ── Grid & cards ───────────────────────────────────────────── */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 14px;
   }
 
   .card {
     position: relative;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
-    padding: 18px; text-decoration: none; color: var(--text);
-    display: flex; flex-direction: column; gap: 10px;
-    transition: all 0.25s ease;
-    border-top: 3px solid var(--accent, var(--rose));
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px; text-decoration: none; color: var(--ink);
+    display: flex; flex-direction: column; gap: 8px;
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
   }
   .card:hover, .card:focus-visible {
-    transform: translateY(-4px);
-    border-color: var(--accent, var(--rose));
-    background: var(--surface-2);
+    transform: translateY(-3px);
+    border-color: var(--accent, var(--ink));
     outline: none;
-    box-shadow: 0 12px 28px -12px rgba(0,0,0,.35);
+    box-shadow: 0 10px 22px -14px rgba(0,0,0,.35);
   }
-  [data-theme="light"] .card:hover, [data-theme="light"] .card:focus-visible {
-    box-shadow: 0 12px 28px -12px rgba(0,0,0,.12);
+
+  .stamp {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .04em;
+    color: var(--accent, var(--ink)); border: 1px solid var(--accent, var(--ink));
+    border-radius: 4px; padding: 2px 7px; align-self: flex-start;
   }
-  .card:focus-visible { box-shadow: 0 0 0 2px var(--accent, var(--rose)); }
 
-  .card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .card h2 { margin: 2px 0 0; font-family: var(--display); font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .card p.desc { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.55; flex-grow: 1; }
 
-  .badge {
-    font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
-    color: var(--accent, var(--rose)); border: 1px solid var(--accent, var(--rose));
-    border-radius: 999px; padding: 3px 9px; text-transform: uppercase;
-    background: color-mix(in srgb, var(--accent, var(--rose)) 12%, transparent);
-  }
-  .ext { font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
-
-  .card h2 { margin: 0; font-size: 15.5px; font-weight: 600; line-height: 1.35; }
-  .card p  { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; flex-grow: 1; }
-
+  .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px; }
   .card .path {
-    font-family: var(--mono); font-size: 10.5px; color: var(--muted); opacity: .75;
+    font-family: var(--mono); font-size: 10px; color: var(--muted); opacity: .8;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-
   .card .go {
-    font-family: var(--mono); font-size: 11.5px; color: var(--accent, var(--rose));
-    display: flex; align-items: center; gap: 6px; margin-top: 2px;
+    font-size: 12px; font-weight: 600; color: var(--accent, var(--ink));
+    display: flex; align-items: center; gap: 4px; flex: none;
   }
-  .card .go svg { width: 12px; height: 12px; transition: transform 0.2s ease; }
-  .card:hover .go svg { transform: translateX(4px); }
+  .card .go svg { width: 11px; height: 11px; transition: transform .18s ease; }
+  .card:hover .go svg { transform: translateX(3px); }
 
-  .empty, .hint {
+  .empty {
     font-family: var(--mono); font-size: 12.5px; color: var(--muted);
-    border: 1px dashed var(--line); border-radius: 10px; padding: 16px; line-height: 1.7;
+    border: 1px dashed var(--line); border-radius: 8px; padding: 16px; line-height: 1.7;
   }
-  .hint code {
-    background: var(--surface-2); border: 1px solid var(--line);
-    padding: 1px 6px; border-radius: 4px; color: var(--gold);
-  }
+  .empty code { background: var(--paper); border: 1px solid var(--line); padding: 1px 6px; border-radius: 4px; }
 
-  /* ── Terminal repliable en bas ──────────────────────────────── */
-  .term-details { margin-top: 34px; }
-  .term-details summary {
-    font-family: var(--mono); font-size: 12.5px; color: var(--muted);
-    cursor: pointer; padding: 10px 0; user-select: none;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .term-details summary:hover { color: var(--text); }
-  .term-details summary::before { content: "▸"; color: var(--gold); transition: transform .2s; }
-  .term-details[open] summary::before { transform: rotate(90deg); }
+  /* ── Contact ────────────────────────────────────────────────── */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 22px; align-items: start; }
 
-  .term {
-    margin-top: 10px; background: var(--surface); border: 1px solid var(--line);
-    border-radius: 10px; overflow: hidden;
-    box-shadow: 0 20px 50px -20px rgba(0,0,0,.6);
+  .contact-info, .contact-form {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px;
   }
-  [data-theme="light"] .term { box-shadow: 0 20px 50px -20px rgba(0,0,0,.1); }
+  .contact-info h3 { font-family: var(--display); font-size: 15px; margin: 0 0 12px; }
+  .contact-info p { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0 0 14px; }
 
-  .term-bar {
-    display: flex; align-items: center; gap: 8px; padding: 10px 14px;
-    background: var(--surface-2); border-bottom: 1px solid var(--line);
+  .contact-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .contact-list li { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
+  .contact-list .ico {
+    width: 26px; height: 26px; border-radius: 6px; background: var(--paper); color: var(--clay);
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
   }
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot.r { background: #F17F7F; } .dot.y { background: #E3B341; } .dot.g { background: #4FD08A; }
-  .term-title { margin-left: 8px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .contact-list .ico svg { width: 13px; height: 13px; }
 
-  .term-body {
-    padding: 14px 18px 18px; font-family: var(--mono); font-size: 13px;
-    color: var(--muted); line-height: 1.75;
+  .fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .fg label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+  .fg input, .fg textarea {
+    font-family: var(--body); font-size: 13px; padding: 9px 11px; border-radius: 7px;
+    background: var(--paper); border: 1.5px solid var(--line); color: var(--ink);
+    transition: border-color .18s;
   }
-  .term-body .cmd { color: var(--text); }
-  .term-body .ok { color: var(--teal); }
-  #scan-status { white-space: pre-wrap; }
+  .fg input:focus, .fg textarea:focus { outline: none; border-color: var(--clay); }
+  .fg textarea { resize: vertical; min-height: 100px; font-family: var(--body); }
 
+  #form-fb { display: none; margin: 8px 0; padding: 9px 12px; border-radius: 7px; font-size: 12.5px; }
+
+  .send-btn {
+    width: 100%; padding: 11px; background: var(--ink); color: var(--paper); border: none;
+    border-radius: 7px; font-weight: 600; font-size: 13px; cursor: pointer;
+    transition: opacity .18s, transform .18s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .send-btn:hover { opacity: .85; }
+  .send-btn:disabled { opacity: .6; cursor: wait; }
+  .send-btn svg { width: 14px; height: 14px; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Footer ─────────────────────────────────────────────────── */
   footer {
-    margin-top: 40px; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
-    border-top: 1px solid var(--line); padding-top: 16px; text-align: center;
+    margin-top: 36px; font-family: var(--mono); font-size: 11px; color: var(--muted);
+    border-top: 1px solid var(--line); padding-top: 14px; text-align: center; line-height: 1.7;
   }
-  footer strong { color: var(--text); }
+  footer strong { color: var(--ink-soft); }
+
+  @media (max-width: 720px) { .contact-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <button class="theme-toggle" id="themeToggle" aria-label="Basculer le thème">
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-      </svg>
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
-    </button>
 
-    <div class="eyebrow">Techno-Info <span class="path">/ index.html</span></div>
-    <h1>Portail de Cours<span class="caret">&nbsp;</span></h1>
-    <p class="sub">Tous les cours et ressources classés par module — visibles immédiatement.</p>
-  </header>
-
-  <!-- Stats -->
-  <div class="stats-bar">
-    <div class="stat-item">
-      <div class="stat-icon gold">📚</div>
-      <div><div class="stat-value" id="total-count">7</div><div class="stat-label">Ressources</div></div>
+<nav class="navbar">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark">TI</span>
+      <span class="brand-text">Techno-Info</span>
+    </a>
+    <div class="nav-links">
+      <a href="#cours">Cours locaux</a>
+      <a href="#occ">OCC</a>
+      <a href="#asr">ASR</a>
     </div>
-    <div class="stat-item">
-      <div class="stat-icon violet">📂</div>
-      <div><div class="stat-value">3</div><div class="stat-label">Modules</div></div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-icon teal">✓</div>
-      <div><div class="stat-value">Prêt</div><div class="stat-label">Statut</div></div>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Basculer le thème">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <a href="#contact" class="nav-contact">Contact</a>
     </div>
   </div>
+</nav>
 
-  <!-- ══ MODULE 1 : COURS LOCAUX (affichés en premier) ══ -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-icon gold">📄</div>
+<div class="wrap" id="top">
+
+  <header class="hero">
+    <div class="hero-kicker">Fiche catalogue — mise à jour continue</div>
+    <h1>Le portail des cours de Techno-Info</h1>
+    <p class="sub">Tous les supports classés par module. Ajoutez un fichier .html à la racine et il apparaît ici automatiquement.</p>
+    <div class="hero-meta"><strong id="total-count">7</strong> ressources réparties sur <strong>3</strong> modules</div>
+  </header>
+
+  <!-- ══ MODULE 1 : COURS LOCAUX ══ -->
+  <div class="section" id="cours">
+    <div class="section-header" style="--accent: var(--mustard);">
       <div>
-        <h2 class="section-title">Cours Locaux</h2>
+        <h2 class="section-title">Cours locaux</h2>
         <p class="section-subtitle">Fichiers HTML à la racine de Techno-Info</p>
       </div>
       <span class="section-count" id="course-count">…</span>
     </div>
     <div class="grid" id="grid"></div>
-    <div class="hint" id="server-hint" style="display:none; margin-top:14px;">
+    <div class="empty" id="server-hint" style="display:none; margin-top:14px;">
       Détection automatique indisponible (ouverture directe sans serveur). Liste de secours utilisée.
       Pour activer le scan : <code>python3 -m http.server 8000</code> puis <code>http://localhost:8000/</code>
     </div>
   </div>
 
   <!-- ══ MODULE 2 : OCC ══ -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-icon teal">🔒</div>
+  <div class="section" id="occ">
+    <div class="section-header" style="--accent: var(--forest);">
       <div>
         <h2 class="section-title">OCC — IoT Cyber Academy</h2>
         <p class="section-subtitle">Cybersécurité appliquée à l'Internet des Objets</p>
@@ -302,68 +295,86 @@
       <span class="section-count">2 ressources</span>
     </div>
     <div class="grid">
-      <a href="OCC/iot-cyber-academy-pratique/index.html" class="card" style="--accent: var(--teal);">
-        <div class="card-top"><span class="badge">OCC · Pratique</span><span class="ext">/index.html</span></div>
+      <a href="OCC/iot-cyber-academy-pratique/index.html" class="card" style="--accent: var(--forest);">
+        <span class="stamp">OCC-P</span>
         <h2>IoT Cyber Academy — Pratique</h2>
-        <p>Exercices pratiques, laboratoires et projets hands-on en cybersécurité IoT</p>
-        <span class="path">OCC/iot-cyber-academy-pratique/</span>
-        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <p class="desc">Exercices pratiques, laboratoires et projets hands-on en cybersécurité IoT.</p>
+        <div class="card-foot">
+          <span class="path">OCC/iot-cyber-academy-pratique/</span>
+          <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
       </a>
-      <a href="OCC/iot-cyber-academy-th%C3%A9orique/index.html" class="card" style="--accent: var(--violet);">
-        <div class="card-top"><span class="badge">OCC · Théorie</span><span class="ext">/index.html</span></div>
+      <a href="OCC/iot-cyber-academy-th%C3%A9orique/index.html" class="card" style="--accent: var(--mustard);">
+        <span class="stamp" style="color:var(--mustard); border-color:var(--mustard);">OCC-T</span>
         <h2>IoT Cyber Academy — Théorique</h2>
-        <p>Cours théoriques, concepts fondamentaux et documentation de référence</p>
-        <span class="path">OCC/iot-cyber-academy-théorique/</span>
-        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <p class="desc">Cours théoriques, concepts fondamentaux et documentation de référence.</p>
+        <div class="card-foot">
+          <span class="path">OCC/iot-cyber-academy-théorique/</span>
+          <span class="go" style="color:var(--mustard);">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
       </a>
     </div>
   </div>
 
   <!-- ══ MODULE 3 : ASR ══ -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-icon violet">🌐</div>
+  <div class="section" id="asr">
+    <div class="section-header" style="--accent: var(--clay);">
       <div>
-        <h2 class="section-title">ASR — Administration Systèmes & Réseaux</h2>
+        <h2 class="section-title">ASR — Administration Systèmes &amp; Réseaux</h2>
         <p class="section-subtitle">Administration systèmes et infrastructure réseau</p>
       </div>
       <span class="section-count">2 ressources</span>
     </div>
     <div class="grid">
-      <a href="ASR/practice-site/index.html" class="card" style="--accent: var(--teal);">
-        <div class="card-top"><span class="badge">ASR · Pratique</span><span class="ext">/index.html</span></div>
+      <a href="ASR/practice-site/index.html" class="card" style="--accent: var(--forest);">
+        <span class="stamp" style="color:var(--forest); border-color:var(--forest);">ASR-P</span>
         <h2>ASR — Practice Site</h2>
-        <p>Laboratoires pratiques, exercices d'administration systèmes et réseaux</p>
-        <span class="path">ASR/practice-site/</span>
-        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <p class="desc">Laboratoires pratiques, exercices d'administration systèmes et réseaux.</p>
+        <div class="card-foot">
+          <span class="path">ASR/practice-site/</span>
+          <span class="go" style="color:var(--forest);">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
       </a>
-      <a href="ASR/theory-site/index.html" class="card" style="--accent: var(--violet);">
-        <div class="card-top"><span class="badge">ASR · Théorie</span><span class="ext">/index.html</span></div>
+      <a href="ASR/theory-site/index.html" class="card" style="--accent: var(--clay);">
+        <span class="stamp">ASR-T</span>
         <h2>ASR — Theory Site</h2>
-        <p>Documentation théorique, concepts et ressources d'apprentissage ASR</p>
-        <span class="path">ASR/theory-site/</span>
-        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <p class="desc">Documentation théorique, concepts et ressources d'apprentissage ASR.</p>
+        <div class="card-foot">
+          <span class="path">ASR/theory-site/</span>
+          <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
       </a>
     </div>
   </div>
 
-  <!-- Terminal repliable en bas -->
-  <details class="term-details">
-    <summary>bash — scan du dossier courant (détails techniques)</summary>
-    <div class="term">
-      <div class="term-bar">
-        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-        <span class="term-title">bash — scan du dossier courant</span>
-      </div>
-      <div class="term-body">
-        <div><span class="cmd">$</span> ls -1 *.html | grep -v index.html</div>
-        <div id="scan-status">…</div>
+  <!-- ══ CONTACT ══ -->
+  <div class="section" id="contact">
+    <div class="section-header" style="--accent: var(--clay);">
+      <div>
+        <h2 class="section-title">Contact &amp; remarques</h2>
+        <p class="section-subtitle">Une question, une suggestion, un bug ? Écrivez-moi directement</p>
       </div>
     </div>
-  </details>
+
+    <div class="contact-grid">
+
+      <form class="contact-form" id="contactForm" onsubmit="event.preventDefault(); sendMsg();">
+        <div class="fg"><label for="fn">Nom</label><input id="fn" type="text" placeholder="Votre nom complet" required /></div>
+        <div class="fg"><label for="fe">Email</label><input id="fe" type="email" placeholder="votre@email.com" required /></div>
+        <div class="fg"><label for="fs">Objet</label><input id="fs" type="text" placeholder="Remarque, bug, suggestion…" required /></div>
+        <div class="fg"><label for="fm">Contenu</label><textarea id="fm" placeholder="Décrivez votre remarque ou message en détail…" required></textarea></div>
+        <div id="form-fb" role="status"></div>
+        <button type="submit" class="send-btn" id="send-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Envoyer le message
+        </button>
+      </form>
+    </div>
+  </div>
 
   <footer>
-    <strong>Techno-Info</strong> — Portail centralisé de cours · Ajoutez un .html à la racine, il apparaît automatiquement
+    <strong>Techno-Info</strong> — portail centralisé de cours · ajoutez un .html à la racine, il apparaît automatiquement<br>
+    © 2026 RAKOTONDRAZAKA N. Mirajo · Antananarivo · Madagascar
   </footer>
 </div>
 
@@ -377,14 +388,14 @@ const themeManager = {
     document.getElementById('themeToggle').addEventListener('click', () => this.toggle());
   },
   toggle() {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
     this.setTheme(current === 'dark' ? 'light' : 'dark');
   },
   setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-    document.querySelector('.icon-sun').style.display  = theme === 'light' ? 'none'  : 'block';
-    document.querySelector('.icon-moon').style.display = theme === 'light' ? 'block' : 'none';
+    document.querySelector('.icon-sun').style.display  = theme === 'light' ? 'block' : 'none';
+    document.querySelector('.icon-moon').style.display = theme === 'light' ? 'none'  : 'block';
   }
 };
 
@@ -396,13 +407,12 @@ const FALLBACK_COURSES = [
 ];
 
 const ACCENT_MAP = {
-  gold:   { keywords: ['sage', 'gestion'], label: 'gestion' },
-  violet: { keywords: ['csharp', 'c#', '.net', 'dev'], label: 'dev' },
-  teal:   { keywords: ['machine', 'ml', 'ia', 'data', 'ai'], label: 'data' }
+  mustard: { keywords: ['sage', 'gestion'] },
+  clay:    { keywords: ['csharp', 'c#', '.net', 'dev'] },
+  forest:  { keywords: ['machine', 'ml', 'ia', 'data', 'ai'] }
 };
-const ACCENT_COLORS = ['gold', 'violet', 'teal', 'rose'];
+const ACCENT_COLORS = ['mustard', 'forest', 'clay'];
 
-// ══ Utilitaires ══
 function selectAccent(filename) {
   const normalized = filename.toLowerCase();
   for (const [color, config] of Object.entries(ACCENT_MAP)) {
@@ -438,27 +448,29 @@ function renderCourseCards(courses) {
   grid.innerHTML = '';
 
   courseCount.textContent = `${courses.length} cours`;
-  totalCount.textContent = courses.length + 4; // + 4 ressources des modules
+  totalCount.textContent = courses.length + 4;
 
   if (courses.length === 0) {
     grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">Aucun fichier .html à la racine.<br>Déposez un cours ici et rechargez la page.</div>`;
     return;
   }
 
-  courses.forEach(course => {
+  courses.forEach((course, i) => {
     const accent = selectAccent(course.file);
-    const label = Object.entries(ACCENT_MAP).find(([c]) => c === accent)?.[1]?.label || 'local';
+    const code = `TI-${String(i + 1).padStart(2, '0')}`;
 
     const card = document.createElement('a');
     card.className = 'card';
     card.href = encodeURI(course.file);
     card.style.setProperty('--accent', `var(--${accent})`);
     card.innerHTML = `
-      <div class="card-top"><span class="badge">${label}</span><span class="ext">.html</span></div>
+      <span class="stamp">${code}</span>
       <h2>${course.fallbackTitle || formatTitle(course.file)}</h2>
       <p class="desc">Ouvrir le cours…</p>
-      <span class="path">./${course.file}</span>
-      <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div class="card-foot">
+        <span class="path">./${course.file}</span>
+        <span class="go">Ouvrir <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
     `;
     grid.appendChild(card);
 
@@ -481,18 +493,63 @@ async function detectViaDirectoryListing() {
   return links.map(file => ({ file, fallbackTitle: null }));
 }
 
+// ══ EmailJS — envoi du formulaire de contact ══
+function showFb(msg, ok) {
+  const fb = document.getElementById('form-fb');
+  fb.style.display = 'block';
+  fb.textContent = msg;
+  if (ok) {
+    fb.style.background = 'color-mix(in srgb, var(--forest) 15%, transparent)';
+    fb.style.color = 'var(--forest)';
+    fb.style.border = '1px solid color-mix(in srgb, var(--forest) 35%, transparent)';
+  } else {
+    fb.style.background = 'color-mix(in srgb, var(--clay) 15%, transparent)';
+    fb.style.color = 'var(--clay)';
+    fb.style.border = '1px solid color-mix(in srgb, var(--clay) 35%, transparent)';
+  }
+}
+
+async function sendMsg() {
+  const btn = document.getElementById('send-btn');
+  const n = document.getElementById('fn').value.trim();
+  const e = document.getElementById('fe').value.trim();
+  const s = document.getElementById('fs').value.trim();
+  const m = document.getElementById('fm').value.trim();
+
+  if (!n || !e || !s || !m) { showFb('⚠️ Veuillez remplir tous les champs.', false); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { showFb('⚠️ Email invalide.', false); return; }
+
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;"></span> Envoi en cours…';
+
+  try {
+    if (typeof emailjs === 'undefined') throw new Error('EmailJS non chargé');
+    emailjs.init('pSjJNGMwvt6SCnsTK');
+    await emailjs.send('service_dxc6yjq', 'template_sish3vb', {
+      from_name: n, from_email: e, subject: s, message: m,
+      to_name: 'Mirajo Henry', reply_to: e
+    });
+    showFb('✅ Message envoyé avec succès ! Je vous répondrai rapidement.', true);
+    ['fn', 'fe', 'fs', 'fm'].forEach(id => document.getElementById(id).value = '');
+    btn.innerHTML = '✓ Envoyé';
+    setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 3500);
+  } catch (err) {
+    console.error('Erreur EmailJS :', err);
+    showFb("❌ Échec de l'envoi. Réessayez ou écrivez-moi directement à mirajohenry@gmail.com", false);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
 // ══ Initialisation ══
 async function initialize() {
   themeManager.init();
-  const scanStatus = document.getElementById('scan-status');
   try {
     const files = await detectViaDirectoryListing();
-    scanStatus.innerHTML = files.map(f => `<span class="ok">✓</span> ${f.file}`).join('\n') || 'aucun fichier';
     renderCourseCards(files);
   } catch {
     document.getElementById('server-hint').style.display = 'block';
-    scanStatus.innerHTML = FALLBACK_COURSES.map(f =>
-      `<span class="ok">✓</span> ${f.file} <span style="color:var(--muted)">(liste de secours)</span>`).join('\n');
     renderCourseCards(FALLBACK_COURSES);
   }
 }
